@@ -28,16 +28,19 @@ import javax.swing.JPanel;
  */
 public class Panel extends JPanel {
 
-    public static final int RADIUS = 30;
+    public static final int DIAMETER = 30;
 
     @Override
     public void paint(Graphics g) {
         Graphics2D gr2d = (Graphics2D) g;
         gr2d.setBackground(Color.white);
 
-        //long diag = Math.round(Math.sqrt(2 * RADIUS * RADIUS));
         for (Pawn pawn : Game.pawns) {
-            gr2d.drawOval(Math.round(pawn.getX()) - RADIUS, Math.round(pawn.getY()) + RADIUS, RADIUS, RADIUS);
+            int x = Math.round(pawn.getX());
+            int y = Math.round(pawn.getY());
+            gr2d.drawOval(x-DIAMETER/2, y-DIAMETER/2, DIAMETER, DIAMETER);
+            gr2d.drawLine(x, y, (int) Math.round(x+Math.cos(pawn.getAbsAngle())*DIAMETER),
+                    (int) Math.round(y+Math.sin(pawn.getAbsAngle())*DIAMETER));
         }
 
     }
