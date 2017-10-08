@@ -59,7 +59,7 @@ public class UpdThread extends Thread {
         }
 
         Game.viewStats();
-        Game.evolution(Game.pawns);
+        Game.pawns = Game.evolution(Game.pawns);
     }
 
     private void processPawns() {
