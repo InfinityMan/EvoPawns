@@ -32,20 +32,28 @@ public final class Pawn extends Agent {
     public static final double MAX_SPEED = 16;
 
     /*
-    Inputs of neuron net:
-        0: speed [0;1]
-        1: absolute angle of movement [0;360)
-        2: mass
-        3: relative angle to nearest enemy [-180;180)
-    Outputs:
-        0: new speed
-        1: new absolute angle
-        2: shoot price [0;10]
+        Inputs of neuron net:
+    0: speed [0;1]
+    1: absolute angle of movement [0;360)
+    2: mass
+    3: relative angle to nearest food [-180;180)
+    4: distance to nearest food
+    5: relative angle to nearest enemy [-180;180)
+    6: distamce to nearest enemy
+        Outputs:
+    0: new speed
+    1: new absolute angle
+    2: shoot price [0;10]
      */
 
     private double mass; // (0;1000]
+    
     private double rltAngleToEnemy; // [-180;180)
+    private double rltAngleToFood; // [-180;180)
 
+    private float distanceToEnemy;
+    private float distanceToFood;
+    
     public Network network;
 
     public double newSpeed;
@@ -75,7 +83,8 @@ public final class Pawn extends Agent {
      * Calculate out parameters from input parameters by network.
      */
     public void calculate() {
-        double[] in = {getSpeed(), getAbsAngle(), mass, rltAngleToEnemy};
+        double[] in = {getSpeed(), getAbsAngle(), getMass(), getRltAngleToFood(),
+            getDistanceToFood(), getRltAngleToEnemy(), getDistanceToEnemy()};
         double[] out = {newSpeed, newAbsAngle, shootPrice};
 
         network.calculate(in, out, true);
@@ -212,6 +221,61 @@ public final class Pawn extends Agent {
     public void setRltAngleToEnemy(double rltAngleToEnemy) {
         this.rltAngleToEnemy = rltAngleToEnemy;
     }
+    
+    /**
+     * Get the value of rltAngleToFood
+     *
+     * @return the value of rltAngleToFood
+     */
+    public double getRltAngleToFood() {
+        return rltAngleToFood;
+    }
+
+    /**
+     * Set the value of rltAngleToFood
+     *
+     * @param rltAngleToFood new value of rltAngleToFood
+     */
+    public void setRltAngleToFood(double rltAngleToFood) {
+        this.rltAngleToFood = rltAngleToFood;
+    }
+
+    /**
+     * Get the value of distanceToEnemy
+     *
+     * @return the value of distanceToEnemy
+     */
+    public float getDistanceToEnemy() {
+        return distanceToEnemy;
+    }
+
+    /**
+     * Set the value of distanceToEnemy
+     *
+     * @param distanceToEnemy new value of distanceToEnemy
+     */
+    public void setDistanceToEnemy(float distanceToEnemy) {
+        this.distanceToEnemy = distanceToEnemy;
+    }
+    
+    /**
+     * Get the value of distanceToFood
+     *
+     * @return the value of distanceToFood
+     */
+    public float getDistanceToFood() {
+        return distanceToFood;
+    }
+
+    /**
+     * Set the value of distanceToFood
+     *
+     * @param distanceToFood new value of distanceToFood
+     */
+    public void setDistanceToFood(float distanceToFood) {
+        this.distanceToFood = distanceToFood;
+    }
+
 
     public void setNewSpeed(double newSpeed) {
         if (newSpeed >= 0 && newSpeed <= 1) {
