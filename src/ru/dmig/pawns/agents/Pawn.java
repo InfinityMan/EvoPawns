@@ -46,8 +46,6 @@ public final class Pawn extends Agent {
     2: shoot price [0;10]
      */
 
-    private double mass; // (0;1000]
-    
     private double rltAngleToEnemy; // [-180;180)
     private double rltAngleToFood; // [-180;180)
 
@@ -66,10 +64,12 @@ public final class Pawn extends Agent {
     public float foodGathered = 0;
 
     public Pawn(float x, float y, Network network) {
-        super(0.2,0,x,y);
+        super(0.2,0,x,y,100);
         
-        setMass(100);
-        setRltAngleToEnemy(0); //TODO
+        setRltAngleToEnemy(0);
+        setRltAngleToFood(0);
+        setDistanceToEnemy(0);
+        setDistanceToFood(0);
 
         this.network = network;
 
@@ -107,6 +107,10 @@ public final class Pawn extends Agent {
         } catch (IllegalArgumentException e) {
             setShootPrice(0);
         }
+        
+        if(shootPrice > 0) {
+            Game.newBullet(getX(), getY(), getAbsAngle(), shootPrice, this);
+        }
     }
 
     /**
@@ -116,7 +120,7 @@ public final class Pawn extends Agent {
      */
     public double calcFitness() {
         double distanceFit = 0.5 * distance;
-        double massFit = 8 * mass;
+        double massFit = 8 * getMass();
         double warFit = 0;
         if(totalDamageUsed > 0) {
             warFit = (8 * damageCaused) / totalDamageUsed;
@@ -195,24 +199,6 @@ public final class Pawn extends Agent {
         } else if(getMass() > 700 && getMass() <= 1000) {
             return 3;
         } else throw new IllegalStateException();
-    }
-
-    /**
-     * Get the value of mass
-     *
-     * @return the value of mass
-     */
-    public double getMass() {
-        return mass;
-    }
-
-    /**
-     * Set the value of mass
-     *
-     * @param mass new value of mass
-     */
-    public void setMass(double mass) {
-        this.mass = mass;
     }
 
     /**
@@ -305,7 +291,7 @@ public final class Pawn extends Agent {
     }
 
     public void setShootPrice(double shootPrice) {
-        if (shootPrice >= 0 && shootPrice <= 10) {
+        if (shootPrice >= 0 && shootPrice <= 50) {
             this.shootPrice = shootPrice;
         } else {
             throw new IllegalArgumentException();
