@@ -81,7 +81,9 @@ public class Agent {
      * @param speed new value of speed
      */
     public final void setSpeed(double speed) {
-        this.speed = speed;
+        if(speed >= 0 && speed <= 1) {
+            this.speed = speed;
+        } else throw new IllegalArgumentException();
     }
 
     /**
@@ -99,7 +101,9 @@ public class Agent {
      * @param absAngle new value of absAngle
      */
     public final void setAbsAngle(double absAngle) {
-        this.absAngle = absAngle;
+        if(absAngle >= 0 && absAngle < 360) {
+            this.absAngle = absAngle;
+        } throw new IllegalArgumentException();
     }
 
     
