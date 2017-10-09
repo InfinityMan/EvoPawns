@@ -16,6 +16,7 @@
  */
 package ru.dmig.pawns;
 
+import ru.dmig.pawns.agents.Pawn;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;

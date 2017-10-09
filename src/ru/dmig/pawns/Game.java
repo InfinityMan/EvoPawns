@@ -16,6 +16,7 @@
  */
 package ru.dmig.pawns;
 
+import ru.dmig.pawns.agents.Pawn;
 import java.util.ArrayList;
 import ru.epiclib.base.Arrayer;
 import ru.epiclib.base.Base;
