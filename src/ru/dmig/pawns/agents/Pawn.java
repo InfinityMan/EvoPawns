@@ -61,6 +61,9 @@ public final class Pawn extends Agent {
     public double shootPrice;
 
     public float distance = 0;
+    public float damageCaused = 0;
+    public float totalDamageUsed = 0;
+    public float foodGathered = 0;
 
     public Pawn(float x, float y, Network network) {
         super(0.2,0,x,y);
@@ -112,7 +115,15 @@ public final class Pawn extends Agent {
      * @return Fitness of this pawn
      */
     public double calcFitness() {
-        return distance;
+        double distanceFit = 0.5 * distance;
+        double massFit = 8 * mass;
+        double warFit = 0;
+        if(totalDamageUsed > 0) {
+            warFit = (8 * damageCaused) / totalDamageUsed;
+        }
+        double foodFit = foodGathered;
+        
+        return distanceFit + massFit + warFit + foodFit;
     }
     
     /**
