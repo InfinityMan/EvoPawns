@@ -105,6 +105,77 @@ public final class Pawn extends Agent {
     public double calcFitness() {
         return distance;
     }
+    
+    /**
+     * Add mass gathered from food
+     * @param food Full food amount
+     */
+    public void feed(double food) {
+        double energyGathered = food;
+        switch (getCategory()) {
+            case 0:
+                //Nothing to change
+                break;
+            case 1:
+                energyGathered = energyGathered * 3 / 4;
+                break;
+            case 2:
+                energyGathered = energyGathered * 2 / 5;
+                break;
+            case 3:
+                energyGathered = energyGathered / 10;
+                break;
+            default:
+                throw new AssertionError();
+        }
+        setMass(getMass() + energyGathered);
+    }
+    
+    /**
+     * Remove mass from pawn by attack damage
+     * @param damage Full food amount
+     */
+    public void attack(double damage) {
+        double damageGet = damage;
+        switch (getCategory()) {
+            case 0:
+                damageGet = damageGet / 2;
+                break;
+            case 1:
+                //Nothing to change
+                break;
+            case 2:
+                damageGet = damageGet * 2;
+                break;
+            case 3:
+                damageGet = damageGet * 4;
+                break;
+            default:
+                throw new AssertionError();
+        }
+        setMass(getMass() - damageGet);
+    }
+    
+    /**
+     * Get category of pawn.
+     * If mass:
+     * 0 < x < 100 : 0
+     * 100 < x < 400 : 1
+     * 400 < x < 700 : 2
+     * 700 < x < 1000 : 3
+     * @return code of category
+     */
+    public int getCategory() {
+        if(getMass() >= 0 && getMass() <= 100) {
+            return 0;
+        } else if(getMass() > 100 && getMass() <= 400) {
+            return 1;
+        } else if(getMass() > 400 && getMass() <= 700) {
+            return 2;
+        } else if(getMass() > 700 && getMass() <= 1000) {
+            return 3;
+        } else throw new IllegalStateException();
+    }
 
     /**
      * Get the value of mass
