@@ -25,6 +25,8 @@ import ru.dmig.pawns.Game;
  */
 public class Agent {
     
+    public static final float MAX_BULLET_SPEED = 60;
+    
     public enum Type {PAWN, BULLET, FOOD};
     
     public Type t = Type.PAWN;
@@ -35,16 +37,21 @@ public class Agent {
     private float x;
     private float y;
     
-    public Agent(double speed, double absAngle, float x, float y) {
+    private double mass; // (0;1000]
+    public Pawn authorOfBullet;
+    
+    public Agent(double speed, double absAngle, float x, float y, double mass) {
         this.speed = 0;
         this.absAngle = 0;
         this.x = 0;
         this.y = 0;
+        this.mass = 0;
 
         setSpeed(speed);
         setAbsAngle(absAngle);
         addX(x);
         addY(y);
+        setMass(mass);
     }
     
     public Agent(float x, float y) {
@@ -157,6 +164,24 @@ public class Agent {
         } else {
             this.y += y;
         }
+    }
+    
+    /**
+     * Get the value of mass
+     *
+     * @return the value of mass
+     */
+    public final double getMass() {
+        return mass;
+    }
+
+    /**
+     * Set the value of mass
+     *
+     * @param mass new value of mass
+     */
+    public final void setMass(double mass) {
+        this.mass = mass;
     }
 
     
