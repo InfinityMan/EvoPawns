@@ -25,6 +25,10 @@ import ru.dmig.pawns.Game;
  */
 public class Agent {
     
+    public enum Type {PAWN, BULLET, FOOD};
+    
+    public Type t = Type.PAWN;
+    
     private double speed; // [0;1]
     private double absAngle; // [0;360)
     
