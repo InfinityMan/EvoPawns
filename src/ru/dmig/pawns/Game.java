@@ -33,7 +33,7 @@ public class Game {
     /**
      * Amount of pawns for game
      */
-    public static final int AMOUNT_OF_PAWNS = 20;
+    public static final int AMOUNT_OF_PAWNS = 1;
 
     /**
      * Interplanetary pawns array
@@ -85,7 +85,7 @@ public class Game {
     /**
      * Amount of rounds (generations) to play
      */
-    public static final int AMOUNT_OF_ROUNDS = 50;
+    public static final int AMOUNT_OF_ROUNDS = 1000;
 
     /**
      * Chance of mutation of every paricular weight. From 0 to 100. "By definition at 100 mutation rate, every variable is chosen randomly each generation and no information is retained."
@@ -93,6 +93,9 @@ public class Game {
     public static final int MUTATION_RATE = 5;
     
     public static final int FOOD_AMOUNT = AMOUNT_OF_PAWNS + 3;
+    
+    public static final int MIN_MASS_OF_FOOD = 5;
+    public static final int MAX_MASS_OF_FOOD = 7;
 
     public static void main(String[] args) throws InterruptedException {
 
@@ -139,8 +142,8 @@ public class Game {
     
     public static void generateFood(int amount) {
         for (int i = 0; i < amount; i++) {
-            foods.add(new Agent(Base.randomNumber(0, LENGTH_OF_FIELD), 
-                Base.randomNumber(0, HEIGHT_OF_FIELD)));
+            foods.add(new Agent(0,0,Base.randomNumber(0, LENGTH_OF_FIELD), 
+                Base.randomNumber(0, HEIGHT_OF_FIELD),Base.randomNumber(MIN_MASS_OF_FOOD, MAX_MASS_OF_FOOD)));
         }
     }
 
@@ -200,40 +203,60 @@ public class Game {
      */
     public static Pawn[] evolution(Pawn[] pawns) {
         int i;
-        double[] fitnesses = new double[AMOUNT_OF_PAWNS];
-        for (i = 0; i < pawns.length; i++) {
-            fitnesses[i] = pawns[i].calcFitness();
-        }
+        if (pawns.length > 3) {
+            double[] fitnesses = new double[AMOUNT_OF_PAWNS];
+            for (i = 0; i < pawns.length; i++) {
+                fitnesses[i] = pawns[i].calcFitness();
+            }
 
-        //Crossover
-        int[] parents = getParents(fitnesses); //test for %4
-        double[][] newGens = new double[AMOUNT_OF_PAWNS][];
-        for (i = 0; i < parents.length; i += 2) {
-            double[] genomA = weightsIntoGenom(pawns[parents[i]].network.getWeights());
-            double[] genomB = weightsIntoGenom(pawns[parents[i + 1]].network.getWeights());
-            double[] genomAB = new double[genomA.length];
-            double[] genomBA = new double[genomB.length];
-            EvoAlg.crossover(genomA, genomB, genomAB, genomBA);
-            newGens[i] = genomA;
-            newGens[i + 1] = genomB;
-            newGens[AMOUNT_OF_PAWNS - i - 1] = genomAB;
-            newGens[AMOUNT_OF_PAWNS - i - 2] = genomBA;
-        }
-        //Mutation
-        for (i = 0; i < newGens.length; i++) {
-            for (int j = 0; j < newGens[i].length; j++) {
-                if (Base.chance(MUTATION_RATE, 0)) {
-                    newGens[i][j] = Math.random(); //TODO mutation
+            //Crossover
+            int[] parents = getParents(fitnesses); //test for %4
+            double[][] newGens = new double[AMOUNT_OF_PAWNS][];
+            for (i = 0; i < parents.length; i += 2) {
+                double[] genomA = weightsIntoGenom(pawns[parents[i]].network.getWeights());
+                double[] genomB = weightsIntoGenom(pawns[parents[i + 1]].network.getWeights());
+                double[] genomAB = new double[genomA.length];
+                double[] genomBA = new double[genomB.length];
+                EvoAlg.crossover(genomA, genomB, genomAB, genomBA);
+                newGens[i] = genomA;
+                newGens[i + 1] = genomB;
+                newGens[AMOUNT_OF_PAWNS - i - 1] = genomAB;
+                newGens[AMOUNT_OF_PAWNS - i - 2] = genomBA;
+            }
+            //Mutation
+            for (i = 0; i < newGens.length; i++) {
+                for (int j = 0; j < newGens[i].length; j++) {
+                    if (Base.chance(MUTATION_RATE, 0)) {
+                        newGens[i][j] = Math.random(); //TODO mutation
+                    }
                 }
             }
+            //Creating new pawns from gens
+            Pawn[] newPawns = new Pawn[AMOUNT_OF_PAWNS];
+            for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
+                newPawns[i] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
+                newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
+            }
+            return newPawns;
+        } else {
+            double[][] newGens = new double[AMOUNT_OF_PAWNS][];
+            for (int j = 0; j < newGens.length; j++) {
+                newGens[j] = weightsIntoGenom(pawns[j].network.getWeights());
+            }
+            for (i = 0; i < newGens.length; i++) {
+                for (int j = 0; j < newGens[i].length; j++) {
+                    if (Base.chance(MUTATION_RATE, 0)) {
+                        newGens[i][j] = Math.random(); //TODO mutation
+                    }
+                }
+            }
+            Pawn[] newPawns = new Pawn[AMOUNT_OF_PAWNS];
+            for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
+                newPawns[i] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
+                newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
+            }
+            return newPawns;
         }
-        //Creating new pawns from gens
-        Pawn[] newPawns = new Pawn[AMOUNT_OF_PAWNS];
-        for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
-            newPawns[i] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
-            newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
-        }
-        return newPawns;
     }
 
     /**
@@ -286,6 +309,7 @@ public class Game {
         double fit = Arrayer.maxDoubleInArray(fitnesses);
         System.out.println("Fittest: " + fit);
         System.out.println("Average: " + avg);
+        System.out.println("Food: "+pawns[0].foodGathered);
         
         ChartPanel.cp.update(fit, avg);
     }

@@ -72,6 +72,8 @@ public class UpdThread extends Thread {
         Pawn[] pawns = Game.pawns;
 
         for (int i = 0; i < Game.AMOUNT_OF_PAWNS; i++) {
+            
+            setRelatives(pawns[i]);
 
             pawns[i].calculate();
 
@@ -121,7 +123,8 @@ public class UpdThread extends Thread {
                         Game.pawns[i].getY() + Panel.PAWN_DIAMETER/2 >= food.getY() && 
                         Game.pawns[i].getY() - Panel.PAWN_DIAMETER/2 <= food.getY()) {
                     Game.pawns[i].feed(food.getMass());
-                    //System.out.println("Boom");
+                    System.out.println("pawn: "+i+"; mass: "+food.getMass());
+                    System.out.println("Boom");
                 }
             }
         }
@@ -129,11 +132,21 @@ public class UpdThread extends Thread {
     
     private void setRelatives(Pawn p) {
         Agent nearestFood = Game.foods.get(getNearestFood(p.getX(), p.getY()));
-        double xDiff = Math.abs(p.getX() - nearestFood.getX());
-        double yDiff = Math.abs(p.getY() - nearestFood.getY());
+        double x = p.getX() - nearestFood.getX();
+        double y = p.getY() - nearestFood.getY();
+        double xDiff = Math.abs(x);
+        double yDiff = Math.abs(y);
         double distance = Math.sqrt(xDiff*xDiff + yDiff*yDiff);
         p.setDistanceToFood((float) distance);
-        p.setRltAngleToFood(Math.asin(yDiff));
+        int degreeToAdd = 0; //if x > 0 && y > 0
+        if(x > 0 && y < 0) {
+            degreeToAdd = 90;
+        } else if(x < 0 && y < 0) {
+            degreeToAdd = 180;
+        } else {
+            degreeToAdd = 270;
+        }
+        p.setRltAngleToFood(degreeToAdd + Math.atan(y/x));
     }
     
     private int getNearestFood(float x, float y) {
