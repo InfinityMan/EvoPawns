@@ -47,8 +47,16 @@ public class Agent {
         this.y = 0;
         this.mass = 0;
 
-        setSpeed(speed);
-        setAbsAngle(absAngle);
+        try {
+            setSpeed(speed);
+        } catch (IllegalArgumentException e) {
+            setSpeed(0);
+        }
+        try {
+            setAbsAngle(0);
+        } catch (IllegalArgumentException e) {
+            setAbsAngle(0);
+        }
         addX(x);
         addY(y);
         setMass(mass);
@@ -68,7 +76,7 @@ public class Agent {
      * Updating coordinates of agent by current speed and angle
      */
     public void updateCoords() {
-        double mov = getSpeed() * Pawn.MAX_SPEED;
+        double mov = getSpeed() * MAX_BULLET_SPEED;
         double angle = getAbsAngle();
         float xMov = (float) (Math.cos(angle) * mov);
         float yMov = (float) (Math.sin(angle) * mov);
@@ -91,7 +99,7 @@ public class Agent {
      *
      * @param speed new value of speed
      */
-    public final void setSpeed(double speed) {
+    public final void setSpeed(double speed) throws IllegalArgumentException {
         if(speed >= 0 && speed <= 1) {
             this.speed = speed;
         } else throw new IllegalArgumentException();
@@ -111,12 +119,12 @@ public class Agent {
      *
      * @param absAngle new value of absAngle
      */
-    public final void setAbsAngle(double absAngle) {
-        if(absAngle >= 0 && absAngle < 360) {
+    public final void setAbsAngle(double absAngle) throws IllegalArgumentException {
+        //System.out.println(absAngle >= 0 && absAngle < 360);
+        //if(absAngle >= 0 && absAngle < 360) {
             this.absAngle = absAngle;
-        } throw new IllegalArgumentException();
+        //} throw new IllegalArgumentException();
     }
-
     
     /**
      * Get the value of x
@@ -133,12 +141,22 @@ public class Agent {
      * @param x addend of x
      */
     public final void addX(float x) {
-        if (this.x + x >= Game.LENGTH_OF_FIELD) {
-            this.x = (this.x + x) - Game.LENGTH_OF_FIELD;
-        } else if (this.x + x < 0) {
-            this.x = (this.x + x) + Game.LENGTH_OF_FIELD;
+        if (t != Type.BULLET) {
+            if (this.x + x >= Game.LENGTH_OF_FIELD) {
+                this.x = (this.x + x) - Game.LENGTH_OF_FIELD;
+            } else if (this.x + x < 0) {
+                this.x = (this.x + x) + Game.LENGTH_OF_FIELD;
+            } else {
+                this.x += x;
+            }
         } else {
-            this.x += x;
+            if (this.x + x >= Game.LENGTH_OF_FIELD) {
+                Game.bullets.remove(this);
+            } else if (this.x + x < 0) {
+                Game.bullets.remove(this);
+            } else {
+                this.x += x;
+            }
         }
     }
 
