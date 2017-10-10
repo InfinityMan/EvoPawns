@@ -109,7 +109,7 @@ public class UpdThread extends Thread {
                         Game.pawns[i].getY() - Panel.PAWN_DIAMETER/2 <= bullet.getY()) {
                     if(bullet.authorOfBullet != Game.pawns[i]) {
                         Game.pawns[i].bulletHit(bullet.getMass());
-                        System.out.println("Boom");
+                        //System.out.println("Boom");
                     }
                 }
             }
@@ -121,7 +121,7 @@ public class UpdThread extends Thread {
                         Game.pawns[i].getY() + Panel.PAWN_DIAMETER/2 >= food.getY() && 
                         Game.pawns[i].getY() - Panel.PAWN_DIAMETER/2 <= food.getY()) {
                     Game.pawns[i].feed(food.getMass());
-                    System.out.println("Boom");
+                    //System.out.println("Boom");
                 }
             }
         }

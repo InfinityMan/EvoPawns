@@ -249,20 +249,23 @@ public class Game {
         double[] lFitnesses = fitnesses;
         double[] chances = new double[fitnesses.length];
         int[] thousChances = new int[fitnesses.length];
-        
+
         for (int i = 0; i < parentsIDs.length; i++) {
             double totalSumm = 0;
             
             for (int j = 0; j < lFitnesses.length; j++) {
                 totalSumm += lFitnesses[j];
-                
             }
             for (int j = 0; j < lFitnesses.length; j++) {
-                chances[j] = totalSumm / lFitnesses[j];
+                chances[j] = (lFitnesses[j] / totalSumm) * 100;
                 thousChances[j] = (int) Math.round(chances[j] * 1000);
             }
+            if(Base.chance(70, 0)) {
+                parentsIDs[i] = Base.chances(thousChances, 3);
+            } else {
+                parentsIDs[i] = Base.randomNumber(0, lFitnesses.length-1);
+            }
             
-            parentsIDs[i] = Base.chances(thousChances, 3);
             lFitnesses[parentsIDs[i]] = 0; //TODO normal deleting
         }
         return parentsIDs;
@@ -281,7 +284,6 @@ public class Game {
         double avg = Arrayer.mediumValueOfArray(fitnesses);
         System.out.println("Fittest: " + Arrayer.maxDoubleInArray(fitnesses));
         System.out.println("Average: " + avg);
-        System.out.println(bullets.size());
     }
     
     public static void exception() {
