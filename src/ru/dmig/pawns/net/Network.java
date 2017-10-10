@@ -73,7 +73,7 @@ public class Network implements Serializable {
     public Network(int[] layersDimensions) {
         mLayers = new Layer[layersDimensions.length - 1];
         for (int i = 0; i < layersDimensions.length - 1; i++) {
-            mLayers[i] = new Layer(layersDimensions[i + 1], layersDimensions[i]);
+            mLayers[i] = new Layer(layersDimensions[i + 1], layersDimensions[i], true);
         }
     }
 

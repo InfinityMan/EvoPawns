@@ -40,10 +40,10 @@ public class Layer implements Serializable {
         }
     }
 
-    public Layer(int count, int previousCount) {
+    public Layer(int count, int previousCount, boolean pause) {
         neurons = new Neuron[count];
         for (int i = 0; i < count; i++) {
-            neurons[i] = new Neuron(previousCount);
+            neurons[i] = new Neuron(previousCount, pause);
         }
     }
 

@@ -18,6 +18,8 @@ package ru.dmig.pawns.net;
 
 import java.io.Serializable;
 import java.util.List;
+import ru.dmig.pawns.Game;
+import ru.epiclib.base.Base;
 
 /**
  * Implements the neural network neuron
@@ -26,7 +28,9 @@ import java.util.List;
  * @author jnemec (on github)
  * @author honzour (on github)
  */
-public class Neuron implements Serializable {
+public final class Neuron implements Serializable {
+    
+    
 
     //http://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
     private static final long serialVersionUID = 1734654068548880380L;
@@ -46,22 +50,38 @@ public class Neuron implements Serializable {
     /**
      *
      * @param inputCount number of inputs not counting treshold
+     * @param pause Need pause after restarting?
      */
-    public Neuron(int inputCount) {
+    public Neuron(int inputCount, boolean pause) {
         inputCount++;
         weights = new double[inputCount];
-        restart();
+        restart(pause);
     }
 
-    public void restart() {
+    /**
+     * Restarts the neuron
+     * @param pause Need pause after restarting?
+     */
+    public void restart(boolean pause) {
+        final int MAX = 10;
+        final int MIN = -10;
+        
+        final int amountOfPeriods = MAX - MIN;
+        
+        int periodId = Base.randomNumber(0, amountOfPeriods - 1);
+        
         int inputCount = weights.length;
 
         weights[0] = 0;
-        for (int i = 1; i < inputCount; i++) {
-            weights[0] += Math.random();
+        for (int i = 0; i < inputCount; i++) {
+            weights[i] = MIN + periodId + Math.random();
         }
-        for (int i = 1; i < inputCount; i++) {
-            weights[i] = Math.random();
+        if(pause) {
+            try {
+                Thread.sleep(0, 2);
+            } catch (InterruptedException ex) {
+                Game.exception();
+            }
         }
     }
 
