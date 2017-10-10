@@ -129,16 +129,16 @@ public final class Pawn extends Agent {
      */
     public double calcFitness() {
         double distanceFit = 0.5 * distance;
-        double massFit = 8 * getMass();
+        //double massFit = 8 * getMass();
         double warFit = 0;
         if(totalDamageUsed > 0) {
             if(damageCaused != 0) {
                 warFit = (8 * damageCaused) / totalDamageUsed;
             } else warFit = 0 - (totalDamageUsed / 2);
         }
-        double foodFit = foodGathered;
+        //double foodFit = foodGathered;
         
-        return distanceFit + massFit + warFit + foodFit;
+        return distanceFit;
     }
     
     /**

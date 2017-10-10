@@ -247,10 +247,23 @@ public class Game {
         }
         int[] parentsIDs = new int[fitnesses.length / 2];
         double[] lFitnesses = fitnesses;
-
-        for (int i = 0; i < fitnesses.length / 2; i++) {
-            parentsIDs[i] = Arrayer.maxDoubleInArrayID(lFitnesses);
-            lFitnesses[parentsIDs[i]] = -1000000; //TODO normal deleting
+        double[] chances = new double[fitnesses.length];
+        int[] thousChances = new int[fitnesses.length];
+        
+        for (int i = 0; i < parentsIDs.length; i++) {
+            double totalSumm = 0;
+            
+            for (int j = 0; j < lFitnesses.length; j++) {
+                totalSumm += lFitnesses[j];
+                
+            }
+            for (int j = 0; j < lFitnesses.length; j++) {
+                chances[j] = totalSumm / lFitnesses[j];
+                thousChances[j] = (int) Math.round(chances[j] * 1000);
+            }
+            
+            parentsIDs[i] = Base.chances(thousChances, 3);
+            lFitnesses[parentsIDs[i]] = 0; //TODO normal deleting
         }
         return parentsIDs;
     }
