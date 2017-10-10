@@ -70,7 +70,7 @@ public class Game {
     /**
      * Height of field to simulate
      */
-    public static final int HEIGHT_OF_FIELD = 600;
+    public static final int HEIGHT_OF_FIELD = 800;
 
     /**
      * Duration of one tick of game
@@ -102,6 +102,7 @@ public class Game {
     
     public static void newRun() {
         try {
+            ChartPanel.lauch();
             generatePawns();
             foods = new ArrayList<>();
             bullets = new ArrayList<>();
@@ -282,8 +283,11 @@ public class Game {
             System.out.println(fitnesses[i]);
         }
         double avg = Arrayer.mediumValueOfArray(fitnesses);
-        System.out.println("Fittest: " + Arrayer.maxDoubleInArray(fitnesses));
+        double fit = Arrayer.maxDoubleInArray(fitnesses);
+        System.out.println("Fittest: " + fit);
         System.out.println("Average: " + avg);
+        
+        ChartPanel.cp.update(fit, avg);
     }
     
     public static void exception() {
