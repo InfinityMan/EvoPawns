@@ -18,6 +18,7 @@ package ru.dmig.pawns;
 
 import ru.dmig.pawns.agents.Pawn;
 import java.util.ArrayList;
+import ru.dmig.pawns.agents.Agent;
 import ru.epiclib.base.Arrayer;
 import ru.epiclib.base.Base;
 import ru.epiclib.evo.EvoAlg;
@@ -32,27 +33,39 @@ public class Game {
     /**
      * Amount of pawns for game
      */
-    public static final int AMOUNT_OF_PAWNS = 8;
+    public static final int AMOUNT_OF_PAWNS = 20;
 
     /**
      * Interplanetary pawns array
      */
     public static Pawn[] pawns;
+    
+    /**
+     * Interplanetary food list
+     */
+    public static ArrayList<Agent> foods;
+    
+    /**
+     * Interplanetary bullets list
+     */
+    public static ArrayList<Agent> bullets;
 
     /**
      * Current generation in game
      */
     public static int generation = 0;
+    
+    public static UpdThread upThread;
 
     /**
      * Setting of minds anatomy of pawns
      */
-    public static final int[] LAYERS_OF_NET = {4, 4, 3, 3};
+    public static final int[] LAYERS_OF_NET = {6, 5, 4, 3};
 
     /**
      * Length of field to simulate
      */
-    public static final int LENGTH_OF_FIELD = 600;
+    public static final int LENGTH_OF_FIELD = 1000;
 
     /**
      * Height of field to simulate
@@ -67,7 +80,7 @@ public class Game {
     /**
      * Duration of one generation playing in milliseconds
      */
-    public static final double DURATION_OF_ROUND = 4 * 1000;
+    public static final double DURATION_OF_ROUND = 6 * 1000;
 
     /**
      * Amount of rounds (generations) to play
@@ -78,25 +91,56 @@ public class Game {
      * Chance of mutation of every paricular weight. From 0 to 100. "By definition at 100 mutation rate, every variable is chosen randomly each generation and no information is retained."
      */
     public static final int MUTATION_RATE = 5;
+    
+    public static final int FOOD_AMOUNT = AMOUNT_OF_PAWNS + 3;
 
     public static void main(String[] args) throws InterruptedException {
 
+        newRun();
+
+    }
+    
+    public static void newRun() {
+        try {
+            generatePawns();
+            foods = new ArrayList<>();
+            bullets = new ArrayList<>();
+            generateFood(FOOD_AMOUNT);
+            
+            Frame.panel = new Panel();
+            
+            java.awt.EventQueue.invokeLater(() -> {
+                Frame.frame = new Frame();
+                Frame.frame.setVisible(true);
+            });
+            
+            Thread.sleep(2000);
+            
+            upThread = new UpdThread();
+        } catch (InterruptedException ex) {
+            System.exit(-12121121);
+        }
+    }
+    
+    public static void newBullet(float x, float y, double angle, double mass, Pawn author) {
+        bullets.add(new Agent(Agent.MAX_BULLET_SPEED, angle, x, y, mass));
+        bullets.get(bullets.size()-1).authorOfBullet = author;
+        bullets.get(bullets.size()-1).t = Agent.Type.BULLET;
+    }
+    
+    public static void generatePawns() {
         pawns = new Pawn[AMOUNT_OF_PAWNS];
         for (int i = 0; i < pawns.length; i++) {
             pawns[i] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
+            pawns[i].setAbsAngle(Base.randomNumber(0, 359));
         }
-
-        Frame.panel = new Panel();
-
-        java.awt.EventQueue.invokeLater(() -> {
-            Frame.frame = new Frame();
-            Frame.frame.setVisible(true);
-        });
-
-        Thread.sleep(2000);
-
-        new UpdThread();
-
+    }
+    
+    public static void generateFood(int amount) {
+        for (int i = 0; i < amount; i++) {
+            foods.add(new Agent(Base.randomNumber(0, LENGTH_OF_FIELD), 
+                Base.randomNumber(0, HEIGHT_OF_FIELD)));
+        }
     }
 
     /**
@@ -185,7 +229,7 @@ public class Game {
         //Creating new pawns from gens
         Pawn[] newPawns = new Pawn[AMOUNT_OF_PAWNS];
         for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
-            newPawns[i] = new Pawn(pawns[i].getX(), pawns[i].getY());
+            newPawns[i] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
             newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
         }
         return newPawns;
@@ -222,7 +266,13 @@ public class Game {
             System.out.println(fitnesses[i]);
         }
         double avg = Arrayer.mediumValueOfArray(fitnesses);
+        System.out.println("Fittest: " + Arrayer.maxDoubleInArray(fitnesses));
         System.out.println("Average: " + avg);
+        System.out.println(bullets.size());
+    }
+    
+    public static void exception() {
+        System.err.println("EXXXXXXXXXXXXX!!1!");
     }
 
 }

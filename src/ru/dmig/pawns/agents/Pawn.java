@@ -108,8 +108,17 @@ public final class Pawn extends Agent {
             setShootPrice(0);
         }
         
-        if(shootPrice > 0) {
-            Game.newBullet(getX(), getY(), getAbsAngle(), shootPrice, this);
+//        if(shootPrice > 0) {
+//            Game.newBullet(getX(), getY(), getAbsAngle(), shootPrice, this);
+//            totalDamageUsed += shootPrice;
+//        }
+    }
+    
+    public void bulletHit(double bulletMass) {
+        if(bulletMass > getMass()) {
+            System.out.println("rip");
+        } else {
+            setMass(getMass() - bulletMass);
         }
     }
 
@@ -123,7 +132,9 @@ public final class Pawn extends Agent {
         double massFit = 8 * getMass();
         double warFit = 0;
         if(totalDamageUsed > 0) {
-            warFit = (8 * damageCaused) / totalDamageUsed;
+            if(damageCaused != 0) {
+                warFit = (8 * damageCaused) / totalDamageUsed;
+            } else warFit = 0 - (totalDamageUsed / 2);
         }
         double foodFit = foodGathered;
         

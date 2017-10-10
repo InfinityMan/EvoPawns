@@ -16,8 +16,10 @@
  */
 package ru.dmig.pawns;
 
+import java.util.ArrayList;
 import ru.dmig.pawns.agents.Pawn;
 import java.util.Calendar;
+import ru.dmig.pawns.agents.Agent;
 
 /**
  * Updates the pawns, simulation, and e.t.c.
@@ -49,6 +51,9 @@ public class UpdThread extends Thread {
         while (finishTime > currentTime) {
 
             processPawns();
+            processBullets();
+            
+            collisionSensor();
 
             try {
                 Frame.frame.update();
@@ -86,6 +91,65 @@ public class UpdThread extends Thread {
             pawns[i].distance += Math.abs(yMov);
 
         }
+    }
+    
+    private void processBullets() {
+        Game.bullets.forEach((bullet) -> {
+            bullet.updateCoords();
+        });
+    }
+    
+    private void collisionSensor() {
+        
+        for (int i = 0; i < Game.AMOUNT_OF_PAWNS; i++) {
+            for (Agent bullet : Game.bullets) {
+                if(Game.pawns[i].getX() + Panel.PAWN_DIAMETER/2 >= bullet.getX() &&
+                        Game.pawns[i].getX() - Panel.PAWN_DIAMETER/2 <= bullet.getX() &&
+                        Game.pawns[i].getY() + Panel.PAWN_DIAMETER/2 >= bullet.getY() && 
+                        Game.pawns[i].getY() - Panel.PAWN_DIAMETER/2 <= bullet.getY()) {
+                    if(bullet.authorOfBullet != Game.pawns[i]) {
+                        Game.pawns[i].bulletHit(bullet.getMass());
+                        System.out.println("Boom");
+                    }
+                }
+            }
+            
+            ArrayList<Integer> idToDelete = new ArrayList<>();
+            for (Agent food : Game.foods) {
+                if(Game.pawns[i].getX() + Panel.PAWN_DIAMETER/2 >= food.getX() &&
+                        Game.pawns[i].getX() - Panel.PAWN_DIAMETER/2 <= food.getX() &&
+                        Game.pawns[i].getY() + Panel.PAWN_DIAMETER/2 >= food.getY() && 
+                        Game.pawns[i].getY() - Panel.PAWN_DIAMETER/2 <= food.getY()) {
+                    Game.pawns[i].feed(food.getMass());
+                    System.out.println("Boom");
+                }
+            }
+        }
+    }
+    
+    private void setRelatives(Pawn p) {
+        Agent nearestFood = Game.foods.get(getNearestFood(p.getX(), p.getY()));
+        double xDiff = Math.abs(p.getX() - nearestFood.getX());
+        double yDiff = Math.abs(p.getY() - nearestFood.getY());
+        double distance = Math.sqrt(xDiff*xDiff + yDiff*yDiff);
+        p.setDistanceToFood((float) distance);
+        p.setRltAngleToFood(Math.asin(yDiff));
+    }
+    
+    private int getNearestFood(float x, float y) {
+        double lastDiff = Game.LENGTH_OF_FIELD;
+        int lastID = 0;
+        for (int i = 0; i < Game.foods.size(); i++) {
+            Agent get = Game.foods.get(i);
+            double xDiff = Math.abs(get.getX() - x);
+            double yDiff = Math.abs(get.getY() - y);
+            double distance = Math.sqrt(xDiff*xDiff + yDiff*yDiff);
+            if(distance < lastDiff) {
+                lastID = i;
+                lastDiff = distance;
+            } 
+        }
+        return lastID;
     }
 
 }

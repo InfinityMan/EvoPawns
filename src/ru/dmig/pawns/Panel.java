@@ -30,8 +30,8 @@ import ru.dmig.pawns.agents.Agent;
  */
 public class Panel extends JPanel {
 
-    public static final int PAWN_DIAMETER = 30;
-    public static final int BULLET_DIAMETER = 8;
+    public static final int PAWN_DIAMETER = 20;
+    public static final int BULLET_DIAMETER = 6;
     public static final int FOOD_DIAMETER = 5;
 
     @Override
