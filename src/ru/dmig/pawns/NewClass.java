@@ -22,6 +22,6 @@ package ru.dmig.pawns;
  */
 public class NewClass {
     public static void main(String[] args) {
-        System.out.println(Math.sin(3.1415926));
+        System.out.println(1d/Math.PI);
     }
 }

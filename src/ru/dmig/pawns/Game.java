@@ -93,7 +93,7 @@ public class Game {
      */
     public static final int MUTATION_RATE = 5;
     
-    public static final int FOOD_AMOUNT = AMOUNT_OF_PAWNS + 5;
+    public static final int FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 1.5);
     
     public static final int MIN_MASS_OF_FOOD = 5;
     public static final int MAX_MASS_OF_FOOD = 7;
@@ -208,6 +208,8 @@ public class Game {
      */
     public static Pawn[] evolution(Pawn[] pawns) {
         int i;
+        pawns[0].network.printWeights();
+        
         if (pawns.length > 3) {
             double[] fitnesses = new double[AMOUNT_OF_PAWNS];
             for (i = 0; i < pawns.length; i++) {
@@ -304,7 +306,7 @@ public class Game {
      * Prints on screen info about last generation
      */
     public static void viewStats() {
-        System.out.println("Generation: " + generation);
+        //System.out.println("Generation: " + generation);
         double[] fitnesses = new double[AMOUNT_OF_PAWNS];
         for (int i = 0; i < AMOUNT_OF_PAWNS; i++) {
             fitnesses[i] = pawns[i].calcFitness();
@@ -312,9 +314,8 @@ public class Game {
         }
         double avg = Arrayer.mediumValueOfArray(fitnesses);
         double fit = Arrayer.maxDoubleInArray(fitnesses);
-        System.out.println("Fittest: " + fit);
-        System.out.println("Average: " + avg);
-        System.out.println("Food: "+pawns[0].foodGathered);
+        //System.out.println("Fittest: " + fit);
+        //System.out.println("Average: " + avg);
         
         ChartPanel.cp.update(fit, avg);
     }

@@ -68,12 +68,11 @@ public final class Neuron implements Serializable {
         
         final int amountOfPeriods = MAX - MIN;
         
-        int periodId = Base.randomNumber(0, amountOfPeriods - 1);
-        
         int inputCount = weights.length;
 
         weights[0] = 0;
         for (int i = 0; i < inputCount; i++) {
+            int periodId = Base.randomNumber(0, amountOfPeriods - 1);
             weights[i] = MIN + periodId + Math.random();
         }
         if(pause) {

@@ -91,14 +91,14 @@ public final class Pawn extends Agent {
         double[] out = {newSpeed, newAbsAngle, shootPrice};
 
         network.calculate(in, out, true);
-
+        
         try {
             setNewSpeed(out[0]);
         } catch (IllegalArgumentException e) {
             setNewSpeed(getSpeed());
         }
         try {
-            setNewAbsAngle(out[1]);
+            setNewAbsAngle(out[1]/(1d/Math.PI));
         } catch (IllegalArgumentException e) {
             setNewAbsAngle(getAbsAngle());
         }
