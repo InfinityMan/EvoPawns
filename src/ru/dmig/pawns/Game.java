@@ -64,7 +64,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns
      */
-    public static final int[] LAYERS_OF_NET = {6, 4, 3, 3};
+    public static final int[] LAYERS_OF_NET = {6, 5, 4, 3};
 
     /**
      * Length of field to simulate
@@ -134,29 +134,37 @@ public class Game {
         JOptionPane.showMessageDialog(null, "Здравствуйте."
                 + " В общем, на графике, если он есть, синия линия - значение крутости самой сильной пешки, оранжевая - средняя крутость.");
         JOptionPane.showMessageDialog(null, "В замечательной версии -32.853, было добавлено: пешки, крутость, еда, графика -2 уровня, настройка количества пешек, и длительности раунда.");
-        String amountOfPawnsStr = JOptionPane.showInputDialog(null, "Введите количество пешек для игры [По умолчанию: 20]: ");
+        String amountOfPawnsStr = JOptionPane.showInputDialog(null, "Введите количество пешек для игры [По умолчанию: 16]: ");
         String timeOfRoundStr = JOptionPane.showInputDialog(null,"Введите длительность раунда (жизни одного поколения) в секундах [По умолчанию: 8]: ");
         
-        int amountOfPawns = 20;
+        int amountOfPawns = 16;
         int timeOfRound = 8;
         
-        try {
-            amountOfPawns = Integer.valueOf(amountOfPawnsStr);
-            if(amountOfPawns < 4 || amountOfPawns > 40 || amountOfPawns % 4 != 0) {
-                throw new NumberFormatException();
+        if (!amountOfPawnsStr.equals("")) {
+            try {
+                amountOfPawns = Integer.valueOf(amountOfPawnsStr);
+                if (amountOfPawns < 4 || amountOfPawns > 40 || amountOfPawns % 4 != 0) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством пешек. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 3, но меньше 41, при этом обязательно делиться на 4.");
+                amountOfPawns = 16;
             }
-        } catch(NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством пешек. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 3, но меньше 41, при этом обязательно делиться на 4.");
-            amountOfPawns = 20;
+        } else {
+            amountOfPawns = 16;
         }
         
-        try {
-            timeOfRound = Integer.valueOf(timeOfRoundStr);
-            if(timeOfRound < 1 || timeOfRound > 60) {
-                throw new NumberFormatException();
+        if (!timeOfRoundStr.equals("")) {
+            try {
+                timeOfRound = Integer.valueOf(timeOfRoundStr);
+                if (timeOfRound < 1 || timeOfRound > 60) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством секунд на раунд. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 0, но меньше 61.");
+                timeOfRound = 8;
             }
-        } catch(NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством секунд на раунд. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 0, но меньше 61.");
+        } else {
             timeOfRound = 8;
         }
         

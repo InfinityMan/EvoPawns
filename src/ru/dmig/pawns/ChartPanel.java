@@ -56,7 +56,7 @@ public class ChartPanel extends JFrame {
         c.setMinimumSize(new Dimension(MIN_LENGTH, MIN_HEIGHT));
         add(c);
         
-        cp.setTitle("Chart of fitness");
+        setTitle("Chart of fitness");
         cp = this;
 
     }
