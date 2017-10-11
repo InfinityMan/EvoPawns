@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import ru.dmig.pawns.agents.Pawn;
 import java.util.Calendar;
 import ru.dmig.pawns.agents.Agent;
+import ru.epiclib.base.Arrayer;
 
 /**
  * Updates the pawns, simulation, and e.t.c.
@@ -74,7 +75,7 @@ public class UpdThread extends Thread {
         for (int i = 0; i < Game.AMOUNT_OF_PAWNS; i++) {
             
             setRelatives(pawns[i]);
-
+            
             pawns[i].calculate();
 
             pawns[i].setSpeed(pawns[i].newSpeed);
@@ -117,36 +118,42 @@ public class UpdThread extends Thread {
             }
             
             ArrayList<Integer> idToDelete = new ArrayList<>();
-            for (Agent food : Game.foods) {
+            for (int j = 0; j < Game.foods.size(); j++) {
+                Agent food = Game.foods.get(j);
                 if(Game.pawns[i].getX() + Panel.PAWN_DIAMETER/2 >= food.getX() &&
                         Game.pawns[i].getX() - Panel.PAWN_DIAMETER/2 <= food.getX() &&
                         Game.pawns[i].getY() + Panel.PAWN_DIAMETER/2 >= food.getY() && 
                         Game.pawns[i].getY() - Panel.PAWN_DIAMETER/2 <= food.getY()) {
                     Game.pawns[i].feed(food.getMass());
-                    System.out.println("pawn: "+i+"; mass: "+food.getMass());
-                    System.out.println("Boom");
+                    idToDelete.add(j);
                 }
             }
+            for (int j = 0; j < idToDelete.size(); j++) {
+                int id = Arrayer.maxIntInList(idToDelete);
+                Game.foods.remove(id);
+                Game.generateFood(1);
+            }
+            
         }
     }
     
     private void setRelatives(Pawn p) {
         Agent nearestFood = Game.foods.get(getNearestFood(p.getX(), p.getY()));
-        double x = p.getX() - nearestFood.getX();
+        double x = nearestFood.getX() - p.getX();
         double y = p.getY() - nearestFood.getY();
         double xDiff = Math.abs(x);
         double yDiff = Math.abs(y);
         double distance = Math.sqrt(xDiff*xDiff + yDiff*yDiff);
         p.setDistanceToFood((float) distance);
         int degreeToAdd = 0; //if x > 0 && y > 0
-        if(x > 0 && y < 0) {
+        if(x < 0 && y > 0) {
             degreeToAdd = 90;
         } else if(x < 0 && y < 0) {
             degreeToAdd = 180;
         } else {
             degreeToAdd = 270;
         }
-        p.setRltAngleToFood(degreeToAdd + Math.atan(y/x));
+        p.setRltAngleToFood(degreeToAdd + (Math.asin((double) Math.abs(y)/distance))*57.296d);
     }
     
     private int getNearestFood(float x, float y) {

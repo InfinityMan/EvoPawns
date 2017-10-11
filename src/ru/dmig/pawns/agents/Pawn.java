@@ -136,7 +136,7 @@ public final class Pawn extends Agent {
                 warFit = (8 * damageCaused) / totalDamageUsed;
             } else warFit = 0 - (totalDamageUsed / 2);
         }
-        double foodFit = foodGathered;
+        double foodFit = foodGathered*160;
         
         return distanceFit + foodFit;
     }

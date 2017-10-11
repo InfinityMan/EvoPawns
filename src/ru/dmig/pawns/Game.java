@@ -18,6 +18,7 @@ package ru.dmig.pawns;
 
 import ru.dmig.pawns.agents.Pawn;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import ru.dmig.pawns.agents.Agent;
 import ru.epiclib.base.Arrayer;
 import ru.epiclib.base.Base;
@@ -33,7 +34,7 @@ public class Game {
     /**
      * Amount of pawns for game
      */
-    public static final int AMOUNT_OF_PAWNS = 1;
+    public static final int AMOUNT_OF_PAWNS = 20;
 
     /**
      * Interplanetary pawns array
@@ -60,7 +61,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns
      */
-    public static final int[] LAYERS_OF_NET = {6, 5, 4, 3};
+    public static final int[] LAYERS_OF_NET = {6, 4, 3, 3};
 
     /**
      * Length of field to simulate
@@ -80,7 +81,7 @@ public class Game {
     /**
      * Duration of one generation playing in milliseconds
      */
-    public static final double DURATION_OF_ROUND = 6 * 1000;
+    public static final double DURATION_OF_ROUND = 10 * 1000;
 
     /**
      * Amount of rounds (generations) to play
@@ -92,7 +93,7 @@ public class Game {
      */
     public static final int MUTATION_RATE = 5;
     
-    public static final int FOOD_AMOUNT = AMOUNT_OF_PAWNS + 3;
+    public static final int FOOD_AMOUNT = AMOUNT_OF_PAWNS + 5;
     
     public static final int MIN_MASS_OF_FOOD = 5;
     public static final int MAX_MASS_OF_FOOD = 7;
@@ -104,6 +105,9 @@ public class Game {
     }
     
     public static void newRun() {
+        JOptionPane.showMessageDialog(null, "Здравствуйте."
+                + " В общем, на графике, если он есть, синия линия - значение крутости самой сильной пешки, оранжевая - средняя крутость.\n"
+                + " Я сам ещё не успел потестировать, будут ли они гоняться за едой после сотен лет эволюции.. Да и вообще, мало что тестил; но вроде должно работать...");
         try {
             ChartPanel.lauch();
             generatePawns();
