@@ -16,6 +16,7 @@
  */
 package ru.dmig.pawns;
 
+import java.awt.HeadlessException;
 import ru.dmig.pawns.agents.Pawn;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
@@ -34,7 +35,9 @@ public class Game {
     /**
      * Amount of pawns for game
      */
-    public static final int AMOUNT_OF_PAWNS = 20;
+    public static int AMOUNT_OF_PAWNS = 20;
+    
+    public static boolean DISTANCE_FITNESS = true;
 
     /**
      * Interplanetary pawns array
@@ -81,7 +84,7 @@ public class Game {
     /**
      * Duration of one generation playing in milliseconds
      */
-    public static final double DURATION_OF_ROUND = 10 * 1000;
+    public static double DURATION_OF_ROUND = 8 * 1000;
 
     /**
      * Amount of rounds (generations) to play
@@ -99,15 +102,12 @@ public class Game {
     public static final int MAX_MASS_OF_FOOD = 7;
 
     public static void main(String[] args) throws InterruptedException {
-
+        tutorial();
         newRun();
 
     }
     
     public static void newRun() {
-        JOptionPane.showMessageDialog(null, "Здравствуйте."
-                + " В общем, на графике, если он есть, синия линия - значение крутости самой сильной пешки, оранжевая - средняя крутость.\n"
-                + " Я сам ещё не успел потестировать, будут ли они гоняться за едой после сотен лет эволюции.. Да и вообще, мало что тестил; но вроде должно работать...");
         try {
             ChartPanel.lauch();
             pawns = generatePawns();
@@ -128,6 +128,39 @@ public class Game {
         } catch (InterruptedException ex) {
             System.exit(-12121121);
         }
+    }
+
+    protected static void tutorial() {
+        JOptionPane.showMessageDialog(null, "Здравствуйте."
+                + " В общем, на графике, если он есть, синия линия - значение крутости самой сильной пешки, оранжевая - средняя крутость.");
+        JOptionPane.showMessageDialog(null, "В замечательной версии -32.853, было добавлено: пешки, крутость, еда, графика -2 уровня, настройка количества пешек, и длительности раунда.");
+        String amountOfPawnsStr = JOptionPane.showInputDialog(null, "Введите количество пешек для игры [По умолчанию: 20]: ");
+        String timeOfRoundStr = JOptionPane.showInputDialog(null,"Введите длительность раунда (жизни одного поколения) в секундах [По умолчанию: 8]: ");
+        
+        int amountOfPawns = 20;
+        int timeOfRound = 8;
+        
+        try {
+            amountOfPawns = Integer.valueOf(amountOfPawnsStr);
+            if(amountOfPawns < 4 || amountOfPawns > 40 || amountOfPawns % 4 != 0) {
+                throw new NumberFormatException();
+            }
+        } catch(NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством пешек. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 3, но меньше 41, при этом обязательно делиться на 4.");
+            amountOfPawns = 20;
+        }
+        
+        try {
+            timeOfRound = Integer.valueOf(timeOfRoundStr);
+            if(timeOfRound < 1 || timeOfRound > 60) {
+                throw new NumberFormatException();
+            }
+        } catch(NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством секунд на раунд. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 0, но меньше 61.");
+            timeOfRound = 8;
+        }
+        
+        AMOUNT_OF_PAWNS = amountOfPawns;
     }
     
     public static void newBullet(float x, float y, double angle, double mass, Pawn author) {
@@ -213,7 +246,7 @@ public class Game {
         if (pawns.length > 3) {
             double[] fitnesses = new double[AMOUNT_OF_PAWNS];
             for (i = 0; i < pawns.length; i++) {
-                fitnesses[i] = pawns[i].calcFitness();
+                fitnesses[i] = pawns[i].calcFitness(DISTANCE_FITNESS);
             }
 
             //Crossover
@@ -309,7 +342,7 @@ public class Game {
         //System.out.println("Generation: " + generation);
         double[] fitnesses = new double[AMOUNT_OF_PAWNS];
         for (int i = 0; i < AMOUNT_OF_PAWNS; i++) {
-            fitnesses[i] = pawns[i].calcFitness();
+            fitnesses[i] = pawns[i].calcFitness(DISTANCE_FITNESS);
             System.out.println(fitnesses[i]);
         }
         double avg = Arrayer.mediumValueOfArray(fitnesses);

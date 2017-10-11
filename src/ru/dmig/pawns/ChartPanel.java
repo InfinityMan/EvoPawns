@@ -35,11 +35,16 @@ public class ChartPanel extends JFrame {
     
     public XYChart chart;
     public static ChartPanel cp;
+    
+    private static final int MIN_LENGTH = 1200;
+    private static final int MIN_HEIGHT = 700;
 
     public ChartPanel() {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         
-        chart = new XYChart(800, 600);
+        chart = new XYChart(MIN_LENGTH, MIN_HEIGHT);
+        chart.setXAxisTitle("Generation (Поколение)");
+        chart.setYAxisTitle("Fitness (Крутость)");
         ArrayList<Integer> gen = new ArrayList<>();
         for (int i = 0; i < fittests.size(); i++) {
             gen.add(i);
@@ -48,9 +53,10 @@ public class ChartPanel extends JFrame {
         //chart.addSeries("Averages", gen, averages);
         
         XChartPanel<XYChart> c = new XChartPanel<>(chart);
-        c.setMinimumSize(new Dimension(1000, 800));
+        c.setMinimumSize(new Dimension(MIN_LENGTH, MIN_HEIGHT));
         add(c);
         
+        cp.setTitle("Chart of fitness");
         cp = this;
 
     }
