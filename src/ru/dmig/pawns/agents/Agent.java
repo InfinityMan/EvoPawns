@@ -32,7 +32,7 @@ public class Agent {
     public Type t = Type.PAWN;
     
     private double speed; // [0;1]
-    private double absAngle; // [0;360)
+    private double absAngle; // [0;2pi)
     
     private float x;
     private float y;
@@ -120,10 +120,9 @@ public class Agent {
      * @param absAngle new value of absAngle
      */
     public final void setAbsAngle(double absAngle) throws IllegalArgumentException {
-        //System.out.println(absAngle >= 0 && absAngle < 360);
-        //if(absAngle >= 0 && absAngle < 360) {
+        if(absAngle >= 0 && absAngle < 2*Math.PI) {
             this.absAngle = absAngle;
-        //} throw new IllegalArgumentException();
+        } else throw new IllegalArgumentException();
     }
     
     /**

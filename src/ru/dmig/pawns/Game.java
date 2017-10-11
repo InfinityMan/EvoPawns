@@ -110,7 +110,7 @@ public class Game {
                 + " Я сам ещё не успел потестировать, будут ли они гоняться за едой после сотен лет эволюции.. Да и вообще, мало что тестил; но вроде должно работать...");
         try {
             ChartPanel.lauch();
-            generatePawns();
+            pawns = generatePawns();
             foods = new ArrayList<>();
             bullets = new ArrayList<>();
             generateFood(FOOD_AMOUNT);
@@ -136,12 +136,13 @@ public class Game {
         bullets.get(bullets.size()-1).t = Agent.Type.BULLET;
     }
     
-    public static void generatePawns() {
-        pawns = new Pawn[AMOUNT_OF_PAWNS];
+    public static Pawn[] generatePawns() {
+        Pawn[] pawns = new Pawn[AMOUNT_OF_PAWNS];
         for (int i = 0; i < pawns.length; i++) {
             pawns[i] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
-            pawns[i].setAbsAngle(Base.randomNumber(0, 359));
+            pawns[i].setAbsAngle(randomAngle());
         }
+        return pawns;
     }
     
     public static void generateFood(int amount) {
@@ -254,11 +255,11 @@ public class Game {
                     }
                 }
             }
-            Pawn[] newPawns = new Pawn[AMOUNT_OF_PAWNS];
+            Pawn[] newPawns = generatePawns();
             for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
-                newPawns[i] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
             }
+            
             return newPawns;
         }
     }
@@ -320,6 +321,12 @@ public class Game {
     
     public static void exception() {
         System.err.println("EXXXXXXXXXXXXX!!1!");
+    }
+    
+    public static double randomAngle() {
+        int angle = Base.randomNumber(0, 359);
+        double radAngle = angle * (Math.PI / 180);
+        return radAngle;
     }
 
 }

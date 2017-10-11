@@ -153,7 +153,7 @@ public class UpdThread extends Thread {
         } else {
             degreeToAdd = 270;
         }
-        p.setRltAngleToFood(degreeToAdd + (Math.asin((double) Math.abs(y)/distance))*57.296d);
+        p.setRltAngleToFood(degreeToAdd + Math.asin((double) Math.abs(y)/distance));
     }
     
     private int getNearestFood(float x, float y) {

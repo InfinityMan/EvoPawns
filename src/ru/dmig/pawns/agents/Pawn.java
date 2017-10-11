@@ -34,11 +34,11 @@ public final class Pawn extends Agent {
     /*
         Inputs of neuron net:
     0: speed [0;1]
-    1: absolute angle of movement [0;360)
+    1: absolute angle of movement [0;2pi)
     2: mass
-    3: relative angle to nearest food [-180;180)
+    3: relative angle to nearest food [0;2pi)
     4: distance to nearest food
-    5: relative angle to nearest enemy [-180;180)
+    5: relative angle to nearest enemy [0;2pi)
     6: distamce to nearest enemy
         Outputs:
     0: new speed
@@ -46,8 +46,8 @@ public final class Pawn extends Agent {
     2: shoot price [0;10]
      */
 
-    private double rltAngleToEnemy; // [-180;180)
-    private double rltAngleToFood; // [-180;180)
+    private double rltAngleToEnemy;
+    private double rltAngleToFood;
 
     private float distanceToEnemy;
     private float distanceToFood;
@@ -295,7 +295,7 @@ public final class Pawn extends Agent {
     }
 
     public void setNewAbsAngle(double newAbsAngle) {
-        if (newAbsAngle >= 0 && newAbsAngle < 360) {
+        if (newAbsAngle >= 0 && newAbsAngle < 2*Math.PI) {
             this.newAbsAngle = newAbsAngle;
         } else {
             throw new IllegalArgumentException();
