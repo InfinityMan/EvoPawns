@@ -47,19 +47,19 @@ public class Frame extends javax.swing.JFrame {
         setResizable(false);
 
         panelC.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        panelC.setMaximumSize(new java.awt.Dimension(1000, 800));
-        panelC.setMinimumSize(new java.awt.Dimension(1000, 800));
-        panelC.setPreferredSize(new java.awt.Dimension(1000, 800));
+        panelC.setMaximumSize(new java.awt.Dimension(1100, 900));
+        panelC.setMinimumSize(new java.awt.Dimension(1100, 900));
+        panelC.setPreferredSize(new java.awt.Dimension(1100, 900));
 
         javax.swing.GroupLayout panelCLayout = new javax.swing.GroupLayout(panelC);
         panelC.setLayout(panelCLayout);
         panelCLayout.setHorizontalGroup(
             panelCLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 996, Short.MAX_VALUE)
+            .addGap(0, 1096, Short.MAX_VALUE)
         );
         panelCLayout.setVerticalGroup(
             panelCLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 796, Short.MAX_VALUE)
+            .addGap(0, 896, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -68,15 +68,11 @@ public class Frame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelC, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(panelC, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(panelC, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(panelC, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();

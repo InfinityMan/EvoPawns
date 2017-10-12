@@ -30,9 +30,9 @@ import ru.dmig.pawns.agents.Agent;
  */
 public class Panel extends JPanel {
 
-    public static final int PAWN_DIAMETER = 20;
+    public static final int PAWN_DIAMETER = 16;
     public static final int BULLET_DIAMETER = 6;
-    public static final int FOOD_DIAMETER = 5;
+    public static final int FOOD_DIAMETER = 3;
 
     @Override
     public void paint(Graphics g) {
@@ -64,8 +64,6 @@ public class Panel extends JPanel {
             int x = Math.round(food.getX());
             int y = Math.round(food.getY());
             gr2d.drawOval(x-FOOD_DIAMETER/2, y-FOOD_DIAMETER/2, FOOD_DIAMETER, FOOD_DIAMETER);
-            gr2d.drawLine(x, y, (int) Math.round(x+Math.cos(food.getAbsAngle())*FOOD_DIAMETER),
-                    (int) Math.round(y+Math.sin(food.getAbsAngle())*FOOD_DIAMETER));
         });
 
     }

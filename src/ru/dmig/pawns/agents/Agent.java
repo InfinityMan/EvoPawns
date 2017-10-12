@@ -140,11 +140,13 @@ public class Agent {
      * @param x addend of x
      */
     public final void addX(float x) {
-        if (t != Type.BULLET) {
+        if (t == Type.PAWN) {
             if (this.x + x >= Game.LENGTH_OF_FIELD) {
-                this.x = (this.x + x) - Game.LENGTH_OF_FIELD;
+                setSpeed(0);
+                setAbsAngle(Math.PI);
             } else if (this.x + x < 0) {
-                this.x = (this.x + x) + Game.LENGTH_OF_FIELD;
+                setSpeed(0);
+                setAbsAngle(0);
             } else {
                 this.x += x;
             }
@@ -174,12 +176,24 @@ public class Agent {
      * @param y addend of y
      */
     public final void addY(float y) {
-        if (this.y + y >= Game.HEIGHT_OF_FIELD) {
-            this.y = (this.y + y) - Game.HEIGHT_OF_FIELD;
-        } else if (this.y + y < 0) {
-            this.y = (this.y + y) + Game.HEIGHT_OF_FIELD;
+        if (t == Type.PAWN) {
+            if (this.y + y >= Game.HEIGHT_OF_FIELD) {
+                setSpeed(0);
+                setAbsAngle(3*Math.PI/2);
+            } else if (this.y + y < 0) {
+                setSpeed(0);
+                setAbsAngle(Math.PI/2);
+            } else {
+                this.y += y;
+            }
         } else {
-            this.y += y;
+            if (this.y + y >= Game.HEIGHT_OF_FIELD) {
+                Game.bullets.remove(this);
+            } else if (this.y + y < 0) {
+                Game.bullets.remove(this);
+            } else {
+                this.y += y;
+            }
         }
     }
     

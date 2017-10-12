@@ -29,7 +29,7 @@ public final class Pawn extends Agent {
     /**
      * Max speed for every pawn in every direction. (Maybe, I don't sure)
      */
-    public static final double MAX_SPEED = 16;
+    public static final double MAX_SPEED = 4;
 
     /*
         Inputs of neuron net:
@@ -98,7 +98,7 @@ public final class Pawn extends Agent {
             setNewSpeed(getSpeed());
         }
         try {
-            setNewAbsAngle(out[1]/(1d/Math.PI));
+            setNewAbsAngle(out[1]/(1d/(Math.PI*2)));
         } catch (IllegalArgumentException e) {
             setNewAbsAngle(getAbsAngle());
         }
@@ -128,7 +128,7 @@ public final class Pawn extends Agent {
      * @return Fitness of this pawn
      */
     public double calcFitness(boolean distanceFitness) {
-        double distanceFit = 0.5 * distance;
+        double distanceFit = distance;
         //double massFit = 8 * getMass();
         double warFit = 0;
         if(totalDamageUsed > 0) {
@@ -138,7 +138,7 @@ public final class Pawn extends Agent {
         }
         double foodFit = foodGathered*160;
         if(distanceFitness) {
-            return 0.6 * distanceFit + foodFit;
+            return 0.09 * distanceFit + foodFit;
         } else {
             return foodFit;
         }

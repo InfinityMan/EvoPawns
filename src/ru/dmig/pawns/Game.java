@@ -69,37 +69,37 @@ public class Game {
     /**
      * Length of field to simulate
      */
-    public static final int LENGTH_OF_FIELD = 1000;
+    public static final int LENGTH_OF_FIELD = 1100;
 
     /**
      * Height of field to simulate
      */
-    public static final int HEIGHT_OF_FIELD = 800;
+    public static final int HEIGHT_OF_FIELD = 900;
 
     /**
      * Duration of one tick of game
      */
-    public static final int TICK_DURATION = 50;
+    public static final int TICK_DURATION = 60;
 
     /**
      * Duration of one generation playing in milliseconds
      */
-    public static double DURATION_OF_ROUND = 8 * 1000;
+    public static double DURATION_OF_ROUND = 10 * 1000;
 
     /**
      * Amount of rounds (generations) to play
      */
-    public static final int AMOUNT_OF_ROUNDS = 1000;
+    public static final int AMOUNT_OF_ROUNDS = 10000;
 
     /**
      * Chance of mutation of every paricular weight. From 0 to 100. "By definition at 100 mutation rate, every variable is chosen randomly each generation and no information is retained."
      */
     public static final int MUTATION_RATE = 5;
     
-    public static final int FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 1.5);
+    public static final int FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 1.6);
     
     public static final int MIN_MASS_OF_FOOD = 5;
-    public static final int MAX_MASS_OF_FOOD = 7;
+    public static final int MAX_MASS_OF_FOOD = 5;
 
     public static void main(String[] args) throws InterruptedException {
         tutorial();
@@ -284,6 +284,12 @@ public class Game {
             for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
                 newPawns[i] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
+            }
+            
+            for (int j = 0; j < newPawns.length; j++) {
+                if(Base.chance(4, 0)) {
+                    newPawns[j] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
+                }
             }
             return newPawns;
         } else {
