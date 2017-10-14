@@ -22,7 +22,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JPanel;
 import ru.dmig.pawns.Game;
-import ru.dmig.pawns.agents.Agent;
 
 /**
  * JPanel for painting all activity of pawns here
@@ -39,10 +38,11 @@ public class Panel extends JPanel {
     public void paint(Graphics g) {
         Graphics2D gr2d = (Graphics2D) g;
         gr2d.setBackground(Color.white);
+        gr2d.setColor(Color.PINK);
+        
+        drawDangerZone(gr2d);
+        
         gr2d.setColor(Color.black);
-        
-        
-
         for (int i = 1; i < Game.pawns.length; i++) {
             if(i == 0) {
                 gr2d.setColor(Color.blue);
@@ -71,6 +71,16 @@ public class Panel extends JPanel {
             gr2d.drawOval(x-FOOD_DIAMETER/2, y-FOOD_DIAMETER/2, FOOD_DIAMETER, FOOD_DIAMETER);
         });
 
+    }
+    
+    private void drawDangerZone(Graphics2D g) {
+        int len = Game.LENGTH_OF_FIELD;
+        int heg = Game.HEIGHT_OF_FIELD;
+        int dng = Game.DANGER_ZONE;
+        g.fillRect(0, 0, len, dng);
+        g.fillRect(len-dng, dng, dng, heg-dng);
+        g.fillRect(0, heg-dng, len-dng, dng);
+        g.fillRect(0, dng, dng, heg-dng-dng);
     }
     
     private void drawPawn(Graphics2D g, Pawn pawn) {

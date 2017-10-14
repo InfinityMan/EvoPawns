@@ -102,6 +102,8 @@ public class Game {
     
     public static final int MIN_MASS_OF_FOOD = 5;
     public static final int MAX_MASS_OF_FOOD = 5;
+    
+    public static final int DANGER_ZONE = 20;
 
     public static void main(String[] args) throws InterruptedException {
         tutorial();
@@ -202,8 +204,8 @@ public class Game {
     }
     
     private static Agent generateFood() {
-        float x = Base.randomNumber(20, LENGTH_OF_FIELD-20);
-        float y = Base.randomNumber(20, HEIGHT_OF_FIELD-20);
+        float x = Base.randomNumber(DANGER_ZONE, LENGTH_OF_FIELD-DANGER_ZONE);
+        float y = Base.randomNumber(DANGER_ZONE, HEIGHT_OF_FIELD-DANGER_ZONE);
         float mass = Base.randomNumber(MIN_MASS_OF_FOOD, MAX_MASS_OF_FOOD);
         
         return new Agent(0, 0, x, y, mass);
