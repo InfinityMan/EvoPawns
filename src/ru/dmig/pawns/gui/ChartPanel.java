@@ -19,10 +19,9 @@ package ru.dmig.pawns.gui;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
-import org.knowm.xchart.XYChartBuilder;
+import org.knowm.xchart.style.Styler;
 import ru.epiclib.base.Arrayer;
 
 /**
@@ -46,7 +45,7 @@ public class ChartPanel extends JFrame {
     public ChartPanel() {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         
-        chart = new XYChart(MIN_LENGTH, MIN_HEIGHT);
+        chart = new XYChart(MIN_LENGTH, MIN_HEIGHT, Styler.ChartTheme.Matlab);
         chart.setXAxisTitle("Generation (Поколение)");
         chart.setYAxisTitle("Fitness (Крутость)");
         ArrayList<Integer> gen = new ArrayList<>();
@@ -69,7 +68,7 @@ public class ChartPanel extends JFrame {
         chart.removeSeries("Fittest");
         chart.removeSeries("Averages");
         ArrayList<Integer> gen = new ArrayList<>();
-        for (int i = 0; i < fittests.size(); i++) {
+        for (int i = 1; i < fittests.size()+1; i++) {
             gen.add(i);
         }
         chart.removeSeries("FittestA");
@@ -90,13 +89,11 @@ public class ChartPanel extends JFrame {
             aFittests.add(0d);
             aAverages.add(0d);
         }
-//        for (int i = 20; i < fittests.size(); i++) {
-//                genA.add(i);
-//            }
-        chart.addSeries("FittestA", gen, aFittests);
-        chart.addSeries("AveragesA", gen, aAverages);
+        
         chart.addSeries("Fittest", gen, fittests);
         chart.addSeries("Averages", gen, averages);
+        chart.addSeries("FittestA", gen, aFittests);
+        chart.addSeries("AveragesA", gen, aAverages);
         
         pack();
         repaint();

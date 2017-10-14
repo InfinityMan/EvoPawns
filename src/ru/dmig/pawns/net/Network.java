@@ -82,6 +82,7 @@ public class Network implements Serializable {
      *
      * @param input before scaling. Array data will not be changed in this method.
      * @param output after scaling
+     * @param scaleOutput
      */
     public void calculate(double[] input, double output[], boolean scaleOutput) {
         int i, j, k;
@@ -133,10 +134,10 @@ public class Network implements Serializable {
     }
 
     public void printWeights() {
-        for (int i = 0; i < mLayers.length; i++) {
-            for (int j = 0; j < mLayers[i].neurons.length; j++) {
-                for (int k = 0; k < mLayers[i].neurons[j].weights.length; k++) {
-                    System.out.print(Base.maximumFractionDigits(2, mLayers[i].neurons[j].weights[k]) + " ");
+        for (Layer mLayer : mLayers) {
+            for (Neuron neuron : mLayer.neurons) {
+                for (int k = 0; k < neuron.weights.length; k++) {
+                    System.out.print(Base.maximumFractionDigits(2, neuron.weights[k]) + " ");
                 }
                 System.out.println();
             }

@@ -16,13 +16,13 @@
  */
 package ru.dmig.pawns;
 
-import ru.dmig.pawns.gui.ChartPanel;
-import ru.dmig.pawns.gui.Frame;
-import ru.dmig.pawns.gui.Panel;
-import ru.dmig.pawns.agents.Pawn;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import ru.dmig.pawns.agents.Agent;
+import ru.dmig.pawns.agents.Pawn;
+import ru.dmig.pawns.gui.ChartPanel;
+import ru.dmig.pawns.gui.Frame;
+import ru.dmig.pawns.gui.Panel;
 import ru.epiclib.base.Arrayer;
 import ru.epiclib.base.Base;
 import ru.epiclib.evo.EvoAlg;
@@ -144,7 +144,7 @@ public class Game {
         int amountOfPawns;
         int timeOfRound;
         
-        if (!amountOfPawnsStr.equals("")) {
+        if (!amountOfPawnsStr.isEmpty()) {
             try {
                 amountOfPawns = Integer.valueOf(amountOfPawnsStr);
                 FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
@@ -159,7 +159,7 @@ public class Game {
             amountOfPawns = AMOUNT_OF_PAWNS;
         }
         
-        if (!timeOfRoundStr.equals("")) {
+        if (!timeOfRoundStr.isEmpty()) {
             try {
                 timeOfRound = Integer.valueOf(timeOfRoundStr);
                 if (timeOfRound < 1 || timeOfRound > 60) {
@@ -204,8 +204,8 @@ public class Game {
     }
     
     private static Agent generateFood() {
-        float x = Base.randomNumber(DANGER_ZONE, LENGTH_OF_FIELD-DANGER_ZONE);
-        float y = Base.randomNumber(DANGER_ZONE, HEIGHT_OF_FIELD-DANGER_ZONE);
+        float x = Base.randomNumber(DANGER_ZONE+1, LENGTH_OF_FIELD-DANGER_ZONE-1);
+        float y = Base.randomNumber(DANGER_ZONE+1, HEIGHT_OF_FIELD-DANGER_ZONE-1);
         float mass = Base.randomNumber(MIN_MASS_OF_FOOD, MAX_MASS_OF_FOOD);
         
         return new Agent(0, 0, x, y, mass);
@@ -275,7 +275,6 @@ public class Game {
      */
     public static Pawn[] evolution(Pawn[] pawns) {
         int i;
-        pawns[0].network.printWeights();
         
         double[][] newGens = new double[AMOUNT_OF_PAWNS][];
         Pawn[] newPawns = new Pawn[AMOUNT_OF_PAWNS];
@@ -315,14 +314,14 @@ public class Game {
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
             }
             
-            for (int j = 0; j < newPawns.length; j++) {
+            for (i = 0; i < newPawns.length; i++) {
                 if(Base.chance(4, 0)) {
-                    newPawns[j] = generatePawn();
+                    newPawns[i] = generatePawn();
                 }
             }
         } else {
-            for (int j = 0; j < newGens.length; j++) {
-                newGens[j] = weightsIntoGenom(pawns[j].network.getWeights());
+            for (i = 0; i < newGens.length; i++) {
+                newGens[i] = weightsIntoGenom(pawns[i].network.getWeights());
             }
             for (i = 0; i < newGens.length; i++) {
                 for (int j = 0; j < newGens[i].length; j++) {
@@ -336,7 +335,11 @@ public class Game {
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
             }
         }
-        regenerateFood(50);
+        if(generation % 5 == 0) {
+            regenerateFood(100);
+        } else {
+            regenerateFood(50);
+        }
         return newPawns;
     }
 
@@ -380,18 +383,21 @@ public class Game {
      * Prints on screen info about last generation
      */
     public static void viewStats() {
-        //System.out.println("Generation: " + generation);
         double[] fitnesses = new double[AMOUNT_OF_PAWNS];
         for (int i = 0; i < AMOUNT_OF_PAWNS; i++) {
             fitnesses[i] = pawns[i].calcFitness(DISTANCE_FITNESS);
-            System.out.println(fitnesses[i]);
         }
         double avg = Arrayer.mediumValueOfArray(fitnesses);
         double fit = Arrayer.maxDoubleInArray(fitnesses);
-        //System.out.println("Fittest: " + fit);
-        //System.out.println("Average: " + avg);
         
         ChartPanel.cp.update(fit, avg);
+        
+        double[] pens = new double[AMOUNT_OF_PAWNS];
+        for (int i = 0; i < pens.length; i++) {
+            pens[i] = pawns[i].dangerZonePenalty;
+        }
+        
+        System.out.println("pen: "+Arrayer.mediumValueOfArray(pens));
     }
     
     public static void exception() {

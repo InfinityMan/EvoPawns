@@ -52,6 +52,7 @@ public final class Pawn extends Agent {
 
     public float distance = 0;
     public float foodGathered = 0;
+    public float dangerZonePenalty = 0;
 
     public Pawn(float x, float y, Network network) {
         super(0.2,0,x,y,100);
@@ -112,13 +113,22 @@ public final class Pawn extends Agent {
      * @return Fitness of this pawn
      */
     public double calcFitness(boolean distanceFitness) {
-        double distanceFit = distance;
-        //double massFit = 8 * getMass();
-        double foodFit = foodGathered*160;
-        if(distanceFitness) {
-            return 0.09 * distanceFit + foodFit;
+        double distanceFit = distance * 0.01;
+        double foodFit = foodGathered * 18;
+        double dngPenalty = dangerZonePenalty * 0.12;
+        if (distanceFitness) {
+            return distanceFit + foodFit - dngPenalty;
         } else {
             return foodFit;
+        }
+    }
+
+    public boolean isPawnInDangerZone() {
+        if(getX() <= Game.DANGER_ZONE || getX() >= Game.LENGTH_OF_FIELD-Game.DANGER_ZONE ||
+                getY() <= Game.DANGER_ZONE || getY() >= Game.LENGTH_OF_FIELD-Game.DANGER_ZONE) {
+            return true;
+        } else {
+            return false;
         }
     }
     

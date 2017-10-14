@@ -16,12 +16,12 @@
  */
 package ru.dmig.pawns;
 
-import ru.dmig.pawns.gui.Frame;
-import ru.dmig.pawns.gui.Panel;
 import java.util.ArrayList;
-import ru.dmig.pawns.agents.Pawn;
 import java.util.Calendar;
 import ru.dmig.pawns.agents.Agent;
+import ru.dmig.pawns.agents.Pawn;
+import ru.dmig.pawns.gui.Frame;
+import ru.dmig.pawns.gui.Panel;
 import ru.epiclib.base.Arrayer;
 
 /**
@@ -51,7 +51,13 @@ public class UpdThread extends Thread {
         startTime = Calendar.getInstance().getTimeInMillis();
         finishTime = startTime + Game.DURATION_OF_ROUND;
         currentTime = startTime;
+        
+        double halfOfRoundTime = startTime + Game.DURATION_OF_ROUND/2;
         while (finishTime > currentTime) {
+            
+            if(currentTime <= halfOfRoundTime && (currentTime + Game.TICK_DURATION >= halfOfRoundTime)) {
+                Game.regenerateFood(20);
+            }
 
             processPawns();
             processBullets();
@@ -91,6 +97,10 @@ public class UpdThread extends Thread {
 
             pawns[i].addX(xMov);
             pawns[i].addY(yMov);
+            
+            if(pawns[i].isPawnInDangerZone()) {
+                pawns[i].dangerZonePenalty++;
+            }
 
             pawns[i].distance += Math.abs(xMov);
             pawns[i].distance += Math.abs(yMov);
@@ -114,7 +124,6 @@ public class UpdThread extends Thread {
                         Game.pawns[i].getY() - Panel.PAWN_DIAMETER/2 <= bullet.getY()) {
                     if(bullet.authorOfBullet != Game.pawns[i]) {
                         Game.pawns[i].bulletHit(bullet.getMass());
-                        //System.out.println("Boom");
                     }
                 }
             }
@@ -130,7 +139,7 @@ public class UpdThread extends Thread {
                     idToDelete.add(j);
                 }
             }
-            for (int j = 0; j < idToDelete.size(); j++) {
+            for (Integer idToDelete1 : idToDelete) {
                 int id = Arrayer.maxIntInList(idToDelete);
                 Game.foods.remove(id);
                 Game.generateFood(1);
@@ -154,7 +163,7 @@ public class UpdThread extends Thread {
         } else {
             degreeToAdd = Math.PI*3/2;
         }
-        p.setRltAngleToFood(degreeToAdd + Math.asin((double) Math.abs(y)/distance));
+        p.setRltAngleToFood(degreeToAdd + Math.asin(Math.abs(y)/distance));
     }
     
     private int getNearestFood(float x, float y) {
