@@ -201,9 +201,12 @@ public class Game {
         }
     }
     
-    public static Agent generateFood() {
-        return new Agent(0,0,Base.randomNumber(0, LENGTH_OF_FIELD), 
-                Base.randomNumber(0, HEIGHT_OF_FIELD),Base.randomNumber(MIN_MASS_OF_FOOD, MAX_MASS_OF_FOOD));
+    private static Agent generateFood() {
+        float x = Base.randomNumber(20, LENGTH_OF_FIELD-20);
+        float y = Base.randomNumber(20, HEIGHT_OF_FIELD-20);
+        float mass = Base.randomNumber(MIN_MASS_OF_FOOD, MAX_MASS_OF_FOOD);
+        
+        return new Agent(0, 0, x, y, mass);
     }
     
     public static void regenerateFood(int chance) {
