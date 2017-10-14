@@ -30,6 +30,8 @@ import ru.epiclib.base.Arrayer;
  * @author Dmig
  */
 public class UpdThread extends Thread {
+    
+    
 
     private double startTime;
     private double currentTime;
@@ -47,21 +49,23 @@ public class UpdThread extends Thread {
     }
 
     private void simulateRound() {
+        
+        
         Game.generation++;
         startTime = Calendar.getInstance().getTimeInMillis();
         finishTime = startTime + Game.DURATION_OF_ROUND;
         currentTime = startTime;
-        
-        double halfOfRoundTime = startTime + Game.DURATION_OF_ROUND/2;
+
+        double halfOfRoundTime = startTime + Game.DURATION_OF_ROUND / 2;
         while (finishTime > currentTime) {
-            
-            if(currentTime <= halfOfRoundTime && (currentTime + Game.TICK_DURATION >= halfOfRoundTime)) {
+
+            if (currentTime <= halfOfRoundTime && (currentTime + Game.TICK_DURATION >= halfOfRoundTime)) {
                 Game.regenerateFood(20);
             }
 
             processPawns();
             processBullets();
-            
+
             collisionSensor();
 
             try {
@@ -81,13 +85,13 @@ public class UpdThread extends Thread {
         Pawn[] pawns = Game.pawns;
 
         for (int i = 0; i < Game.AMOUNT_OF_PAWNS; i++) {
-            
+
             if (pawns[i].isAlive()) {
-                setRelatives(pawns[i], true);
-                setRelatives(pawns[i], false);
-                
+                setRelatives(pawns[i]);
+                setRelativeToEnemy(pawns[i]);
+
                 pawns[i].calculate();
-                
+
                 pawns[i].setSpeed(pawns[i].newSpeed);
                 pawns[i].setAbsAngle(pawns[i].newAbsAngle);
 
@@ -98,25 +102,25 @@ public class UpdThread extends Thread {
                 float yMov = (float) (Math.sin(angle) * mov);
                 
                 pawns[i].addX(xMov);
-                pawns[i].addY(yMov);
-                
+                pawns[i].addY(-yMov);
+
                 if (pawns[i].isPawnInDangerZone()) {
                     pawns[i].dangerZonePenalty++;
                 }
-                
+
                 pawns[i].distance += Math.abs(xMov);
                 pawns[i].distance += Math.abs(yMov);
             }
 
         }
     }
-    
+
     private void processBullets() {
         Game.bullets.forEach((bullet) -> {
             bullet.updateCoords();
         });
     }
-    
+
     private void collisionSensor() {
 
         for (int i = 0; i < Game.AMOUNT_OF_PAWNS; i++) {
@@ -162,36 +166,60 @@ public class UpdThread extends Thread {
             }
         }
     }
+
+    private void setRelatives(Pawn p) {
+        Agent food = Game.foods.get(getNearestFood(p.getX(), p.getY()));
+        p.setRltAngleToFood(getAngle(p.getX(), p.getY(), food.getX(), food.getY()));
+    }
     
-    private void setRelatives(Pawn p, boolean food) {
-        Agent agent;
-        if(food) {
-            agent = Game.foods.get(getNearestFood(p.getX(), p.getY()));
-        } else {
-            agent = Game.foods.get(getNearestFood(p.getX(), p.getY()));
-        }
-        double x = agent.getX() - p.getX();
-        double y = p.getY() - agent.getY();
+    protected static double getAngle(float x1, float y1, float x2, float y2) {
+        y1 = Game.HEIGHT_OF_FIELD - y1;
+        y2 = Game.HEIGHT_OF_FIELD - y2;
+        
+        double x = x2 - x1;
+        double y = y2 - y1;
         double xDiff = Math.abs(x);
         double yDiff = Math.abs(y);
-        double distance = Math.sqrt(xDiff*xDiff + yDiff*yDiff);
-        double degreeToAdd; //if x > 0 && y > 0
-        if(x < 0 && y > 0) {
-            degreeToAdd = Math.PI/2;
-        } else if(x < 0 && y < 0) {
+        int sqr;
+        double degreeToAdd;
+        if (x < 0 && y > 0) {
+            sqr = 2;
+            degreeToAdd = Math.PI / 2;
+        } else if (x < 0 && y < 0) {
+            sqr = 3;
             degreeToAdd = Math.PI;
-        } else if(x > 0 && y < 0) {
-            degreeToAdd = Math.PI*3/2;
+        } else if (x > 0 && y < 0) {
+            sqr = 4;
+            degreeToAdd = Math.PI * 3 / 2;
         } else {
+            sqr = 1;
             degreeToAdd = 0;
         }
-        if(food) {
-            p.setRltAngleToFood(degreeToAdd + Math.asin(Math.abs(y)/distance));
+        if(sqr == 4 || sqr == 2) {
+            return (degreeToAdd + Math.atan(xDiff / yDiff));
         } else {
-            p.setRltAngleToEnemy(degreeToAdd + Math.asin(Math.abs(y)/distance));
+            return (degreeToAdd + Math.atan(yDiff / xDiff));
         }
     }
     
+    protected static double getDistance(float x1, float y1, float x2, float y2) {
+        y1 = Game.HEIGHT_OF_FIELD - y1;
+        y2 = Game.HEIGHT_OF_FIELD - y2;
+        
+        double xDiff = x2 - x1;
+        double yDiff = y2 - y1;
+        double x = Math.abs(xDiff);
+        double y = Math.abs(yDiff);
+        return Math.sqrt(x*x + y*y);
+    }
+
+    private void setRelativeToEnemy(Pawn p) {
+        Pawn enemy = Game.pawns[getNearestPawn(p)];
+        
+        p.setRltAngleToEnemy(getAngle(p.getX(), p.getY(), enemy.getX(), enemy.getY()));
+        p.setDistToEnemy((float) getDistance(p.getX(), p.getY(), enemy.getX(), enemy.getY()));
+    }
+
     private int getNearestFood(float x, float y) {
         double lastDiff = Game.LENGTH_OF_FIELD;
         int lastID = 0;
@@ -199,11 +227,29 @@ public class UpdThread extends Thread {
             Agent get = Game.foods.get(i);
             double xDiff = Math.abs(get.getX() - x);
             double yDiff = Math.abs(get.getY() - y);
-            double distance = Math.sqrt(xDiff*xDiff + yDiff*yDiff);
-            if(distance < lastDiff) {
+            double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+            if (distance < lastDiff) {
                 lastID = i;
                 lastDiff = distance;
-            } 
+            }
+        }
+        return lastID;
+    }
+
+    protected int getNearestPawn(Pawn pawn) {
+        double lastDiff = Game.LENGTH_OF_FIELD;
+        int lastID = 0;
+        for (int i = 0; i < Game.pawns.length; i++) {
+            if (!pawn.equals(Game.pawns[i])) {
+                Agent get = Game.pawns[i];
+                double xDiff = Math.abs(get.getX() - pawn.getX());
+                double yDiff = Math.abs(get.getY() - pawn.getY());
+                double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+                if (distance < lastDiff) {
+                    lastID = i;
+                    lastDiff = distance;
+                }
+            }
         }
         return lastID;
     }

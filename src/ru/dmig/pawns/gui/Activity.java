@@ -24,7 +24,7 @@ import ru.dmig.pawns.Game;
  */
 public class Activity extends javax.swing.JFrame {
     
-    private float gameSpeed = 2;
+    private float gameSpeed = 0.5f;
     
     public static void init() {
         java.awt.EventQueue.invokeLater(() -> {
@@ -40,7 +40,7 @@ public class Activity extends javax.swing.JFrame {
     }
     
     public void update() {
-        
+        curSpeedL.setText("Current speed: "+gameSpeed+"x");
     }
 
     /**
@@ -61,6 +61,7 @@ public class Activity extends javax.swing.JFrame {
         avgL = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Activity");
 
         curSpeedL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         curSpeedL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -172,6 +173,7 @@ public class Activity extends javax.swing.JFrame {
             Game.TICK_DURATION = Game.TICK_DURATION / 2;
             Game.DURATION_OF_ROUND = Game.DURATION_OF_ROUND / 2;
             gameSpeed = gameSpeed*2;
+            update();
         }
     }//GEN-LAST:event_speedPlusActionPerformed
 
@@ -179,6 +181,7 @@ public class Activity extends javax.swing.JFrame {
         Game.TICK_DURATION = Game.TICK_DURATION * 2;
         Game.DURATION_OF_ROUND = Game.DURATION_OF_ROUND * 2;
         gameSpeed = gameSpeed/2;
+        update();
     }//GEN-LAST:event_speedMinusActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

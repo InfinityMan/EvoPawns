@@ -95,6 +95,7 @@ public class ChartPanel extends JFrame {
         chart.addSeries("FittestA", gen, aFittests);
         chart.addSeries("AveragesA", gen, aAverages);
         
+        
         pack();
         repaint();
     }

@@ -43,12 +43,18 @@ public class Panel extends JPanel {
         drawDangerZone(gr2d);
         
         gr2d.setColor(Color.black);
-        for (int i = 1; i < Game.pawns.length; i++) {
+        for (int i = 0; i < Game.pawns.length; i++) {
             if (Game.pawns[i].isAlive()) {
-                drawPawn(gr2d, Game.pawns[i]);
+                if (i == 0) {
+                    gr2d.setColor(Color.blue);
+                    drawPawn(gr2d, Game.pawns[i]);
+                    gr2d.setColor(Color.black);
+                } else {
+                    drawPawn(gr2d, Game.pawns[i]);
+                }
             }
         }
-        
+
         gr2d.setColor(Color.red);
         
         Game.bullets.forEach((bullet) -> {
@@ -84,7 +90,7 @@ public class Panel extends JPanel {
         int y = Math.round(pawn.getY());
         g.drawOval(x - PAWN_DIAMETER / 2, y - PAWN_DIAMETER / 2, PAWN_DIAMETER, PAWN_DIAMETER);
         g.drawLine(x, y, (int) Math.round(x + Math.cos(pawn.getAbsAngle()) * PAWN_DIAMETER),
-                (int) Math.round(y + Math.sin(pawn.getAbsAngle()) * PAWN_DIAMETER));
+                (int) Math.round(y - Math.sin(pawn.getAbsAngle()) * PAWN_DIAMETER));
     }
 
 }

@@ -174,11 +174,11 @@ public class Agent {
     public final void addY(float y) {
         if (t == Type.PAWN) {
             if (this.y + y >= Game.HEIGHT_OF_FIELD) {
-                setSpeed(0);
-                setAbsAngle(3*Math.PI/2);
+                //setSpeed(0);
+                //setAbsAngle(3*Math.PI/2);
             } else if (this.y + y < 0) {
-                setSpeed(0);
-                setAbsAngle(Math.PI/2);
+                //setSpeed(0);
+                //setAbsAngle(Math.PI/2);
             } else {
                 this.y += y;
             }

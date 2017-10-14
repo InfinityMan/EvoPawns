@@ -16,6 +16,7 @@
  */
 package ru.dmig.pawns.agents;
 
+import java.util.Objects;
 import ru.dmig.pawns.Game;
 import ru.dmig.pawns.net.Network;
 
@@ -37,6 +38,7 @@ public final class Pawn extends Agent {
     1: absolute angle of movement
     2: relative angle to nearest food
     3: relative angle to nearest pawn
+    4: distance to nearest pawn
     4: x
     5: y
         Outputs:
@@ -47,6 +49,8 @@ public final class Pawn extends Agent {
     private double rltAngleToFood;
     private double rltAngleToEnemy;
     
+    private float distToEnemy;
+
     public Network network;
 
     public double newSpeed;
@@ -82,7 +86,12 @@ public final class Pawn extends Agent {
         double aangl = getAbsAngle()/(Math.PI*2);
         double ranglF = getRltAngleToFood()/(Math.PI*2);
         double ranglE = getRltAngleToEnemy()/(Math.PI*2);
-        double[] in = {getSpeed(), aangl, ranglF, ranglE, x, y};
+        double distE = 1;
+        if(getDistToEnemy() <= 200) {
+            distE = getDistToEnemy()/200;
+        }
+        
+        double[] in = {getSpeed(), aangl, ranglF, ranglE, distE, x, y};
         double[] out = {newSpeed, newAbsAngle};
 
         network.calculate(in, out, true);
@@ -107,7 +116,6 @@ public final class Pawn extends Agent {
     public void attack(double damage) {
         if(damage > getMass()) {
             kill();
-            System.out.println("rip");
         } else {
             setMass(getMass() - damage);
         }
@@ -205,6 +213,24 @@ public final class Pawn extends Agent {
     public void setRltAngleToEnemy(double rltAngleToEnemy) {
         this.rltAngleToEnemy = rltAngleToEnemy;
     }
+    
+    /**
+     * Get the value of distToEnemy
+     *
+     * @return the value of distToEnemy
+     */
+    public float getDistToEnemy() {
+        return distToEnemy;
+    }
+
+    /**
+     * Set the value of distToEnemy
+     *
+     * @param distToEnemy new value of distToEnemy
+     */
+    public void setDistToEnemy(float distToEnemy) {
+        this.distToEnemy = distToEnemy;
+    }
 
     public void setNewSpeed(double newSpeed) {
         if (newSpeed >= 0 && newSpeed <= 1) {
@@ -221,5 +247,68 @@ public final class Pawn extends Agent {
             throw new IllegalArgumentException();
         }
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.rltAngleToFood) ^ (Double.doubleToLongBits(this.rltAngleToFood) >>> 32));
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.rltAngleToEnemy) ^ (Double.doubleToLongBits(this.rltAngleToEnemy) >>> 32));
+        hash = 97 * hash + Float.floatToIntBits(this.distToEnemy);
+        hash = 97 * hash + Objects.hashCode(this.network);
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.newSpeed) ^ (Double.doubleToLongBits(this.newSpeed) >>> 32));
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.newAbsAngle) ^ (Double.doubleToLongBits(this.newAbsAngle) >>> 32));
+        hash = 97 * hash + Float.floatToIntBits(this.distance);
+        hash = 97 * hash + Float.floatToIntBits(this.foodGathered);
+        hash = 97 * hash + Float.floatToIntBits(this.dangerZonePenalty);
+        hash = 97 * hash + (this.alive ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Pawn other = (Pawn) obj;
+        if (Double.doubleToLongBits(this.rltAngleToFood) != Double.doubleToLongBits(other.rltAngleToFood)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.rltAngleToEnemy) != Double.doubleToLongBits(other.rltAngleToEnemy)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.distToEnemy) != Float.floatToIntBits(other.distToEnemy)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.newSpeed) != Double.doubleToLongBits(other.newSpeed)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.newAbsAngle) != Double.doubleToLongBits(other.newAbsAngle)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.distance) != Float.floatToIntBits(other.distance)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.foodGathered) != Float.floatToIntBits(other.foodGathered)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.dangerZonePenalty) != Float.floatToIntBits(other.dangerZonePenalty)) {
+            return false;
+        }
+        if (this.alive != other.alive) {
+            return false;
+        }
+        if (!Objects.equals(this.network, other.network)) {
+            return false;
+        }
+        return true;
+    }
+
+    
 
 }

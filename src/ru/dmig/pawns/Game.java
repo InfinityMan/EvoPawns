@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import ru.dmig.pawns.agents.Agent;
 import ru.dmig.pawns.agents.Pawn;
+import ru.dmig.pawns.gui.Activity;
 import ru.dmig.pawns.gui.ChartPanel;
 import ru.dmig.pawns.gui.Frame;
 import ru.dmig.pawns.gui.Panel;
@@ -64,7 +65,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns
      */
-    public static final int[] LAYERS_OF_NET = {6, 5, 3, 3, 2};
+    public static final int[] LAYERS_OF_NET = {7, 7, 4, 2, 2};
 
     /**
      * Length of field to simulate
@@ -79,12 +80,12 @@ public class Game {
     /**
      * Duration of one tick of game
      */
-    public static int TICK_DURATION = 8;
+    public static int TICK_DURATION = 32;
 
     /**
      * Duration of one generation playing in milliseconds
      */
-    public static double DURATION_OF_ROUND = 6 * 1000;
+    public static double DURATION_OF_ROUND = 24 * 1000;
 
     /**
      * Amount of rounds (generations) to play
@@ -125,6 +126,8 @@ public class Game {
                 Frame.frame = new Frame();
                 Frame.frame.setVisible(true);
             });
+            
+            Activity.init();
             
             Thread.sleep(2000);
             
@@ -396,8 +399,6 @@ public class Game {
         for (int i = 0; i < pens.length; i++) {
             pens[i] = pawns[i].dangerZonePenalty;
         }
-        
-        System.out.println("pen: "+Arrayer.mediumValueOfArray(pens));
     }
     
     public static void exception() {
