@@ -64,7 +64,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns
      */
-    public static final int[] LAYERS_OF_NET = {5, 4, 4, 2};
+    public static final int[] LAYERS_OF_NET = {6, 5, 3, 3, 2};
 
     /**
      * Length of field to simulate
@@ -102,6 +102,8 @@ public class Game {
     public static final int MAX_MASS_OF_FOOD = 5;
     
     public static final int DANGER_ZONE = 20;
+    
+    public static final double PAWN_DAMAGE = 0.1;
 
     public static void main(String[] args) throws InterruptedException {
         tutorial();

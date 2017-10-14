@@ -82,28 +82,31 @@ public class UpdThread extends Thread {
 
         for (int i = 0; i < Game.AMOUNT_OF_PAWNS; i++) {
             
-            setRelatives(pawns[i]);
-            
-            pawns[i].calculate();
+            if (pawns[i].isAlive()) {
+                setRelatives(pawns[i], true);
+                setRelatives(pawns[i], false);
+                
+                pawns[i].calculate();
+                
+                pawns[i].setSpeed(pawns[i].newSpeed);
+                pawns[i].setAbsAngle(pawns[i].newAbsAngle);
 
-            pawns[i].setSpeed(pawns[i].newSpeed);
-            pawns[i].setAbsAngle(pawns[i].newAbsAngle);
-
-            //Projections TODO
-            double mov = pawns[i].getSpeed() * Pawn.MAX_SPEED;
-            double angle = pawns[i].getAbsAngle();
-            float xMov = (float) (Math.cos(angle) * mov);
-            float yMov = (float) (Math.sin(angle) * mov);
-
-            pawns[i].addX(xMov);
-            pawns[i].addY(yMov);
-            
-            if(pawns[i].isPawnInDangerZone()) {
-                pawns[i].dangerZonePenalty++;
+                //Projections TODO
+                double mov = pawns[i].getSpeed() * Pawn.MAX_SPEED;
+                double angle = pawns[i].getAbsAngle();
+                float xMov = (float) (Math.cos(angle) * mov);
+                float yMov = (float) (Math.sin(angle) * mov);
+                
+                pawns[i].addX(xMov);
+                pawns[i].addY(yMov);
+                
+                if (pawns[i].isPawnInDangerZone()) {
+                    pawns[i].dangerZonePenalty++;
+                }
+                
+                pawns[i].distance += Math.abs(xMov);
+                pawns[i].distance += Math.abs(yMov);
             }
-
-            pawns[i].distance += Math.abs(xMov);
-            pawns[i].distance += Math.abs(yMov);
 
         }
     }
@@ -115,55 +118,78 @@ public class UpdThread extends Thread {
     }
     
     private void collisionSensor() {
-        
+
         for (int i = 0; i < Game.AMOUNT_OF_PAWNS; i++) {
-            for (Agent bullet : Game.bullets) {
-                if(Game.pawns[i].getX() + Panel.PAWN_DIAMETER/2 >= bullet.getX() &&
-                        Game.pawns[i].getX() - Panel.PAWN_DIAMETER/2 <= bullet.getX() &&
-                        Game.pawns[i].getY() + Panel.PAWN_DIAMETER/2 >= bullet.getY() && 
-                        Game.pawns[i].getY() - Panel.PAWN_DIAMETER/2 <= bullet.getY()) {
-                    if(bullet.authorOfBullet != Game.pawns[i]) {
-                        Game.pawns[i].attack(bullet.getMass());
+            if (Game.pawns[i].isAlive()) {
+                for (Agent bullet : Game.bullets) {
+                    if (Game.pawns[i].getX() + Panel.PAWN_DIAMETER / 2 >= bullet.getX()
+                            && Game.pawns[i].getX() - Panel.PAWN_DIAMETER / 2 <= bullet.getX()
+                            && Game.pawns[i].getY() + Panel.PAWN_DIAMETER / 2 >= bullet.getY()
+                            && Game.pawns[i].getY() - Panel.PAWN_DIAMETER / 2 <= bullet.getY()) {
+                        if (bullet.authorOfBullet != Game.pawns[i]) {
+                            Game.pawns[i].attack(bullet.getMass());
+                        }
                     }
                 }
-            }
-            
-            ArrayList<Integer> idToDelete = new ArrayList<>();
-            for (int j = 0; j < Game.foods.size(); j++) {
-                Agent food = Game.foods.get(j);
-                if(Game.pawns[i].getX() + Panel.PAWN_DIAMETER/2 >= food.getX() &&
-                        Game.pawns[i].getX() - Panel.PAWN_DIAMETER/2 <= food.getX() &&
-                        Game.pawns[i].getY() + Panel.PAWN_DIAMETER/2 >= food.getY() && 
-                        Game.pawns[i].getY() - Panel.PAWN_DIAMETER/2 <= food.getY()) {
-                    Game.pawns[i].feed(food.getMass());
-                    idToDelete.add(j);
+
+                for (int j = 0; j < Game.AMOUNT_OF_PAWNS; j++) {
+                    Pawn pawn = Game.pawns[j];
+                    if (Game.pawns[i].getX() + Panel.PAWN_DIAMETER / 2 >= pawn.getX()
+                            && Game.pawns[i].getX() - Panel.PAWN_DIAMETER / 2 <= pawn.getX()
+                            && Game.pawns[i].getY() + Panel.PAWN_DIAMETER / 2 >= pawn.getY()
+                            && Game.pawns[i].getY() - Panel.PAWN_DIAMETER / 2 <= pawn.getY()) {
+                        Game.pawns[i].attack(Game.PAWN_DAMAGE);
+                    }
+                }
+
+                ArrayList<Integer> idToDelete = new ArrayList<>();
+                for (int j = 0; j < Game.foods.size(); j++) {
+                    Agent food = Game.foods.get(j);
+                    if (Game.pawns[i].getX() + Panel.PAWN_DIAMETER / 2 >= food.getX()
+                            && Game.pawns[i].getX() - Panel.PAWN_DIAMETER / 2 <= food.getX()
+                            && Game.pawns[i].getY() + Panel.PAWN_DIAMETER / 2 >= food.getY()
+                            && Game.pawns[i].getY() - Panel.PAWN_DIAMETER / 2 <= food.getY()) {
+                        Game.pawns[i].feed(food.getMass());
+                        idToDelete.add(j);
+                    }
+                }
+
+                for (int j = 0; j < idToDelete.size(); j++) {
+                    int id = Arrayer.maxIntInList(idToDelete);
+                    Game.foods.remove(id);
+                    Game.generateFood(1);
                 }
             }
-            for (Integer idToDelete1 : idToDelete) {
-                int id = Arrayer.maxIntInList(idToDelete);
-                Game.foods.remove(id);
-                Game.generateFood(1);
-            }
-            
         }
     }
     
-    private void setRelatives(Pawn p) {
-        Agent nearestFood = Game.foods.get(getNearestFood(p.getX(), p.getY()));
-        double x = nearestFood.getX() - p.getX();
-        double y = p.getY() - nearestFood.getY();
+    private void setRelatives(Pawn p, boolean food) {
+        Agent agent;
+        if(food) {
+            agent = Game.foods.get(getNearestFood(p.getX(), p.getY()));
+        } else {
+            agent = Game.foods.get(getNearestFood(p.getX(), p.getY()));
+        }
+        double x = agent.getX() - p.getX();
+        double y = p.getY() - agent.getY();
         double xDiff = Math.abs(x);
         double yDiff = Math.abs(y);
         double distance = Math.sqrt(xDiff*xDiff + yDiff*yDiff);
-        double degreeToAdd = 0; //if x > 0 && y > 0
+        double degreeToAdd; //if x > 0 && y > 0
         if(x < 0 && y > 0) {
             degreeToAdd = Math.PI/2;
         } else if(x < 0 && y < 0) {
             degreeToAdd = Math.PI;
-        } else {
+        } else if(x > 0 && y < 0) {
             degreeToAdd = Math.PI*3/2;
+        } else {
+            degreeToAdd = 0;
         }
-        p.setRltAngleToFood(degreeToAdd + Math.asin(Math.abs(y)/distance));
+        if(food) {
+            p.setRltAngleToFood(degreeToAdd + Math.asin(Math.abs(y)/distance));
+        } else {
+            p.setRltAngleToEnemy(degreeToAdd + Math.asin(Math.abs(y)/distance));
+        }
     }
     
     private int getNearestFood(float x, float y) {

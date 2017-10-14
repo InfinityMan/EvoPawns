@@ -44,11 +44,7 @@ public class Panel extends JPanel {
         
         gr2d.setColor(Color.black);
         for (int i = 1; i < Game.pawns.length; i++) {
-            if(i == 0) {
-                gr2d.setColor(Color.blue);
-                drawPawn(gr2d, Game.pawns[0]);
-                gr2d.setColor(Color.black);
-            } else {
+            if (Game.pawns[i].isAlive()) {
                 drawPawn(gr2d, Game.pawns[i]);
             }
         }

@@ -36,14 +36,16 @@ public final class Pawn extends Agent {
     0: speed
     1: absolute angle of movement
     2: relative angle to nearest food
-    3: x
-    4: y
+    3: relative angle to nearest pawn
+    4: x
+    5: y
         Outputs:
     0: new speed
     1: new absolute angle
      */
 
     private double rltAngleToFood;
+    private double rltAngleToEnemy;
     
     public Network network;
 
@@ -78,8 +80,9 @@ public final class Pawn extends Agent {
         double x = getX()/Game.LENGTH_OF_FIELD;
         double y = getY()/Game.LENGTH_OF_FIELD;
         double aangl = getAbsAngle()/(Math.PI*2);
-        double rangl = getRltAngleToFood()/(Math.PI*2);
-        double[] in = {getSpeed(), aangl, rangl, x, y};
+        double ranglF = getRltAngleToFood()/(Math.PI*2);
+        double ranglE = getRltAngleToEnemy()/(Math.PI*2);
+        double[] in = {getSpeed(), aangl, ranglF, ranglE, x, y};
         double[] out = {newSpeed, newAbsAngle};
 
         network.calculate(in, out, true);
@@ -104,6 +107,7 @@ public final class Pawn extends Agent {
     public void attack(double damage) {
         if(damage > getMass()) {
             kill();
+            System.out.println("rip");
         } else {
             setMass(getMass() - damage);
         }
@@ -182,6 +186,24 @@ public final class Pawn extends Agent {
      */
     public void setRltAngleToFood(double rltAngleToFood) {
         this.rltAngleToFood = rltAngleToFood;
+    }
+    
+    /**
+     * Get the value of rltAngleToEnemy
+     *
+     * @return the value of rltAngleToEnemy
+     */
+    public double getRltAngleToEnemy() {
+        return rltAngleToEnemy;
+    }
+
+    /**
+     * Set the value of rltAngleToEnemy
+     *
+     * @param rltAngleToEnemy new value of rltAngleToEnemy
+     */
+    public void setRltAngleToEnemy(double rltAngleToEnemy) {
+        this.rltAngleToEnemy = rltAngleToEnemy;
     }
 
     public void setNewSpeed(double newSpeed) {
