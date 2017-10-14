@@ -38,8 +38,6 @@ public class Game {
      * Amount of pawns for game
      */
     public static int AMOUNT_OF_PAWNS = 32;
-    
-    public static boolean DISTANCE_FITNESS = true;
 
     /**
      * Interplanetary pawns array
@@ -282,7 +280,7 @@ public class Game {
         if (pawns.length > 3) {
             double[] fitnesses = new double[AMOUNT_OF_PAWNS];
             for (i = 0; i < pawns.length; i++) {
-                fitnesses[i] = pawns[i].calcFitness(DISTANCE_FITNESS);
+                fitnesses[i] = pawns[i].calcFitness();
             }
 
             //Crossover
@@ -385,7 +383,7 @@ public class Game {
     public static void viewStats() {
         double[] fitnesses = new double[AMOUNT_OF_PAWNS];
         for (int i = 0; i < AMOUNT_OF_PAWNS; i++) {
-            fitnesses[i] = pawns[i].calcFitness(DISTANCE_FITNESS);
+            fitnesses[i] = pawns[i].calcFitness();
         }
         double avg = Arrayer.mediumValueOfArray(fitnesses);
         double fit = Arrayer.maxDoubleInArray(fitnesses);

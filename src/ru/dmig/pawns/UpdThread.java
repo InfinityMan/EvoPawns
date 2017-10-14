@@ -123,7 +123,7 @@ public class UpdThread extends Thread {
                         Game.pawns[i].getY() + Panel.PAWN_DIAMETER/2 >= bullet.getY() && 
                         Game.pawns[i].getY() - Panel.PAWN_DIAMETER/2 <= bullet.getY()) {
                     if(bullet.authorOfBullet != Game.pawns[i]) {
-                        Game.pawns[i].bulletHit(bullet.getMass());
+                        Game.pawns[i].attack(bullet.getMass());
                     }
                 }
             }

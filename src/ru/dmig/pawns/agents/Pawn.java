@@ -53,6 +53,8 @@ public final class Pawn extends Agent {
     public float distance = 0;
     public float foodGathered = 0;
     public float dangerZonePenalty = 0;
+    
+    private boolean alive = true;
 
     public Pawn(float x, float y, Network network) {
         super(0.2,0,x,y,100);
@@ -99,11 +101,11 @@ public final class Pawn extends Agent {
 //        }
     }
     
-    public void bulletHit(double bulletMass) {
-        if(bulletMass > getMass()) {
-            System.out.println("rip");
+    public void attack(double damage) {
+        if(damage > getMass()) {
+            kill();
         } else {
-            setMass(getMass() - bulletMass);
+            setMass(getMass() - damage);
         }
     }
 
@@ -112,15 +114,13 @@ public final class Pawn extends Agent {
      *
      * @return Fitness of this pawn
      */
-    public double calcFitness(boolean distanceFitness) {
+    public double calcFitness() {
         double distanceFit = distance * 0.01;
         double foodFit = foodGathered * 18;
         double dngPenalty = dangerZonePenalty * 0.12;
-        if (distanceFitness) {
-            return distanceFit + foodFit - dngPenalty;
-        } else {
-            return foodFit;
-        }
+        double massFit = getMass() * 0.9;
+        
+        return distanceFit + foodFit + massFit - dngPenalty;
     }
 
     public boolean isPawnInDangerZone() {
@@ -132,55 +132,17 @@ public final class Pawn extends Agent {
         }
     }
     
-    /**
-     * Add mass gathered from food
-     * @param food Full food amount
-     */
-    public void feed(double food) {
-        foodGathered += food;
-        double energyGathered = food;
-        switch (getCategory()) {
-            case 0:
-                //Nothing to change
-                break;
-            case 1:
-                energyGathered = energyGathered * 3 / 4;
-                break;
-            case 2:
-                energyGathered = energyGathered * 2 / 5;
-                break;
-            case 3:
-                energyGathered = energyGathered / 10;
-                break;
-            default:
-                throw new AssertionError();
-        }
-        setMass(getMass() + energyGathered);
+    public boolean isAlive() {
+        return alive;
     }
     
-    /**
-     * Remove mass from pawn by attack damage
-     * @param damage Full food amount
-     */
-    public void attack(double damage) {
-        double damageGet = damage;
-        switch (getCategory()) {
-            case 0:
-                damageGet = damageGet / 2;
-                break;
-            case 1:
-                //Nothing to change
-                break;
-            case 2:
-                damageGet = damageGet * 2;
-                break;
-            case 3:
-                damageGet = damageGet * 4;
-                break;
-            default:
-                throw new AssertionError();
-        }
-        setMass(getMass() - damageGet);
+    protected void kill() {
+        alive = false;
+    }
+    
+    public void feed(double mass) {
+        setMass(getMass() + mass);
+        foodGathered += mass;
     }
     
     /**
