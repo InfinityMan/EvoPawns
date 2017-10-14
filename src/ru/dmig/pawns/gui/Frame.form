@@ -25,15 +25,12 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="panelC" max="32767" attributes="0"/>
-          </Group>
+          <Component id="panelC" alignment="0" pref="1220" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="panelC" min="-2" max="-2" attributes="0"/>
+          <Component id="panelC" alignment="1" min="-2" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -46,13 +43,13 @@
           </Border>
         </Property>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[1100, 900]"/>
+          <Dimension value="[1200, 1000]"/>
         </Property>
         <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[1100, 900]"/>
+          <Dimension value="[1200, 1000]"/>
         </Property>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[1100, 900]"/>
+          <Dimension value="[1200, 1000]"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -62,12 +59,12 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="1096" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="1216" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="896" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="996" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>

@@ -71,12 +71,12 @@ public class Game {
     /**
      * Length of field to simulate
      */
-    public static final int LENGTH_OF_FIELD = 1100;
+    public static final int LENGTH_OF_FIELD = 1200;
 
     /**
      * Height of field to simulate
      */
-    public static final int HEIGHT_OF_FIELD = 900;
+    public static final int HEIGHT_OF_FIELD = 1000;
 
     /**
      * Duration of one tick of game
