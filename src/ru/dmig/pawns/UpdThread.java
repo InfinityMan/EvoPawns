@@ -16,6 +16,8 @@
  */
 package ru.dmig.pawns;
 
+import ru.dmig.pawns.gui.Frame;
+import ru.dmig.pawns.gui.Panel;
 import java.util.ArrayList;
 import ru.dmig.pawns.agents.Pawn;
 import java.util.Calendar;
@@ -144,14 +146,13 @@ public class UpdThread extends Thread {
         double xDiff = Math.abs(x);
         double yDiff = Math.abs(y);
         double distance = Math.sqrt(xDiff*xDiff + yDiff*yDiff);
-        p.setDistanceToFood((float) distance);
-        int degreeToAdd = 0; //if x > 0 && y > 0
+        double degreeToAdd = 0; //if x > 0 && y > 0
         if(x < 0 && y > 0) {
-            degreeToAdd = 90;
+            degreeToAdd = Math.PI/2;
         } else if(x < 0 && y < 0) {
-            degreeToAdd = 180;
+            degreeToAdd = Math.PI;
         } else {
-            degreeToAdd = 270;
+            degreeToAdd = Math.PI*3/2;
         }
         p.setRltAngleToFood(degreeToAdd + Math.asin((double) Math.abs(y)/distance));
     }

@@ -16,7 +16,9 @@
  */
 package ru.dmig.pawns;
 
-import java.awt.HeadlessException;
+import ru.dmig.pawns.gui.ChartPanel;
+import ru.dmig.pawns.gui.Frame;
+import ru.dmig.pawns.gui.Panel;
 import ru.dmig.pawns.agents.Pawn;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
@@ -35,7 +37,7 @@ public class Game {
     /**
      * Amount of pawns for game
      */
-    public static int AMOUNT_OF_PAWNS = 20;
+    public static int AMOUNT_OF_PAWNS = 32;
     
     public static boolean DISTANCE_FITNESS = true;
 
@@ -64,7 +66,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns
      */
-    public static final int[] LAYERS_OF_NET = {6, 5, 4, 3};
+    public static final int[] LAYERS_OF_NET = {5, 4, 4, 2};
 
     /**
      * Length of field to simulate
@@ -79,12 +81,12 @@ public class Game {
     /**
      * Duration of one tick of game
      */
-    public static final int TICK_DURATION = 60;
+    public static int TICK_DURATION = 8;
 
     /**
      * Duration of one generation playing in milliseconds
      */
-    public static double DURATION_OF_ROUND = 10 * 1000;
+    public static double DURATION_OF_ROUND = 6 * 1000;
 
     /**
      * Amount of rounds (generations) to play
@@ -96,7 +98,7 @@ public class Game {
      */
     public static final int MUTATION_RATE = 5;
     
-    public static final int FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 1.6);
+    public static int FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
     
     public static final int MIN_MASS_OF_FOOD = 5;
     public static final int MAX_MASS_OF_FOOD = 5;
@@ -137,21 +139,22 @@ public class Game {
         String amountOfPawnsStr = JOptionPane.showInputDialog(null, "Введите количество пешек для игры [По умолчанию: 16]: ");
         String timeOfRoundStr = JOptionPane.showInputDialog(null,"Введите длительность раунда (жизни одного поколения) в секундах [По умолчанию: 8]: ");
         
-        int amountOfPawns = 16;
-        int timeOfRound = 8;
+        int amountOfPawns;
+        int timeOfRound;
         
         if (!amountOfPawnsStr.equals("")) {
             try {
                 amountOfPawns = Integer.valueOf(amountOfPawnsStr);
+                FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
                 if (amountOfPawns < 4 || amountOfPawns > 40 || amountOfPawns % 4 != 0) {
                     throw new NumberFormatException();
                 }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством пешек. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 3, но меньше 41, при этом обязательно делиться на 4.");
-                amountOfPawns = 16;
+                amountOfPawns = AMOUNT_OF_PAWNS;
             }
         } else {
-            amountOfPawns = 16;
+            amountOfPawns = AMOUNT_OF_PAWNS;
         }
         
         if (!timeOfRoundStr.equals("")) {
@@ -162,13 +165,14 @@ public class Game {
                 }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством секунд на раунд. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 0, но меньше 61.");
-                timeOfRound = 8;
+                timeOfRound = (int) DURATION_OF_ROUND;
             }
         } else {
-            timeOfRound = 8;
+            timeOfRound = (int) DURATION_OF_ROUND;
         }
         
         AMOUNT_OF_PAWNS = amountOfPawns;
+        DURATION_OF_ROUND = timeOfRound;
     }
     
     public static void newBullet(float x, float y, double angle, double mass, Pawn author) {
@@ -180,16 +184,33 @@ public class Game {
     public static Pawn[] generatePawns() {
         Pawn[] pawns = new Pawn[AMOUNT_OF_PAWNS];
         for (int i = 0; i < pawns.length; i++) {
-            pawns[i] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
-            pawns[i].setAbsAngle(randomAngle());
+            pawns[i] = generatePawn();
         }
         return pawns;
     }
     
+    public static Pawn generatePawn() {
+        Pawn pawn = new Pawn(Base.randomNumber(LENGTH_OF_FIELD/4, LENGTH_OF_FIELD*3/4), Base.randomNumber(HEIGHT_OF_FIELD/4, HEIGHT_OF_FIELD*3/4));
+        pawn.setAbsAngle(randomAngle());
+        return pawn;
+    }
+    
     public static void generateFood(int amount) {
         for (int i = 0; i < amount; i++) {
-            foods.add(new Agent(0,0,Base.randomNumber(0, LENGTH_OF_FIELD), 
-                Base.randomNumber(0, HEIGHT_OF_FIELD),Base.randomNumber(MIN_MASS_OF_FOOD, MAX_MASS_OF_FOOD)));
+            foods.add(generateFood());
+        }
+    }
+    
+    public static Agent generateFood() {
+        return new Agent(0,0,Base.randomNumber(0, LENGTH_OF_FIELD), 
+                Base.randomNumber(0, HEIGHT_OF_FIELD),Base.randomNumber(MIN_MASS_OF_FOOD, MAX_MASS_OF_FOOD));
+    }
+    
+    public static void regenerateFood(int chance) {
+        for (int i = 0; i < foods.size(); i++) {
+            if(Base.chance(chance, 0)) {
+                foods.set(i, generateFood());
+            }
         }
     }
 
@@ -251,6 +272,9 @@ public class Game {
         int i;
         pawns[0].network.printWeights();
         
+        double[][] newGens = new double[AMOUNT_OF_PAWNS][];
+        Pawn[] newPawns = new Pawn[AMOUNT_OF_PAWNS];
+        
         if (pawns.length > 3) {
             double[] fitnesses = new double[AMOUNT_OF_PAWNS];
             for (i = 0; i < pawns.length; i++) {
@@ -259,7 +283,7 @@ public class Game {
 
             //Crossover
             int[] parents = getParents(fitnesses); //test for %4
-            double[][] newGens = new double[AMOUNT_OF_PAWNS][];
+
             for (i = 0; i < parents.length; i += 2) {
                 double[] genomA = weightsIntoGenom(pawns[parents[i]].network.getWeights());
                 double[] genomB = weightsIntoGenom(pawns[parents[i + 1]].network.getWeights());
@@ -280,20 +304,18 @@ public class Game {
                 }
             }
             //Creating new pawns from gens
-            Pawn[] newPawns = new Pawn[AMOUNT_OF_PAWNS];
+
             for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
-                newPawns[i] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
+                newPawns[i] = generatePawn();
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
             }
             
             for (int j = 0; j < newPawns.length; j++) {
                 if(Base.chance(4, 0)) {
-                    newPawns[j] = new Pawn(Base.randomNumber(0, LENGTH_OF_FIELD), Base.randomNumber(0, HEIGHT_OF_FIELD));
+                    newPawns[j] = generatePawn();
                 }
             }
-            return newPawns;
         } else {
-            double[][] newGens = new double[AMOUNT_OF_PAWNS][];
             for (int j = 0; j < newGens.length; j++) {
                 newGens[j] = weightsIntoGenom(pawns[j].network.getWeights());
             }
@@ -304,13 +326,13 @@ public class Game {
                     }
                 }
             }
-            Pawn[] newPawns = generatePawns();
+            newPawns = generatePawns();
             for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
             }
-            
-            return newPawns;
         }
+        regenerateFood(50);
+        return newPawns;
     }
 
     /**

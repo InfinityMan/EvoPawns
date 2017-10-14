@@ -142,11 +142,7 @@ public class Agent {
     public final void addX(float x) {
         if (t == Type.PAWN) {
             if (this.x + x >= Game.LENGTH_OF_FIELD) {
-                setSpeed(0);
-                setAbsAngle(Math.PI);
             } else if (this.x + x < 0) {
-                setSpeed(0);
-                setAbsAngle(0);
             } else {
                 this.x += x;
             }

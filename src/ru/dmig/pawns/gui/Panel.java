@@ -14,13 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ru.dmig.pawns;
+package ru.dmig.pawns.gui;
 
 import ru.dmig.pawns.agents.Pawn;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JPanel;
+import ru.dmig.pawns.Game;
 import ru.dmig.pawns.agents.Agent;
 
 /**
@@ -30,22 +31,26 @@ import ru.dmig.pawns.agents.Agent;
  */
 public class Panel extends JPanel {
 
-    public static final int PAWN_DIAMETER = 16;
+    public static final int PAWN_DIAMETER = 6;
     public static final int BULLET_DIAMETER = 6;
     public static final int FOOD_DIAMETER = 3;
-
+    
     @Override
     public void paint(Graphics g) {
         Graphics2D gr2d = (Graphics2D) g;
         gr2d.setBackground(Color.white);
         gr2d.setColor(Color.black);
+        
+        
 
-        for (Pawn pawn : Game.pawns) {
-            int x = Math.round(pawn.getX());
-            int y = Math.round(pawn.getY());
-            gr2d.drawOval(x-PAWN_DIAMETER/2, y-PAWN_DIAMETER/2, PAWN_DIAMETER, PAWN_DIAMETER);
-            gr2d.drawLine(x, y, (int) Math.round(x+Math.cos(pawn.getAbsAngle())*PAWN_DIAMETER),
-                    (int) Math.round(y+Math.sin(pawn.getAbsAngle())*PAWN_DIAMETER));
+        for (int i = 1; i < Game.pawns.length; i++) {
+            if(i == 0) {
+                gr2d.setColor(Color.blue);
+                drawPawn(gr2d, Game.pawns[0]);
+                gr2d.setColor(Color.black);
+            } else {
+                drawPawn(gr2d, Game.pawns[i]);
+            }
         }
         
         gr2d.setColor(Color.red);
@@ -58,7 +63,7 @@ public class Panel extends JPanel {
                     (int) Math.round(y+Math.sin(bullet.getAbsAngle())*BULLET_DIAMETER));
         });
         
-        gr2d.setColor(Color.green);
+        gr2d.setColor(Color.DARK_GRAY);
         
         Game.foods.forEach((food) -> {
             int x = Math.round(food.getX());
@@ -66,6 +71,14 @@ public class Panel extends JPanel {
             gr2d.drawOval(x-FOOD_DIAMETER/2, y-FOOD_DIAMETER/2, FOOD_DIAMETER, FOOD_DIAMETER);
         });
 
+    }
+    
+    private void drawPawn(Graphics2D g, Pawn pawn) {
+        int x = Math.round(pawn.getX());
+        int y = Math.round(pawn.getY());
+        g.drawOval(x - PAWN_DIAMETER / 2, y - PAWN_DIAMETER / 2, PAWN_DIAMETER, PAWN_DIAMETER);
+        g.drawLine(x, y, (int) Math.round(x + Math.cos(pawn.getAbsAngle()) * PAWN_DIAMETER),
+                (int) Math.round(y + Math.sin(pawn.getAbsAngle()) * PAWN_DIAMETER));
     }
 
 }

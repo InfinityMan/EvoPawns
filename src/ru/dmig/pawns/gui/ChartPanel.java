@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ru.dmig.pawns;
+package ru.dmig.pawns.gui;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
+import ru.epiclib.base.Arrayer;
 
 /**
  *
@@ -32,6 +33,9 @@ public class ChartPanel extends JFrame {
     
     public static ArrayList<Double> fittests = new ArrayList<>();
     public static ArrayList<Double> averages = new ArrayList<>();
+    
+    public static ArrayList<Double> aFittests = new ArrayList<>();
+    public static ArrayList<Double> aAverages = new ArrayList<>();
     
     public XYChart chart;
     public static ChartPanel cp;
@@ -68,6 +72,29 @@ public class ChartPanel extends JFrame {
         for (int i = 0; i < fittests.size(); i++) {
             gen.add(i);
         }
+        chart.removeSeries("FittestA");
+        chart.removeSeries("AveragesA");
+        if (fittests.size() >= 21) {
+            
+            double[] lastFits = new double[20];
+            double[] lastAvgs = new double[20];
+            for (int i = 0; i < 20; i++) {
+                lastFits[i] = fittests.get(fittests.size() - 1 - i);
+                lastAvgs[i] = averages.get(averages.size() - 1 - i);
+            }
+            aFittests.add(Arrayer.mediumValueOfArray(lastFits));
+            aAverages.add(Arrayer.mediumValueOfArray(lastAvgs));
+            ArrayList<Integer> genA = new ArrayList<>();
+            
+        } else {
+            aFittests.add(0d);
+            aAverages.add(0d);
+        }
+//        for (int i = 20; i < fittests.size(); i++) {
+//                genA.add(i);
+//            }
+        chart.addSeries("FittestA", gen, aFittests);
+        chart.addSeries("AveragesA", gen, aAverages);
         chart.addSeries("Fittest", gen, fittests);
         chart.addSeries("Averages", gen, averages);
         

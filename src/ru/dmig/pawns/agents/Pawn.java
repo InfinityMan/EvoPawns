@@ -33,49 +33,35 @@ public final class Pawn extends Agent {
 
     /*
         Inputs of neuron net:
-    0: speed [0;1]
-    1: absolute angle of movement [0;2pi)
-    2: mass
-    3: relative angle to nearest food [0;2pi)
-    4: distance to nearest food
-    5: relative angle to nearest enemy [0;2pi)
-    6: distamce to nearest enemy
+    0: speed
+    1: absolute angle of movement
+    2: relative angle to nearest food
+    3: x
+    4: y
         Outputs:
     0: new speed
     1: new absolute angle
-    2: shoot price [0;10]
      */
 
-    private double rltAngleToEnemy;
     private double rltAngleToFood;
-
-    private float distanceToEnemy;
-    private float distanceToFood;
     
     public Network network;
 
     public double newSpeed;
     public double newAbsAngle;
-    public double shootPrice;
 
     public float distance = 0;
-    public float damageCaused = 0;
-    public float totalDamageUsed = 0;
     public float foodGathered = 0;
 
     public Pawn(float x, float y, Network network) {
         super(0.2,0,x,y,100);
         
-        setRltAngleToEnemy(0);
         setRltAngleToFood(0);
-        setDistanceToEnemy(0);
-        setDistanceToFood(0);
 
         this.network = network;
 
         newSpeed = getSpeed();
         newAbsAngle = getAbsAngle();
-        shootPrice = 0;
     }
 
     public Pawn(float x, float y) {
@@ -86,26 +72,24 @@ public final class Pawn extends Agent {
      * Calculate out parameters from input parameters by network.
      */
     public void calculate() {
-        double[] in = {getSpeed(), getAbsAngle(), getMass(), getRltAngleToFood(),
-            getDistanceToFood(), getRltAngleToEnemy(), getDistanceToEnemy()};
-        double[] out = {newSpeed, newAbsAngle, shootPrice};
+        double x = getX()/Game.LENGTH_OF_FIELD;
+        double y = getY()/Game.LENGTH_OF_FIELD;
+        double aangl = getAbsAngle()/(Math.PI*2);
+        double rangl = getRltAngleToFood()/(Math.PI*2);
+        double[] in = {getSpeed(), aangl, rangl, x, y};
+        double[] out = {newSpeed, newAbsAngle};
 
         network.calculate(in, out, true);
         
         try {
             setNewSpeed(out[0]);
         } catch (IllegalArgumentException e) {
-            setNewSpeed(getSpeed());
+            setNewSpeed(0);
         }
         try {
-            setNewAbsAngle(out[1]/(1d/(Math.PI*2)));
+            setNewAbsAngle(out[1]*Math.PI*2);
         } catch (IllegalArgumentException e) {
-            setNewAbsAngle(getAbsAngle());
-        }
-        try {
-            setShootPrice(out[2]);
-        } catch (IllegalArgumentException e) {
-            setShootPrice(0);
+            setNewAbsAngle(0);
         }
         
 //        if(shootPrice > 0) {
@@ -130,12 +114,6 @@ public final class Pawn extends Agent {
     public double calcFitness(boolean distanceFitness) {
         double distanceFit = distance;
         //double massFit = 8 * getMass();
-        double warFit = 0;
-        if(totalDamageUsed > 0) {
-            if(damageCaused != 0) {
-                warFit = (8 * damageCaused) / totalDamageUsed;
-            } else warFit = 0 - (totalDamageUsed / 2);
-        }
         double foodFit = foodGathered*160;
         if(distanceFitness) {
             return 0.09 * distanceFit + foodFit;
@@ -217,24 +195,6 @@ public final class Pawn extends Agent {
     }
 
     /**
-     * Get the value of rltAngleToEnemy
-     *
-     * @return the value of rltAngleToEnemy
-     */
-    public double getRltAngleToEnemy() {
-        return rltAngleToEnemy;
-    }
-
-    /**
-     * Set the value of rltAngleToEnemy
-     *
-     * @param rltAngleToEnemy new value of rltAngleToEnemy
-     */
-    public void setRltAngleToEnemy(double rltAngleToEnemy) {
-        this.rltAngleToEnemy = rltAngleToEnemy;
-    }
-    
-    /**
      * Get the value of rltAngleToFood
      *
      * @return the value of rltAngleToFood
@@ -252,43 +212,6 @@ public final class Pawn extends Agent {
         this.rltAngleToFood = rltAngleToFood;
     }
 
-    /**
-     * Get the value of distanceToEnemy
-     *
-     * @return the value of distanceToEnemy
-     */
-    public float getDistanceToEnemy() {
-        return distanceToEnemy;
-    }
-
-    /**
-     * Set the value of distanceToEnemy
-     *
-     * @param distanceToEnemy new value of distanceToEnemy
-     */
-    public void setDistanceToEnemy(float distanceToEnemy) {
-        this.distanceToEnemy = distanceToEnemy;
-    }
-    
-    /**
-     * Get the value of distanceToFood
-     *
-     * @return the value of distanceToFood
-     */
-    public float getDistanceToFood() {
-        return distanceToFood;
-    }
-
-    /**
-     * Set the value of distanceToFood
-     *
-     * @param distanceToFood new value of distanceToFood
-     */
-    public void setDistanceToFood(float distanceToFood) {
-        this.distanceToFood = distanceToFood;
-    }
-
-
     public void setNewSpeed(double newSpeed) {
         if (newSpeed >= 0 && newSpeed <= 1) {
             this.newSpeed = newSpeed;
@@ -300,14 +223,6 @@ public final class Pawn extends Agent {
     public void setNewAbsAngle(double newAbsAngle) {
         if (newAbsAngle >= 0 && newAbsAngle < 2*Math.PI) {
             this.newAbsAngle = newAbsAngle;
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    public void setShootPrice(double shootPrice) {
-        if (shootPrice >= 0 && shootPrice <= 50) {
-            this.shootPrice = shootPrice;
         } else {
             throw new IllegalArgumentException();
         }
