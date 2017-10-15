@@ -146,14 +146,12 @@ public class Network implements Serializable {
     }
 
     public int getSize() {
-        int[] layersD = new int[mLayers.length+1];
+        int[] layersD = new int[mLayers.length + 1];
         for (int i = 0; i < layersD.length; i++) {
             if (i != 0) {
-                layersD[i] = mLayers[i-1].neurons.length;
-                System.out.println(layersD[i]);
+                layersD[i] = mLayers[i - 1].neurons.length;
             } else {
-                layersD[0] = mLayers[0].neurons[0].weights.length-1;
-                System.out.println(layersD[0]);
+                layersD[0] = mLayers[0].neurons[0].weights.length - 1;
             }
         }
         return getSize(layersD);

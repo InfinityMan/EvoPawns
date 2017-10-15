@@ -29,22 +29,22 @@ import ru.epiclib.base.Arrayer;
  * @author Dmig
  */
 public class ChartPanel extends JFrame {
-    
+
     public static ArrayList<Double> fittests = new ArrayList<>();
     public static ArrayList<Double> averages = new ArrayList<>();
-    
+
     public static ArrayList<Double> aFittests = new ArrayList<>();
     public static ArrayList<Double> aAverages = new ArrayList<>();
-    
+
     public XYChart chart;
     public static ChartPanel cp;
-    
+
     private static final int MIN_LENGTH = 1200;
     private static final int MIN_HEIGHT = 700;
 
     public ChartPanel() {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        
+
         chart = new XYChart(MIN_LENGTH, MIN_HEIGHT, Styler.ChartTheme.Matlab);
         chart.setXAxisTitle("Generation (Поколение)");
         chart.setYAxisTitle("Fitness (Крутость)");
@@ -54,27 +54,27 @@ public class ChartPanel extends JFrame {
         }
         //chart.addSeries("Fittest", gen, fittests);
         //chart.addSeries("Averages", gen, averages);
-        
+
         XChartPanel<XYChart> c = new XChartPanel<>(chart);
         c.setMinimumSize(new Dimension(MIN_LENGTH, MIN_HEIGHT));
         add(c);
-        
+
         setTitle("Chart of fitness");
         cp = this;
 
     }
-    
+
     public void update() {
         chart.removeSeries("Fittest");
         chart.removeSeries("Averages");
         ArrayList<Integer> gen = new ArrayList<>();
-        for (int i = 1; i < fittests.size()+1; i++) {
+        for (int i = 1; i < fittests.size() + 1; i++) {
             gen.add(i);
         }
         chart.removeSeries("FittestA");
         chart.removeSeries("AveragesA");
         if (fittests.size() >= 21) {
-            
+
             double[] lastFits = new double[20];
             double[] lastAvgs = new double[20];
             for (int i = 0; i < 20; i++) {
@@ -84,28 +84,27 @@ public class ChartPanel extends JFrame {
             aFittests.add(Arrayer.mediumValueOfArray(lastFits));
             aAverages.add(Arrayer.mediumValueOfArray(lastAvgs));
             ArrayList<Integer> genA = new ArrayList<>();
-            
+
         } else {
             aFittests.add(0d);
             aAverages.add(0d);
         }
-        
+
         chart.addSeries("Fittest", gen, fittests);
         chart.addSeries("Averages", gen, averages);
         chart.addSeries("FittestA", gen, aFittests);
         chart.addSeries("AveragesA", gen, aAverages);
-        
-        
+
         pack();
         repaint();
     }
-    
+
     public void update(double fit, double avg) {
         fittests.add(fit);
         averages.add(avg);
         update();
     }
-    
+
     public static double[] arrayListToArray(ArrayList<Double> doubles) {
         double[] ret = new double[doubles.size()];
         for (int i = 0; i < doubles.size(); i++) {
@@ -113,11 +112,11 @@ public class ChartPanel extends JFrame {
         }
         return ret;
     }
-    
+
     public static void lauch() {
         java.awt.EventQueue.invokeLater(() -> {
             new ChartPanel().setVisible(true);
         });
     }
-    
+
 }

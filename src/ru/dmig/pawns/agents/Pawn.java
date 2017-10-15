@@ -45,10 +45,9 @@ public final class Pawn extends Agent {
     0: new speed
     1: new absolute angle
      */
-
     private double rltAngleToFood;
     private double rltAngleToEnemy;
-    
+
     private float distToEnemy;
 
     public Network network;
@@ -59,12 +58,12 @@ public final class Pawn extends Agent {
     public float distance = 0;
     public float foodGathered = 0;
     public float dangerZonePenalty = 0;
-    
+
     private boolean alive = true;
 
     public Pawn(float x, float y, Network network) {
-        super(0.2,0,x,y,100);
-        
+        super(0.2, 0, x, y, 100);
+
         setRltAngleToFood(0);
 
         this.network = network;
@@ -81,40 +80,40 @@ public final class Pawn extends Agent {
      * Calculate out parameters from input parameters by network.
      */
     public void calculate() {
-        double x = getX()/Game.LENGTH_OF_FIELD;
-        double y = getY()/Game.LENGTH_OF_FIELD;
-        double aangl = getAbsAngle()/(Math.PI*2);
-        double ranglF = getRltAngleToFood()/(Math.PI*2);
-        double ranglE = getRltAngleToEnemy()/(Math.PI*2);
+        double x = getX() / Game.LENGTH_OF_FIELD;
+        double y = getY() / Game.LENGTH_OF_FIELD;
+        double aangl = getAbsAngle() / (Math.PI * 2);
+        double ranglF = getRltAngleToFood() / (Math.PI * 2);
+        double ranglE = getRltAngleToEnemy() / (Math.PI * 2);
         double distE = 1;
-        if(getDistToEnemy() <= 200) {
-            distE = getDistToEnemy()/200;
+        if (getDistToEnemy() <= 200) {
+            distE = getDistToEnemy() / 200;
         }
-        
+
         double[] in = {getSpeed(), aangl, ranglF, ranglE, distE, x, y};
         double[] out = {newSpeed, newAbsAngle};
 
         network.calculate(in, out, true);
-        
+
         try {
             setNewSpeed(out[0]);
         } catch (IllegalArgumentException e) {
             setNewSpeed(0);
         }
         try {
-            setNewAbsAngle(out[1]*Math.PI*2);
+            setNewAbsAngle(out[1] * Math.PI * 2);
         } catch (IllegalArgumentException e) {
             setNewAbsAngle(0);
         }
-        
+
 //        if(shootPrice > 0) {
 //            Game.newBullet(getX(), getY(), getAbsAngle(), shootPrice, this);
 //            totalDamageUsed += shootPrice;
 //        }
     }
-    
+
     public void attack(double damage) {
-        if(damage > getMass()) {
+        if (damage > getMass()) {
             kill();
         } else {
             setMass(getMass() - damage);
@@ -131,51 +130,50 @@ public final class Pawn extends Agent {
         double foodFit = foodGathered * 18;
         double dngPenalty = dangerZonePenalty * 0.12;
         double massFit = getMass() * 0.9;
-        
+
         return distanceFit + foodFit + massFit - dngPenalty;
     }
 
     public boolean isPawnInDangerZone() {
-        if(getX() <= Game.DANGER_ZONE || getX() >= Game.LENGTH_OF_FIELD-Game.DANGER_ZONE ||
-                getY() <= Game.DANGER_ZONE || getY() >= Game.LENGTH_OF_FIELD-Game.DANGER_ZONE) {
+        if (getX() <= Game.DANGER_ZONE || getX() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE
+                || getY() <= Game.DANGER_ZONE || getY() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE) {
             return true;
         } else {
             return false;
         }
     }
-    
+
     public boolean isAlive() {
         return alive;
     }
-    
+
     protected void kill() {
         alive = false;
     }
-    
+
     public void feed(double mass) {
         setMass(getMass() + mass);
         foodGathered += mass;
     }
-    
+
     /**
-     * Get category of pawn.
-     * If mass:
-     * 0 < x < 100 : 0
-     * 100 < x < 400 : 1
-     * 400 < x < 700 : 2
-     * 700 < x < 1000 : 3
-     * @return code of category
+     * Get category of pawn. If mass: 0 < x < 100 : 0 100 < x < 400 : 1 400 < x < 700 : 2 700 < x < 1000 : 3
+     * @r
+     *
+     * eturn code of category
      */
     public int getCategory() {
-        if(getMass() >= 0 && getMass() <= 100) {
+        if (getMass() >= 0 && getMass() <= 100) {
             return 0;
-        } else if(getMass() > 100 && getMass() <= 400) {
+        } else if (getMass() > 100 && getMass() <= 400) {
             return 1;
-        } else if(getMass() > 400 && getMass() <= 700) {
+        } else if (getMass() > 400 && getMass() <= 700) {
             return 2;
-        } else if(getMass() > 700 && getMass() <= 1000) {
+        } else if (getMass() > 700 && getMass() <= 1000) {
             return 3;
-        } else throw new IllegalStateException();
+        } else {
+            throw new IllegalStateException();
+        }
     }
 
     /**
@@ -195,7 +193,7 @@ public final class Pawn extends Agent {
     public void setRltAngleToFood(double rltAngleToFood) {
         this.rltAngleToFood = rltAngleToFood;
     }
-    
+
     /**
      * Get the value of rltAngleToEnemy
      *
@@ -213,7 +211,7 @@ public final class Pawn extends Agent {
     public void setRltAngleToEnemy(double rltAngleToEnemy) {
         this.rltAngleToEnemy = rltAngleToEnemy;
     }
-    
+
     /**
      * Get the value of distToEnemy
      *
@@ -241,7 +239,7 @@ public final class Pawn extends Agent {
     }
 
     public void setNewAbsAngle(double newAbsAngle) {
-        if (newAbsAngle >= 0 && newAbsAngle < 2*Math.PI) {
+        if (newAbsAngle >= 0 && newAbsAngle < 2 * Math.PI) {
             this.newAbsAngle = newAbsAngle;
         } else {
             throw new IllegalArgumentException();
@@ -308,7 +306,5 @@ public final class Pawn extends Agent {
         }
         return true;
     }
-
-    
 
 }
