@@ -34,21 +34,25 @@ public class Panel extends JPanel {
     public static final int BULLET_DIAMETER = 6;
     public static final int FOOD_DIAMETER = 3;
     
+    public static final Color MY_ORANGE = new Color(219, 118, 67);
+    public static final Color MY_WHITE = new Color(255, 255, 255);
+    public static final Color MY_BLUE = new Color(25,42,90);
+    
     @Override
     public void paint(Graphics g) {
         Graphics2D gr2d = (Graphics2D) g;
-        gr2d.setBackground(Color.white);
+        gr2d.setBackground(MY_WHITE);
         gr2d.setColor(Color.PINK);
         
         drawDangerZone(gr2d);
         
-        gr2d.setColor(Color.black);
+        gr2d.setColor(MY_ORANGE);
         for (int i = 0; i < Game.pawns.length; i++) {
             if (Game.pawns[i].isAlive()) {
                 if (i == 0) {
                     gr2d.setColor(Color.blue);
                     drawPawn(gr2d, Game.pawns[i]);
-                    gr2d.setColor(Color.black);
+                    gr2d.setColor(MY_ORANGE);
                 } else {
                     drawPawn(gr2d, Game.pawns[i]);
                 }
@@ -65,7 +69,7 @@ public class Panel extends JPanel {
                     (int) Math.round(y+Math.sin(bullet.getAbsAngle())*BULLET_DIAMETER));
         });
         
-        gr2d.setColor(Color.DARK_GRAY);
+        gr2d.setColor(MY_BLUE);
         
         Game.foods.forEach((food) -> {
             int x = Math.round(food.getX());
