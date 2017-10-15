@@ -16,7 +16,10 @@
  */
 package ru.dmig.pawns;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import ru.dmig.pawns.agents.Agent;
 import ru.dmig.pawns.agents.Pawn;
@@ -24,8 +27,10 @@ import ru.dmig.pawns.gui.Activity;
 import ru.dmig.pawns.gui.ChartPanel;
 import ru.dmig.pawns.gui.Frame;
 import ru.dmig.pawns.gui.Panel;
+import ru.dmig.pawns.net.Network;
 import ru.epiclib.base.Arrayer;
 import ru.epiclib.base.Base;
+import ru.epiclib.base.FileWorker;
 import ru.epiclib.evo.EvoAlg;
 
 /**
@@ -36,59 +41,59 @@ import ru.epiclib.evo.EvoAlg;
 public class Game {
 
     /**
-     * Amount of pawns for game
+     * Amount of pawns for game.
      */
     public static int AMOUNT_OF_PAWNS = 32;
 
     /**
-     * Interplanetary pawns array
+     * Interplanetary pawns array.
      */
     public static Pawn[] pawns;
-    
+
     /**
-     * Interplanetary food list
+     * Interplanetary food list.
      */
     public static ArrayList<Agent> foods;
-    
+
     /**
-     * Interplanetary bullets list
+     * Interplanetary bullets list.
      */
     public static ArrayList<Agent> bullets;
 
     /**
-     * Current generation in game
+     * Current generation in game.
      */
     public static int generation = 0;
-    
+
     public static UpdThread upThread;
 
     /**
-     * Setting of minds anatomy of pawns
+     * Setting of minds anatomy of pawns.
      */
-    public static final int[] LAYERS_OF_NET = {7, 7, 4, 2, 2};
+    public static final int[] LAYERS_OF_NET = {7, 6, 6, 2};
 
     /**
-     * Length of field to simulate
+     * Length of field to simulate.
      */
     public static final int LENGTH_OF_FIELD = 1200;
 
     /**
-     * Height of field to simulate
+     * Height of field to simulate.
      */
     public static final int HEIGHT_OF_FIELD = 1000;
 
     /**
-     * Duration of one tick of game
+     * Duration of one tick of game.
      */
     public static int TICK_DURATION = 32;
 
     /**
-     * Duration of one generation playing in milliseconds
+     * Duration of one generation playing in milliseconds.
      */
     public static double DURATION_OF_ROUND = 24 * 1000;
 
     /**
-     * Amount of rounds (generations) to play
+     * Amount of rounds (generations) to play.
      */
     public static final int AMOUNT_OF_ROUNDS = 10000;
 
@@ -96,22 +101,27 @@ public class Game {
      * Chance of mutation of every paricular weight. From 0 to 100. "By definition at 100 mutation rate, every variable is chosen randomly each generation and no information is retained."
      */
     public static final int MUTATION_RATE = 5;
-    
+
     public static int FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
-    
+
     public static final int MIN_MASS_OF_FOOD = 5;
     public static final int MAX_MASS_OF_FOOD = 5;
-    
+
     public static final int DANGER_ZONE = 20;
-    
+
     public static final double PAWN_DAMAGE = 0.1;
+
+    /**
+     * Generation index, when <code>new.gen</code> loads.
+     */
+    public static final int GENERATION_FOR_UPDATE = 10;
 
     public static void main(String[] args) throws InterruptedException {
         tutorial();
         newRun();
 
     }
-    
+
     public static void newRun() {
         try {
             ChartPanel.lauch();
@@ -119,18 +129,18 @@ public class Game {
             foods = new ArrayList<>();
             bullets = new ArrayList<>();
             generateFood(FOOD_AMOUNT);
-            
+
             Frame.panel = new Panel();
-            
+
             java.awt.EventQueue.invokeLater(() -> {
                 Frame.frame = new Frame();
                 Frame.frame.setVisible(true);
             });
-            
+
             Activity.init();
-            
+
             Thread.sleep(2000);
-            
+
             upThread = new UpdThread();
         } catch (InterruptedException ex) {
             System.exit(-12121121);
@@ -142,11 +152,11 @@ public class Game {
                 + " ¬ общем, на графике, если он есть, сини€ лини€ - значение крутости самой сильной пешки, оранжева€ - средн€€ крутость.");
         JOptionPane.showMessageDialog(null, "¬ замечательной версии -32.853, было добавлено: пешки, крутость, еда, графика -2 уровн€, настройка количества пешек, и длительности раунда.");
         String amountOfPawnsStr = JOptionPane.showInputDialog(null, "¬ведите количество пешек дл€ игры [ѕо умолчанию: 16]: ");
-        String timeOfRoundStr = JOptionPane.showInputDialog(null,"¬ведите длительность раунда (жизни одного поколени€) в секундах [ѕо умолчанию: 8]: ");
-        
+        String timeOfRoundStr = JOptionPane.showInputDialog(null, "¬ведите длительность раунда (жизни одного поколени€) в секундах [ѕо умолчанию: 8]: ");
+
         int amountOfPawns;
         int timeOfRound;
-        
+
         if (!amountOfPawnsStr.isEmpty()) {
             try {
                 amountOfPawns = Integer.valueOf(amountOfPawnsStr);
@@ -161,7 +171,7 @@ public class Game {
         } else {
             amountOfPawns = AMOUNT_OF_PAWNS;
         }
-        
+
         if (!timeOfRoundStr.isEmpty()) {
             try {
                 timeOfRound = Integer.valueOf(timeOfRoundStr);
@@ -175,17 +185,17 @@ public class Game {
         } else {
             timeOfRound = (int) DURATION_OF_ROUND;
         }
-        
+
         AMOUNT_OF_PAWNS = amountOfPawns;
         DURATION_OF_ROUND = timeOfRound;
     }
-    
+
     public static void newBullet(float x, float y, double angle, double mass, Pawn author) {
         bullets.add(new Agent(Agent.MAX_BULLET_SPEED, angle, x, y, mass));
-        bullets.get(bullets.size()-1).authorOfBullet = author;
-        bullets.get(bullets.size()-1).t = Agent.Type.BULLET;
+        bullets.get(bullets.size() - 1).authorOfBullet = author;
+        bullets.get(bullets.size() - 1).t = Agent.Type.BULLET;
     }
-    
+
     public static Pawn[] generatePawns() {
         Pawn[] pawns = new Pawn[AMOUNT_OF_PAWNS];
         for (int i = 0; i < pawns.length; i++) {
@@ -193,30 +203,30 @@ public class Game {
         }
         return pawns;
     }
-    
+
     public static Pawn generatePawn() {
-        Pawn pawn = new Pawn(Base.randomNumber(LENGTH_OF_FIELD/4, LENGTH_OF_FIELD*3/4), Base.randomNumber(HEIGHT_OF_FIELD/4, HEIGHT_OF_FIELD*3/4));
+        Pawn pawn = new Pawn(Base.randomNumber(LENGTH_OF_FIELD / 4, LENGTH_OF_FIELD * 3 / 4), Base.randomNumber(HEIGHT_OF_FIELD / 4, HEIGHT_OF_FIELD * 3 / 4));
         pawn.setAbsAngle(randomAngle());
         return pawn;
     }
-    
+
     public static void generateFood(int amount) {
         for (int i = 0; i < amount; i++) {
             foods.add(generateFood());
         }
     }
-    
+
     private static Agent generateFood() {
-        float x = Base.randomNumber(DANGER_ZONE+1, LENGTH_OF_FIELD-DANGER_ZONE-1);
-        float y = Base.randomNumber(DANGER_ZONE+1, HEIGHT_OF_FIELD-DANGER_ZONE-1);
+        float x = Base.randomNumber(DANGER_ZONE + 1, LENGTH_OF_FIELD - DANGER_ZONE - 1);
+        float y = Base.randomNumber(DANGER_ZONE + 1, HEIGHT_OF_FIELD - DANGER_ZONE - 1);
         float mass = Base.randomNumber(MIN_MASS_OF_FOOD, MAX_MASS_OF_FOOD);
-        
+
         return new Agent(0, 0, x, y, mass);
     }
-    
+
     public static void regenerateFood(int chance) {
         for (int i = 0; i < foods.size(); i++) {
-            if(Base.chance(chance, 0)) {
+            if (Base.chance(chance, 0)) {
                 foods.set(i, generateFood());
             }
         }
@@ -277,12 +287,21 @@ public class Game {
      * @return Pawns array after crossover and mutation on start pawns
      */
     public static Pawn[] evolution(Pawn[] pawns) {
+        if (generation == GENERATION_FOR_UPDATE) {
+            try {
+                return loadGenoms("new.gen");
+            } catch (FileNotFoundException ex) {
+            } catch (ParsingException ex) {
+                ex.printStackTrace();
+            }
+        }
         int i;
-        
+
         double[][] newGens = new double[AMOUNT_OF_PAWNS][];
         Pawn[] newPawns = new Pawn[AMOUNT_OF_PAWNS];
-        
-        if (pawns.length > 3) {
+
+        if (pawns.length
+                > 3) {
             double[] fitnesses = new double[AMOUNT_OF_PAWNS];
             for (i = 0; i < pawns.length; i++) {
                 fitnesses[i] = pawns[i].calcFitness();
@@ -316,9 +335,9 @@ public class Game {
                 newPawns[i] = generatePawn();
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
             }
-            
+
             for (i = 0; i < newPawns.length; i++) {
-                if(Base.chance(4, 0)) {
+                if (Base.chance(4, 0)) {
                     newPawns[i] = generatePawn();
                 }
             }
@@ -338,8 +357,12 @@ public class Game {
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
             }
         }
-        if(generation % 5 == 0) {
+        if (generation
+                % 5 == 0) {
             regenerateFood(100);
+            if (generation % 10 == 0) {
+                saveGenoms(newPawns, "gen" + generation);
+            }
         } else {
             regenerateFood(50);
         }
@@ -363,7 +386,7 @@ public class Game {
 
         for (int i = 0; i < parentsIDs.length; i++) {
             double totalSumm = 0;
-            
+
             for (int j = 0; j < lFitnesses.length; j++) {
                 totalSumm += lFitnesses[j];
             }
@@ -371,12 +394,12 @@ public class Game {
                 chances[j] = (lFitnesses[j] / totalSumm) * 100;
                 thousChances[j] = (int) Math.round(chances[j] * 1000);
             }
-            if(Base.chance(70, 0)) {
+            if (Base.chance(70, 0)) {
                 parentsIDs[i] = Base.chances(thousChances, 3);
             } else {
-                parentsIDs[i] = Base.randomNumber(0, lFitnesses.length-1);
+                parentsIDs[i] = Base.randomNumber(0, lFitnesses.length - 1);
             }
-            
+
             lFitnesses[parentsIDs[i]] = 0; //TODO normal deleting
         }
         return parentsIDs;
@@ -392,23 +415,81 @@ public class Game {
         }
         double avg = Arrayer.mediumValueOfArray(fitnesses);
         double fit = Arrayer.maxDoubleInArray(fitnesses);
-        
+
         ChartPanel.cp.update(fit, avg);
-        
+
         double[] pens = new double[AMOUNT_OF_PAWNS];
         for (int i = 0; i < pens.length; i++) {
             pens[i] = pawns[i].dangerZonePenalty;
         }
     }
-    
+
     public static void exception() {
         System.err.println("EXXXXXXXXXXXXX!!1!");
     }
-    
+
     public static double randomAngle() {
         int angle = Base.randomNumber(0, 359);
         double radAngle = angle * (Math.PI / 180);
         return radAngle;
+    }
+
+    public static void saveGenoms(Pawn[] pawns, String fileName) {
+        double[][] genoms = new double[pawns.length][];
+        for (int i = 0; i < genoms.length; i++) {
+            genoms[i] = weightsIntoGenom(pawns[i].network.getWeights());
+        }
+
+        String genomsStr = "";
+        for (int i = 0; i < genoms.length; i++) {
+            if (i != 0) {
+                genomsStr += "\n";
+            }
+            for (int j = 0; j < genoms[i].length; j++) {
+                if (j != 0) {
+                    genomsStr += ";" + genoms[i][j];
+                } else {
+                    genomsStr += genoms[i][j];
+                }
+            }
+        }
+
+        FileWorker.write(fileName, genomsStr);
+    }
+
+    public static Pawn[] loadGenoms(String fileName) throws FileNotFoundException, ParsingException {
+        String[] genoms = FileWorker.read(fileName).split("\n");
+        double[][] gens = new double[genoms.length][];
+        int len = 0;
+        for (int i = 0; i < genoms.length; i++) {
+            String[] gensStr = genoms[i].split(";");
+            if (i == 0) {
+                len = gensStr.length;
+            }
+            if (len == gensStr.length) {
+                gens[i] = new double[len];
+                for (int j = 0; j < len; j++) {
+                    try {
+                        gens[i][j] = Double.valueOf(gensStr[j]);
+                    } catch (NumberFormatException ex) {
+                        throw new ParsingException("NumberFormatException: " + ex);
+                    }
+                }
+            } else {
+                throw new ParsingException("Lengths of genoms are different");
+            }
+
+        }
+        if (Network.getSize(LAYERS_OF_NET) != len) {
+            throw new ParsingException("Invalid model of neural network");
+        }
+        Pawn[] pawns = new Pawn[genoms.length];
+        for (int i = 0; i < pawns.length; i++) {
+            pawns[i] = generatePawn();
+            pawns[i].network = new Network(LAYERS_OF_NET);
+            pawns[i].network.setWeights(genomIntoWeights(gens[i], LAYERS_OF_NET));
+        }
+        return pawns;
     }
 
 }

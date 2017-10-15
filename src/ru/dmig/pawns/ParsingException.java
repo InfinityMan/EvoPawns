@@ -16,27 +16,24 @@
  */
 package ru.dmig.pawns;
 
-import java.io.FileNotFoundException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import ru.dmig.pawns.agents.Pawn;
-import ru.dmig.pawns.net.Network;
-
 /**
  *
  * @author Dmig
  */
-public class NewClass {
-    public static void main(String[] args) throws InterruptedException {
-        Pawn[] pawn = {new Pawn(0, 0)};
-        Game.saveGenoms(pawn, "test.g");
-        Thread.sleep(2);
-        try {
-            Game.loadGenoms("test.g")[0].network.printWeights();
-        } catch (FileNotFoundException ex) {
-            System.err.println("FNF");
-        } catch (ParsingException ex) {
-            System.err.println(ex);
-        }
+public class ParsingException extends Exception {
+
+    /**
+     * Creates a new instance of <code>ParsingException</code> without detail message.
+     */
+    public ParsingException() {
+    }
+
+    /**
+     * Constructs an instance of <code>ParsingException</code> with the specified detail message.
+     *
+     * @param msg the detail message.
+     */
+    public ParsingException(String msg) {
+        super(msg);
     }
 }

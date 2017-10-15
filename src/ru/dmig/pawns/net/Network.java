@@ -159,8 +159,11 @@ public class Network implements Serializable {
 
     public static int getSize(int[] layersD) {
         int size = 0;
-        for (int i = 0; i < layersD.length - 1; i++) {
+        for (int i = 0; i < layersD.length-1; i++) {
             size += (layersD[i] * layersD[i + 1]);
+        }
+        for (int i = 1; i < layersD.length; i++) {
+            size += layersD[i];
         }
         return size;
     }
