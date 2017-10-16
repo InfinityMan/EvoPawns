@@ -16,13 +16,12 @@
  */
 package ru.dmig.pawns;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import ru.dmig.pawns.agents.Agent;
 import ru.dmig.pawns.agents.Pawn;
 import ru.dmig.pawns.gui.Frame;
 import ru.dmig.pawns.gui.Panel;
-import ru.epiclib.base.Arrayer;
 
 /**
  * Updates the pawns, simulation, and e.t.c.
@@ -30,8 +29,6 @@ import ru.epiclib.base.Arrayer;
  * @author Dmig
  */
 public class UpdThread extends Thread {
-    
-    
 
     private double startTime;
     private double currentTime;
@@ -49,8 +46,7 @@ public class UpdThread extends Thread {
     }
 
     private void simulateRound() {
-        
-        
+
         Game.generation++;
         startTime = Calendar.getInstance().getTimeInMillis();
         finishTime = startTime + Game.DURATION_OF_ROUND;
@@ -100,7 +96,7 @@ public class UpdThread extends Thread {
                 double angle = pawns[i].getAbsAngle();
                 float xMov = (float) (Math.cos(angle) * mov);
                 float yMov = (float) (Math.sin(angle) * mov);
-                
+
                 pawns[i].addX(xMov);
                 pawns[i].addY(-yMov);
 
@@ -145,24 +141,20 @@ public class UpdThread extends Thread {
                         Game.pawns[i].attack(Game.PAWN_DAMAGE);
                     }
                 }
-
-                ArrayList<Integer> idToDelete = new ArrayList<>();
-                for (int j = 0; j < Game.foods.size(); j++) {
-                    Agent food = Game.foods.get(j);
+                
+                int deleted = 0;
+                for (Iterator<Agent> itr = Game.foods.iterator(); itr.hasNext();) {
+                    Agent food = itr.next();
                     if (Game.pawns[i].getX() + Panel.PAWN_DIAMETER / 2 >= food.getX()
                             && Game.pawns[i].getX() - Panel.PAWN_DIAMETER / 2 <= food.getX()
                             && Game.pawns[i].getY() + Panel.PAWN_DIAMETER / 2 >= food.getY()
                             && Game.pawns[i].getY() - Panel.PAWN_DIAMETER / 2 <= food.getY()) {
                         Game.pawns[i].feed(food.getMass());
-                        idToDelete.add(j);
+                        itr.remove();
+                        deleted++;
                     }
                 }
-
-                for (int j = 0; j < idToDelete.size(); j++) {
-                    int id = Arrayer.maxIntInList(idToDelete);
-                    Game.foods.remove(id);
-                    Game.generateFood(1);
-                }
+                Game.generateFood(deleted);
             }
         }
     }
@@ -171,11 +163,11 @@ public class UpdThread extends Thread {
         Agent food = Game.foods.get(getNearestFood(p.getX(), p.getY()));
         p.setRltAngleToFood(getAngle(p.getX(), p.getY(), food.getX(), food.getY()));
     }
-    
+
     protected static double getAngle(float x1, float y1, float x2, float y2) {
         y1 = Game.HEIGHT_OF_FIELD - y1;
         y2 = Game.HEIGHT_OF_FIELD - y2;
-        
+
         double x = x2 - x1;
         double y = y2 - y1;
         double xDiff = Math.abs(x);
@@ -195,27 +187,27 @@ public class UpdThread extends Thread {
             sqr = 1;
             degreeToAdd = 0;
         }
-        if(sqr == 4 || sqr == 2) {
+        if (sqr == 4 || sqr == 2) {
             return (degreeToAdd + Math.atan(xDiff / yDiff));
         } else {
             return (degreeToAdd + Math.atan(yDiff / xDiff));
         }
     }
-    
+
     protected static double getDistance(float x1, float y1, float x2, float y2) {
         y1 = Game.HEIGHT_OF_FIELD - y1;
         y2 = Game.HEIGHT_OF_FIELD - y2;
-        
+
         double xDiff = x2 - x1;
         double yDiff = y2 - y1;
         double x = Math.abs(xDiff);
         double y = Math.abs(yDiff);
-        return Math.sqrt(x*x + y*y);
+        return Math.sqrt(x * x + y * y);
     }
 
     private void setRelativeToEnemy(Pawn p) {
         Pawn enemy = Game.pawns[getNearestPawn(p)];
-        
+
         p.setRltAngleToEnemy(getAngle(p.getX(), p.getY(), enemy.getX(), enemy.getY()));
         p.setDistToEnemy((float) getDistance(p.getX(), p.getY(), enemy.getX(), enemy.getY()));
     }

@@ -18,6 +18,7 @@ package ru.dmig.pawns;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -53,7 +54,7 @@ public class Game {
     /**
      * Interplanetary food list.
      */
-    public static ArrayList<Agent> foods;
+    public static volatile ArrayList<Agent> foods;
 
     /**
      * Interplanetary bullets list.
@@ -85,12 +86,12 @@ public class Game {
     /**
      * Duration of one tick of game.
      */
-    public static int TICK_DURATION = 32;
+    public static int TICK_DURATION = 4;
 
     /**
      * Duration of one generation playing in milliseconds.
      */
-    public static double DURATION_OF_ROUND = 24 * 1000;
+    public static double DURATION_OF_ROUND = 3 * 1000;
 
     /**
      * Amount of rounds (generations) to play.
@@ -115,6 +116,12 @@ public class Game {
      * Generation index, when <code>new.gen</code> loads.
      */
     public static final int GENERATION_FOR_UPDATE = 10;
+    
+    public static final String HELP = "Программа представляет собой симулятор развития нейронных сетей с помощью эволюционного алгоритма.\n"
+            + "Оранжевый кружок на поле - это пешка, она принимает решения с помощью нейронной сети, получая на вход:\n"
+            + "Свою скорость, свой угл движения, угол к ближайшей еде, угол к ближайшей угрозе, дистанцию до угрозы, свои координаты.\n"
+            + "На выходе, пешка изменяет свою скорость и угол движения.\n"
+            + "Кружочки тёмно-синего цвета - еда.";
 
     public static void main(String[] args) throws InterruptedException {
         tutorial();
@@ -148,46 +155,32 @@ public class Game {
     }
 
     protected static void tutorial() {
-        JOptionPane.showMessageDialog(null, "Здравствуйте."
-                + " В общем, на графике, если он есть, синия линия - значение крутости самой сильной пешки, оранжевая - средняя крутость.");
-        JOptionPane.showMessageDialog(null, "В замечательной версии -32.853, было добавлено: пешки, крутость, еда, графика -2 уровня, настройка количества пешек, и длительности раунда.");
-        String amountOfPawnsStr = JOptionPane.showInputDialog(null, "Введите количество пешек для игры [По умолчанию: 16]: ");
-        String timeOfRoundStr = JOptionPane.showInputDialog(null, "Введите длительность раунда (жизни одного поколения) в секундах [По умолчанию: 8]: ");
-
-        int amountOfPawns;
-        int timeOfRound;
-
-        if (!amountOfPawnsStr.isEmpty()) {
-            try {
-                amountOfPawns = Integer.valueOf(amountOfPawnsStr);
-                FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
-                if (amountOfPawns < 4 || amountOfPawns > 40 || amountOfPawns % 4 != 0) {
-                    throw new NumberFormatException();
+        int set = JOptionPane.showConfirmDialog(null, "Нужна справка/настройки?", "Настройка", JOptionPane.YES_NO_OPTION);
+        if (set == JOptionPane.YES_OPTION) {
+            JOptionPane.showMessageDialog(null, HELP);
+            String amountOfPawnsStr = JOptionPane.showInputDialog(null,
+                    "Введите количество пешек для игры [По умолчанию: 16]: ");
+            
+            int amountOfPawns;
+            
+            if (!amountOfPawnsStr.isEmpty()) {
+                try {
+                    amountOfPawns = Integer.valueOf(amountOfPawnsStr);
+                    FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
+                    if (amountOfPawns < 4 || amountOfPawns > 40 || amountOfPawns % 4 != 0) {
+                        throw new NumberFormatException();
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством пешек. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 3, но меньше 41, при этом обязательно делиться на 4.");
+                    amountOfPawns = AMOUNT_OF_PAWNS;
                 }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством пешек. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 3, но меньше 41, при этом обязательно делиться на 4.");
+            } else {
                 amountOfPawns = AMOUNT_OF_PAWNS;
             }
-        } else {
-            amountOfPawns = AMOUNT_OF_PAWNS;
+
+            AMOUNT_OF_PAWNS = amountOfPawns;
         }
 
-        if (!timeOfRoundStr.isEmpty()) {
-            try {
-                timeOfRound = Integer.valueOf(timeOfRoundStr);
-                if (timeOfRound < 1 || timeOfRound > 60) {
-                    throw new NumberFormatException();
-                }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством секунд на раунд. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 0, но меньше 61.");
-                timeOfRound = (int) DURATION_OF_ROUND;
-            }
-        } else {
-            timeOfRound = (int) DURATION_OF_ROUND;
-        }
-
-        AMOUNT_OF_PAWNS = amountOfPawns;
-        DURATION_OF_ROUND = timeOfRound;
     }
 
     public static void newBullet(float x, float y, double angle, double mass, Pawn author) {
@@ -289,7 +282,7 @@ public class Game {
     public static Pawn[] evolution(Pawn[] pawns) {
         if (generation == GENERATION_FOR_UPDATE) {
             try {
-                return loadGenoms("new.gen");
+                return loadGenoms("gens//new.gen");
             } catch (FileNotFoundException ex) {
             } catch (ParsingException ex) {
                 ex.printStackTrace();
@@ -361,7 +354,7 @@ public class Game {
                 % 5 == 0) {
             regenerateFood(100);
             if (generation % 10 == 0) {
-                saveGenoms(newPawns, "gen" + generation);
+                saveGenoms(newPawns, "gens//gen" + generation + ".gen");
             }
         } else {
             regenerateFood(50);

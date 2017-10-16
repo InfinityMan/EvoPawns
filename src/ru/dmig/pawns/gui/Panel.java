@@ -20,8 +20,12 @@ import ru.dmig.pawns.agents.Pawn;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 import ru.dmig.pawns.Game;
+import ru.dmig.pawns.agents.Agent;
 
 /**
  * JPanel for painting all activity of pawns here
@@ -33,19 +37,19 @@ public class Panel extends JPanel {
     public static final int PAWN_DIAMETER = 6;
     public static final int BULLET_DIAMETER = 6;
     public static final int FOOD_DIAMETER = 3;
-    
+
     public static final Color MY_ORANGE = new Color(219, 118, 67);
     public static final Color MY_WHITE = new Color(255, 255, 255);
-    public static final Color MY_BLUE = new Color(25,42,90);
-    
+    public static final Color MY_BLUE = new Color(25, 42, 90);
+
     @Override
     public void paint(Graphics g) {
         Graphics2D gr2d = (Graphics2D) g;
         gr2d.setBackground(MY_WHITE);
         gr2d.setColor(Color.PINK);
-        
+
         drawDangerZone(gr2d);
-        
+
         gr2d.setColor(MY_ORANGE);
         for (int i = 0; i < Game.pawns.length; i++) {
             if (Game.pawns[i].isAlive()) {
@@ -60,35 +64,36 @@ public class Panel extends JPanel {
         }
 
         gr2d.setColor(Color.red);
-        
+
         Game.bullets.forEach((bullet) -> {
             int x = Math.round(bullet.getX());
             int y = Math.round(bullet.getY());
-            gr2d.drawOval(x-BULLET_DIAMETER/2, y-BULLET_DIAMETER/2, BULLET_DIAMETER, BULLET_DIAMETER);
-            gr2d.drawLine(x, y, (int) Math.round(x+Math.cos(bullet.getAbsAngle())*BULLET_DIAMETER),
-                    (int) Math.round(y+Math.sin(bullet.getAbsAngle())*BULLET_DIAMETER));
-        });
-        
-        gr2d.setColor(MY_BLUE);
-        
-        Game.foods.forEach((food) -> {
-            int x = Math.round(food.getX());
-            int y = Math.round(food.getY());
-            gr2d.drawOval(x-FOOD_DIAMETER/2, y-FOOD_DIAMETER/2, FOOD_DIAMETER, FOOD_DIAMETER);
+            gr2d.drawOval(x - BULLET_DIAMETER / 2, y - BULLET_DIAMETER / 2, BULLET_DIAMETER, BULLET_DIAMETER);
+            gr2d.drawLine(x, y, (int) Math.round(x + Math.cos(bullet.getAbsAngle()) * BULLET_DIAMETER),
+                    (int) Math.round(y + Math.sin(bullet.getAbsAngle()) * BULLET_DIAMETER));
         });
 
+        gr2d.setColor(MY_BLUE);
+
+        for (Iterator<Agent> itr = Game.foods.iterator(); itr.hasNext();) {
+            Agent food = itr.next();
+            int x = Math.round(food.getX());
+            int y = Math.round(food.getY());
+            gr2d.drawOval(x - FOOD_DIAMETER / 2, y - FOOD_DIAMETER / 2, FOOD_DIAMETER, FOOD_DIAMETER);
+        }
+
     }
-    
+
     private void drawDangerZone(Graphics2D g) {
         int len = Game.LENGTH_OF_FIELD;
         int heg = Game.HEIGHT_OF_FIELD;
         int dng = Game.DANGER_ZONE;
         g.fillRect(0, 0, len, dng);
-        g.fillRect(len-dng, dng, dng, heg-dng);
-        g.fillRect(0, heg-dng, len-dng, dng);
-        g.fillRect(0, dng, dng, heg-dng-dng);
+        g.fillRect(len - dng, dng, dng, heg - dng);
+        g.fillRect(0, heg - dng, len - dng, dng);
+        g.fillRect(0, dng, dng, heg - dng - dng);
     }
-    
+
     private void drawPawn(Graphics2D g, Pawn pawn) {
         int x = Math.round(pawn.getX());
         int y = Math.round(pawn.getY());

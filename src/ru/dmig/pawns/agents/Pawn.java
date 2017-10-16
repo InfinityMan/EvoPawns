@@ -37,10 +37,10 @@ public final class Pawn extends Agent {
     0: speed
     1: absolute angle of movement
     2: relative angle to nearest food
-    3: relative angle to nearest pawn
-    4: distance to nearest pawn
-    4: x
-    5: y
+    3: relative angle to nearest killer
+    4: distance to nearest killer
+    5: x
+    6: y
         Outputs:
     0: new speed
     1: new absolute angle
