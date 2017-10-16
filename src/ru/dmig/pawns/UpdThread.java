@@ -56,7 +56,7 @@ public class UpdThread extends Thread {
         while (finishTime > currentTime) {
 
             if (currentTime <= halfOfRoundTime && (currentTime + Game.TICK_DURATION >= halfOfRoundTime)) {
-                Game.regenerateFood(20);
+                Generator.regenerateFood(20);
             }
 
             processPawns();
@@ -154,7 +154,7 @@ public class UpdThread extends Thread {
                         deleted++;
                     }
                 }
-                Game.generateFood(deleted);
+                Generator.generateFood(deleted);
             }
         }
     }

@@ -132,10 +132,10 @@ public class Game {
     public static void newRun() {
         try {
             ChartPanel.lauch();
-            pawns = generatePawns();
+            pawns = Generator.generatePawns();
             foods = new ArrayList<>();
             bullets = new ArrayList<>();
-            generateFood(FOOD_AMOUNT);
+            Generator.generateFood(FOOD_AMOUNT);
 
             Frame.panel = new Panel();
 
@@ -181,48 +181,6 @@ public class Game {
             AMOUNT_OF_PAWNS = amountOfPawns;
         }
 
-    }
-
-    public static void newBullet(float x, float y, double angle, double mass, Pawn author) {
-        bullets.add(new Agent(Agent.MAX_BULLET_SPEED, angle, x, y, mass));
-        bullets.get(bullets.size() - 1).authorOfBullet = author;
-        bullets.get(bullets.size() - 1).t = Agent.Type.BULLET;
-    }
-
-    public static Pawn[] generatePawns() {
-        Pawn[] pawns = new Pawn[AMOUNT_OF_PAWNS];
-        for (int i = 0; i < pawns.length; i++) {
-            pawns[i] = generatePawn();
-        }
-        return pawns;
-    }
-
-    public static Pawn generatePawn() {
-        Pawn pawn = new Pawn(Base.randomNumber(LENGTH_OF_FIELD / 4, LENGTH_OF_FIELD * 3 / 4), Base.randomNumber(HEIGHT_OF_FIELD / 4, HEIGHT_OF_FIELD * 3 / 4));
-        pawn.setAbsAngle(randomAngle());
-        return pawn;
-    }
-
-    public static void generateFood(int amount) {
-        for (int i = 0; i < amount; i++) {
-            foods.add(generateFood());
-        }
-    }
-
-    private static Agent generateFood() {
-        float x = Base.randomNumber(DANGER_ZONE + 1, LENGTH_OF_FIELD - DANGER_ZONE - 1);
-        float y = Base.randomNumber(DANGER_ZONE + 1, HEIGHT_OF_FIELD - DANGER_ZONE - 1);
-        float mass = Base.randomNumber(MIN_MASS_OF_FOOD, MAX_MASS_OF_FOOD);
-
-        return new Agent(0, 0, x, y, mass);
-    }
-
-    public static void regenerateFood(int chance) {
-        for (int i = 0; i < foods.size(); i++) {
-            if (Base.chance(chance, 0)) {
-                foods.set(i, generateFood());
-            }
-        }
     }
 
     /**
@@ -325,13 +283,13 @@ public class Game {
             //Creating new pawns from gens
 
             for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
-                newPawns[i] = generatePawn();
+                newPawns[i] = Generator.generatePawn();
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
             }
 
             for (i = 0; i < newPawns.length; i++) {
                 if (Base.chance(4, 0)) {
-                    newPawns[i] = generatePawn();
+                    newPawns[i] = Generator.generatePawn();
                 }
             }
         } else {
@@ -345,19 +303,19 @@ public class Game {
                     }
                 }
             }
-            newPawns = generatePawns();
+            newPawns = Generator.generatePawns();
             for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
             }
         }
         if (generation
                 % 5 == 0) {
-            regenerateFood(100);
+            Generator.regenerateFood(100);
             if (generation % 10 == 0) {
                 saveGenoms(newPawns, "gens//gen" + generation + ".gen");
             }
         } else {
-            regenerateFood(50);
+            Generator.regenerateFood(50);
         }
         return newPawns;
     }
@@ -421,12 +379,6 @@ public class Game {
         System.err.println("EXXXXXXXXXXXXX!!1!");
     }
 
-    public static double randomAngle() {
-        int angle = Base.randomNumber(0, 359);
-        double radAngle = angle * (Math.PI / 180);
-        return radAngle;
-    }
-
     public static void saveGenoms(Pawn[] pawns, String fileName) {
         double[][] genoms = new double[pawns.length][];
         for (int i = 0; i < genoms.length; i++) {
@@ -478,7 +430,7 @@ public class Game {
         }
         Pawn[] pawns = new Pawn[genoms.length];
         for (int i = 0; i < pawns.length; i++) {
-            pawns[i] = generatePawn();
+            pawns[i] = Generator.generatePawn();
             pawns[i].network = new Network(LAYERS_OF_NET);
             pawns[i].network.setWeights(genomIntoWeights(gens[i], LAYERS_OF_NET));
         }

@@ -19,6 +19,7 @@ package ru.dmig.pawns;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import ru.dmig.pawns.agents.Pawn;
 import ru.dmig.pawns.net.Network;
 
@@ -28,15 +29,6 @@ import ru.dmig.pawns.net.Network;
  */
 public class NewClass {
     public static void main(String[] args) throws InterruptedException {
-        Pawn[] pawn = {new Pawn(0, 0)};
-        Game.saveGenoms(pawn, "test.g");
-        Thread.sleep(2);
-        try {
-            Game.loadGenoms("test.g")[0].network.printWeights();
-        } catch (FileNotFoundException ex) {
-            System.err.println("FNF");
-        } catch (ParsingException ex) {
-            System.err.println(ex);
-        }
+        
     }
 }
