@@ -41,14 +41,18 @@ public final class Pawn extends Agent {
     4: distance to nearest killer
     5: x
     6: y
+    7: memory previous value
         Outputs:
     0: new speed
     1: new absolute angle
+    2: memory new value
      */
     private double rltAngleToFood;
     private double rltAngleToEnemy;
 
     private float distToEnemy;
+
+    private double memory;
 
     public Network network;
 
@@ -90,8 +94,8 @@ public final class Pawn extends Agent {
             distE = getDistToEnemy() / 200;
         }
 
-        double[] in = {getSpeed(), aangl, ranglF, ranglE, distE, x, y};
-        double[] out = {newSpeed, newAbsAngle};
+        double[] in = {getSpeed(), aangl, ranglF, ranglE, distE, x, y, getMemory()};
+        double[] out = {newSpeed, newAbsAngle, getMemory()};
 
         network.calculate(in, out, true);
 
@@ -105,11 +109,34 @@ public final class Pawn extends Agent {
         } catch (IllegalArgumentException e) {
             setNewAbsAngle(0);
         }
+        try {
+            setMemory(out[2]);
+        } catch (IllegalArgumentException ex) {
+            setMemory(0);
+        }
 
 //        if(shootPrice > 0) {
 //            Game.newBullet(getX(), getY(), getAbsAngle(), shootPrice, this);
 //            totalDamageUsed += shootPrice;
 //        }
+    }
+
+    @Override
+    public void updateCoords(double maxSpeed) {
+        double mov = getSpeed() * maxSpeed;
+        double angle = getAbsAngle();
+        float xMov = (float) (Math.cos(angle) * mov);
+        float yMov = (float) (Math.sin(angle) * mov);
+
+        addX(xMov);
+        addY(-yMov);
+        
+        distance += Math.abs(xMov);
+        distance += Math.abs(yMov);
+    }
+    
+    public void updateCoords() {
+        updateCoords(MAX_SPEED);
     }
 
     public void attack(double damage) {
@@ -148,8 +175,8 @@ public final class Pawn extends Agent {
     }
 
     /**
-     * Get category of pawn. If mass: 0 < x < 100 : 0 100 < x < 400 : 1 400 < x < 700 : 2 700 < x < 1000 : 3
-     * @r
+     * Get category of pawn. If mass: 0 < x < 100 : 0 100 < x < 400 : 1 400 < x < 700 : 2 700 < x < 1000 : 3 @r
+     *
      *
      * eturn code of category
      */
@@ -232,6 +259,28 @@ public final class Pawn extends Agent {
     public void setNewAbsAngle(double newAbsAngle) {
         if (newAbsAngle >= 0 && newAbsAngle < 2 * Math.PI) {
             this.newAbsAngle = newAbsAngle;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    /**
+     * Get the value of memory
+     *
+     * @return the value of memory
+     */
+    public double getMemory() {
+        return memory;
+    }
+
+    /**
+     * Set the value of memory
+     *
+     * @param memory new value of memory
+     */
+    public void setMemory(double memory) throws IllegalArgumentException {
+        if (memory >= 0 && memory <= 1) {
+            this.memory = memory;
         } else {
             throw new IllegalArgumentException();
         }
