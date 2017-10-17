@@ -17,6 +17,7 @@
 package ru.dmig.pawns.agents;
 
 import ru.dmig.pawns.Game;
+import ru.dmig.pawns.Generator;
 
 /**
  * Class for object on game field.
@@ -53,7 +54,7 @@ public class Agent {
             setSpeed(0);
         }
         try {
-            setAbsAngle(0);
+            setAbsAngle(absAngle);
         } catch (IllegalArgumentException e) {
             setAbsAngle(0);
         }
@@ -71,6 +72,22 @@ public class Agent {
         addX(x);
         addY(y);
     }
+    
+    public Agent() {
+        this(0,0);
+        placeInRandomPosition();
+    }
+    
+    public Agent(double speed, double absAngle, double mass) {
+        this(speed, absAngle, 0, 0, mass);
+        placeInRandomPosition();
+    }
+    
+    public Agent(double mass) {
+        this();
+        this.mass = 0;
+        setMass(mass);
+    }
 
     /**
      * Updating coordinates of agent by current speed and angle
@@ -85,13 +102,16 @@ public class Agent {
         addY(yMov);
     }
     
-        public boolean isInDangerZone() {
-        if (getX() <= Game.DANGER_ZONE || getX() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE
-                || getY() <= Game.DANGER_ZONE || getY() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean isInDangerZone() {
+        return getX() <= Game.DANGER_ZONE || getX() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE
+                || getY() <= Game.DANGER_ZONE || getY() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE;
+    }
+    
+    public final void placeInRandomPosition() {
+        float xCoord = Game.DANGER_ZONE+1, yCoord = Game.DANGER_ZONE+1;
+        Generator.generateCoords(xCoord, yCoord);
+        this.x = xCoord;
+        this.y = yCoord;
     }
 
     /**
