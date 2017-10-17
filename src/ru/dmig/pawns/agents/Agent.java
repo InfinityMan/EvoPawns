@@ -91,15 +91,16 @@ public class Agent {
 
     /**
      * Updating coordinates of agent by current speed and angle
+     * @param maxSpeed Max speed of agent
      */
-    public void updateCoords() {
-        double mov = getSpeed() * MAX_BULLET_SPEED;
+    public void updateCoords(double maxSpeed) {
+        double mov = getSpeed() * maxSpeed;
         double angle = getAbsAngle();
         float xMov = (float) (Math.cos(angle) * mov);
         float yMov = (float) (Math.sin(angle) * mov);
 
         addX(xMov);
-        addY(yMov);
+        addY(-yMov);
     }
     
     public boolean isInDangerZone() {
