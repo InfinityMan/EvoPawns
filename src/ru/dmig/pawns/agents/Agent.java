@@ -84,6 +84,15 @@ public class Agent {
         addX(xMov);
         addY(yMov);
     }
+    
+        public boolean isInDangerZone() {
+        if (getX() <= Game.DANGER_ZONE || getX() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE
+                || getY() <= Game.DANGER_ZONE || getY() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Get the value of speed

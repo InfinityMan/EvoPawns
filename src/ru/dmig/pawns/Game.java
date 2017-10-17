@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import ru.dmig.pawns.agents.Agent;
+import ru.dmig.pawns.agents.Killer;
 import ru.dmig.pawns.agents.Pawn;
 import ru.dmig.pawns.gui.Activity;
 import ru.dmig.pawns.gui.ChartPanel;
@@ -60,6 +61,8 @@ public class Game {
      * Interplanetary bullets list.
      */
     public static ArrayList<Agent> bullets;
+    
+    public static ArrayList<Killer> killers;
 
     /**
      * Current generation in game.
@@ -71,7 +74,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns.
      */
-    public static final int[] LAYERS_OF_NET = {7, 6, 6, 2};
+    public static final int[] LAYERS_OF_NET = {7, 6, 5, 3, 2};
 
     /**
      * Length of field to simulate.
@@ -86,12 +89,12 @@ public class Game {
     /**
      * Duration of one tick of game.
      */
-    public static int TICK_DURATION = 4;
+    public static int TICK_DURATION = 32; // 4 is min
 
     /**
      * Duration of one generation playing in milliseconds.
      */
-    public static double DURATION_OF_ROUND = 3 * 1000;
+    public static double DURATION_OF_ROUND = 12 * 1000; //3 is min
 
     /**
      * Amount of rounds (generations) to play.
@@ -108,14 +111,16 @@ public class Game {
     public static final int MIN_MASS_OF_FOOD = 5;
     public static final int MAX_MASS_OF_FOOD = 5;
 
-    public static final int DANGER_ZONE = 20;
+    public static final int DANGER_ZONE = 25;
 
-    public static final double PAWN_DAMAGE = 0.1;
+    public static final double KILLER_DAMAGE = 45;
+    
+    public static final int KILLER_AMOUNT = 62;
 
     /**
      * Generation index, when <code>new.gen</code> loads.
      */
-    public static final int GENERATION_FOR_UPDATE = 10;
+    public static final int GENERATION_FOR_UPDATE = 5;
     
     public static final String HELP = "Программа представляет собой симулятор развития нейронных сетей с помощью эволюционного алгоритма.\n"
             + "Оранжевый кружок на поле - это пешка, она принимает решения с помощью нейронной сети, получая на вход:\n"
@@ -135,7 +140,11 @@ public class Game {
             pawns = Generator.generatePawns();
             foods = new ArrayList<>();
             bullets = new ArrayList<>();
+            killers = new ArrayList<>();
             Generator.generateFood(FOOD_AMOUNT);
+            for (int i = 0; i < KILLER_AMOUNT; i++) {
+                killers.add(Generator.generateKiller());
+            }
 
             Frame.panel = new Panel();
 
@@ -158,6 +167,12 @@ public class Game {
         int set = JOptionPane.showConfirmDialog(null, "Нужна справка/настройки?", "Настройка", JOptionPane.YES_NO_OPTION);
         if (set == JOptionPane.YES_OPTION) {
             JOptionPane.showMessageDialog(null, HELP);
+            int maxSpeed = JOptionPane.showConfirmDialog(null, "Установить максимальную скорость?", "Скорость", JOptionPane.YES_NO_OPTION);
+            if(maxSpeed == JOptionPane.YES_OPTION) {
+                TICK_DURATION = 4;
+                DURATION_OF_ROUND = 3 * 1000;
+            }
+            
             String amountOfPawnsStr = JOptionPane.showInputDialog(null,
                     "Введите количество пешек для игры [По умолчанию: 16]: ");
             
@@ -308,14 +323,15 @@ public class Game {
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
             }
         }
-        if (generation
-                % 5 == 0) {
+        if (generation % 5 == 0) {
             Generator.regenerateFood(100);
+            Generator.regenerateKillers(91);
             if (generation % 10 == 0) {
                 saveGenoms(newPawns, "gens//gen" + generation + ".gen");
             }
         } else {
             Generator.regenerateFood(50);
+            Generator.regenerateKillers(20);
         }
         return newPawns;
     }

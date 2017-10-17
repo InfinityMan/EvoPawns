@@ -97,18 +97,22 @@ public class Generator {
         return pawns;
     }
     
-    public static Killer[] generateKillers(int amount) {
-        Killer[] ret = new Killer[amount];
-        for (int i = 0; i < amount; i++) {
-            ret[i] = generateKiller();
-        }
-        return ret;
-    }
-    
-    private static Killer generateKiller() {
+    public static Killer generateKiller() {
         float x = Base.randomNumber(Game.DANGER_ZONE + 1, Game.LENGTH_OF_FIELD - Game.DANGER_ZONE - 1);
         float y = Base.randomNumber(Game.DANGER_ZONE + 1, Game.HEIGHT_OF_FIELD - Game.DANGER_ZONE - 1);
         return new Killer(x, y);
+    }
+    
+    public static void regenerateKillers(int chance) {
+        if (chance >= 0 && chance <= 100) {
+            for (int i = 0; i < Game.killers.size(); i++) {
+                if (Base.chance(chance, 0)) {
+                    Game.killers.set(i, generateKiller());
+                }
+            }
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
     
 }

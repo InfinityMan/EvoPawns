@@ -30,7 +30,7 @@ public final class Pawn extends Agent {
     /**
      * Max speed for every pawn in every direction. (Maybe, I don't sure)
      */
-    public static final double MAX_SPEED = 4;
+    public static final double MAX_SPEED = 5;
 
     /*
         Inputs of neuron net:
@@ -132,15 +132,6 @@ public final class Pawn extends Agent {
         double massFit = getMass() * 0.9;
 
         return distanceFit + foodFit + massFit - dngPenalty;
-    }
-
-    public boolean isPawnInDangerZone() {
-        if (getX() <= Game.DANGER_ZONE || getX() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE
-                || getY() <= Game.DANGER_ZONE || getY() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public boolean isAlive() {

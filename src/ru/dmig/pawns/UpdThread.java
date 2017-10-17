@@ -19,9 +19,11 @@ package ru.dmig.pawns;
 import java.util.Calendar;
 import java.util.Iterator;
 import ru.dmig.pawns.agents.Agent;
+import ru.dmig.pawns.agents.Killer;
 import ru.dmig.pawns.agents.Pawn;
 import ru.dmig.pawns.gui.Frame;
 import ru.dmig.pawns.gui.Panel;
+import ru.epiclib.base.Base;
 
 /**
  * Updates the pawns, simulation, and e.t.c.
@@ -100,7 +102,7 @@ public class UpdThread extends Thread {
                 pawns[i].addX(xMov);
                 pawns[i].addY(-yMov);
 
-                if (pawns[i].isPawnInDangerZone()) {
+                if (pawns[i].isInDangerZone()) {
                     pawns[i].dangerZonePenalty++;
                 }
 
@@ -132,16 +134,6 @@ public class UpdThread extends Thread {
                     }
                 }
 
-                for (int j = 0; j < Game.AMOUNT_OF_PAWNS; j++) {
-                    Pawn pawn = Game.pawns[j];
-                    if (Game.pawns[i].getX() + Panel.PAWN_DIAMETER / 2 >= pawn.getX()
-                            && Game.pawns[i].getX() - Panel.PAWN_DIAMETER / 2 <= pawn.getX()
-                            && Game.pawns[i].getY() + Panel.PAWN_DIAMETER / 2 >= pawn.getY()
-                            && Game.pawns[i].getY() - Panel.PAWN_DIAMETER / 2 <= pawn.getY()) {
-                        Game.pawns[i].attack(Game.PAWN_DAMAGE);
-                    }
-                }
-                
                 int deleted = 0;
                 for (Iterator<Agent> itr = Game.foods.iterator(); itr.hasNext();) {
                     Agent food = itr.next();
@@ -155,6 +147,17 @@ public class UpdThread extends Thread {
                     }
                 }
                 Generator.generateFood(deleted);
+                
+                for (Iterator<Killer> itr = Game.killers.iterator(); itr.hasNext();) {
+                    Killer killer = itr.next();
+                    if (Game.pawns[i].getX() + Panel.PAWN_DIAMETER / 2 >= killer.getX()
+                            && Game.pawns[i].getX() - Panel.PAWN_DIAMETER / 2 <= killer.getX()
+                            && Game.pawns[i].getY() + Panel.PAWN_DIAMETER / 2 >= killer.getY()
+                            && Game.pawns[i].getY() - Panel.PAWN_DIAMETER / 2 <= killer.getY()) {
+                        Game.pawns[i].attack(Game.KILLER_DAMAGE);
+                        if(Base.chance(60, 0)) Game.pawns[i].attack(Game.pawns[i].getMass()+1);
+                    }
+                }
             }
         }
     }
