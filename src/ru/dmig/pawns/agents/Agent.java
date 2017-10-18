@@ -18,6 +18,7 @@ package ru.dmig.pawns.agents;
 
 import ru.dmig.pawns.Game;
 import ru.dmig.pawns.Generator;
+import ru.epiclib.base.Base;
 
 /**
  * Class for object on game field.
@@ -87,6 +88,7 @@ public class Agent {
         this();
         this.mass = 0;
         setMass(mass);
+        placeInRandomPosition();
     }
 
     /**
@@ -105,14 +107,22 @@ public class Agent {
     
     public boolean isInDangerZone() {
         return getX() <= Game.DANGER_ZONE || getX() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE
-                || getY() <= Game.DANGER_ZONE || getY() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE;
+                || getY() <= Game.DANGER_ZONE || getY() >= Game.HEIGHT_OF_FIELD - Game.DANGER_ZONE;
     }
     
     public final void placeInRandomPosition() {
-        float xCoord = Game.DANGER_ZONE+1, yCoord = Game.DANGER_ZONE+1;
-        Generator.generateCoords(xCoord, yCoord);
-        this.x = xCoord;
-        this.y = yCoord;
+        x = Base.randomNumber(Game.DANGER_ZONE + 1, Game.LENGTH_OF_FIELD - Game.DANGER_ZONE - 1);
+        y = Base.randomNumber(Game.DANGER_ZONE + 1, Game.HEIGHT_OF_FIELD - Game.DANGER_ZONE - 1);
+    }
+    
+    public final void placeInStartPlace() {
+        x = Game.DANGER_ZONE +1;
+        y = Game.DANGER_ZONE +1;
+    }
+    
+    public final void placeInCenter() {
+        x = Game.LENGTH_OF_FIELD / 2;
+        y = Game.HEIGHT_OF_FIELD / 2;
     }
 
     /**

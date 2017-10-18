@@ -30,7 +30,7 @@ public final class Pawn extends Agent {
     /**
      * Max speed for every pawn in every direction. (Maybe, I don't sure)
      */
-    public static final double MAX_SPEED = 5;
+    public static final double MAX_SPEED = 4;
 
     /*
         Inputs of neuron net:
@@ -38,6 +38,7 @@ public final class Pawn extends Agent {
     1: absolute angle of movement
     2: relative angle to nearest food
     3: relative angle to nearest killer
+    4: distance to nearest food
     4: distance to nearest killer
     5: x
     6: y
@@ -51,13 +52,11 @@ public final class Pawn extends Agent {
     private double rltAngleToEnemy;
 
     private float distToEnemy;
+    private float distToFood;
 
     private double memory;
 
     public Network network;
-
-    public double newSpeed;
-    public double newAbsAngle;
 
     public float distance = 0;
     public float foodGathered = 0;
@@ -71,9 +70,6 @@ public final class Pawn extends Agent {
         setRltAngleToFood(0);
 
         this.network = network;
-
-        newSpeed = getSpeed();
-        newAbsAngle = getAbsAngle();
     }
 
     public Pawn(float x, float y) {
@@ -90,35 +86,28 @@ public final class Pawn extends Agent {
         double ranglF = getRltAngleToFood() / (Math.PI * 2);
         double ranglE = getRltAngleToEnemy() / (Math.PI * 2);
         double distE = 1;
+        double distF = 1;
         if (getDistToEnemy() <= 200) {
             distE = getDistToEnemy() / 200;
         }
+        if (getDistToFood() <= 200) {
+            distF = getDistToFood() / 200;
+        }
 
-        double[] in = {getSpeed(), aangl, ranglF, ranglE, distE, x, y, getMemory()};
+        double newSpeed = 0, newAbsAngle = 0;
+
+        double[] in = {getSpeed(), aangl, ranglF, ranglE, distE, distF, x, y, getMemory()};
         double[] out = {newSpeed, newAbsAngle, getMemory()};
 
         network.calculate(in, out, true);
 
         try {
-            setNewSpeed(out[0]);
-        } catch (IllegalArgumentException e) {
-            setNewSpeed(0);
-        }
-        try {
-            setNewAbsAngle(out[1] * Math.PI * 2);
-        } catch (IllegalArgumentException e) {
-            setNewAbsAngle(0);
-        }
-        try {
+            setSpeed(out[0]);
+            setAbsAngle(out[1] * Math.PI * 2);
             setMemory(out[2]);
         } catch (IllegalArgumentException ex) {
-            setMemory(0);
+            System.out.println("Ill: " + out[0] + " " + out[1] * Math.PI * 2 + " " + out[2]);
         }
-
-//        if(shootPrice > 0) {
-//            Game.newBullet(getX(), getY(), getAbsAngle(), shootPrice, this);
-//            totalDamageUsed += shootPrice;
-//        }
     }
 
     @Override
@@ -130,17 +119,17 @@ public final class Pawn extends Agent {
 
         addX(xMov);
         addY(-yMov);
-        
+
         distance += Math.abs(xMov);
         distance += Math.abs(yMov);
     }
-    
+
     public void updateCoords() {
         updateCoords(MAX_SPEED);
     }
 
     public void attack(double damage) {
-        if (damage > getMass()) {
+        if (damage >= getMass()) {
             kill();
         } else {
             setMass(getMass() - damage);
@@ -167,6 +156,15 @@ public final class Pawn extends Agent {
 
     protected void kill() {
         alive = false;
+        setMass(0);
+        dangerZonePenalty += 10; //Some negative fitness for dying
+    }
+    
+    /**
+     * Hurt the maximal damage to pawn. Pawn will be killed
+     */
+    public void smite() {
+        attack(getMass());
     }
 
     public void feed(double mass) {
@@ -248,22 +246,6 @@ public final class Pawn extends Agent {
         this.distToEnemy = distToEnemy;
     }
 
-    public void setNewSpeed(double newSpeed) {
-        if (newSpeed >= 0 && newSpeed <= 1) {
-            this.newSpeed = newSpeed;
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    public void setNewAbsAngle(double newAbsAngle) {
-        if (newAbsAngle >= 0 && newAbsAngle < 2 * Math.PI) {
-            this.newAbsAngle = newAbsAngle;
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
     /**
      * Get the value of memory
      *
@@ -286,6 +268,24 @@ public final class Pawn extends Agent {
         }
     }
 
+    /**
+     * Get the value of distToFood
+     *
+     * @return the value of distToFood
+     */
+    public float getDistToFood() {
+        return distToFood;
+    }
+
+    /**
+     * Set the value of distToFood
+     *
+     * @param distToFood new value of distToFood
+     */
+    public void setDistToFood(float distToFood) {
+        this.distToFood = distToFood;
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;
@@ -293,8 +293,6 @@ public final class Pawn extends Agent {
         hash = 97 * hash + (int) (Double.doubleToLongBits(this.rltAngleToEnemy) ^ (Double.doubleToLongBits(this.rltAngleToEnemy) >>> 32));
         hash = 97 * hash + Float.floatToIntBits(this.distToEnemy);
         hash = 97 * hash + Objects.hashCode(this.network);
-        hash = 97 * hash + (int) (Double.doubleToLongBits(this.newSpeed) ^ (Double.doubleToLongBits(this.newSpeed) >>> 32));
-        hash = 97 * hash + (int) (Double.doubleToLongBits(this.newAbsAngle) ^ (Double.doubleToLongBits(this.newAbsAngle) >>> 32));
         hash = 97 * hash + Float.floatToIntBits(this.distance);
         hash = 97 * hash + Float.floatToIntBits(this.foodGathered);
         hash = 97 * hash + Float.floatToIntBits(this.dangerZonePenalty);
@@ -321,12 +319,6 @@ public final class Pawn extends Agent {
             return false;
         }
         if (Float.floatToIntBits(this.distToEnemy) != Float.floatToIntBits(other.distToEnemy)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.newSpeed) != Double.doubleToLongBits(other.newSpeed)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.newAbsAngle) != Double.doubleToLongBits(other.newAbsAngle)) {
             return false;
         }
         if (Float.floatToIntBits(this.distance) != Float.floatToIntBits(other.distance)) {

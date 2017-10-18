@@ -18,9 +18,7 @@ package ru.dmig.pawns;
 
 import java.util.Calendar;
 import java.util.Iterator;
-import ru.dmig.pawns.agents.Agent;
-import ru.dmig.pawns.agents.Killer;
-import ru.dmig.pawns.agents.Pawn;
+import ru.dmig.pawns.agents.*;
 import ru.dmig.pawns.gui.Frame;
 import ru.dmig.pawns.gui.Panel;
 import ru.epiclib.base.Base;
@@ -35,6 +33,9 @@ public class UpdThread extends Thread {
     private double startTime;
     private double currentTime;
     private double finishTime;
+    
+    private int newTickDuration = Game.TICK_DURATION;
+    private double newDurationOfRound = Game.DURATION_OF_ROUND;
 
     public UpdThread() {
         this.start();
@@ -48,6 +49,9 @@ public class UpdThread extends Thread {
     }
 
     private void simulateRound() {
+        //Changing global speed in start of new round
+        Game.TICK_DURATION = newTickDuration;
+        Game.DURATION_OF_ROUND = newDurationOfRound;
 
         Game.generation++;
         startTime = Calendar.getInstance().getTimeInMillis();
@@ -62,7 +66,7 @@ public class UpdThread extends Thread {
             }
 
             processPawns();
-            processBullets();
+            processKillers();
 
             collisionSensor();
 
@@ -82,41 +86,37 @@ public class UpdThread extends Thread {
     private void processPawns() {
         Pawn[] pawns = Game.pawns;
 
-        for (int i = 0; i < Game.AMOUNT_OF_PAWNS; i++) {
-
-            if (pawns[i].isAlive()) {
-                setRelatives(pawns[i]);
-                setRelativeToEnemy(pawns[i]);
-
-                pawns[i].calculate();
-
-                pawns[i].setSpeed(pawns[i].newSpeed);
-                pawns[i].setAbsAngle(pawns[i].newAbsAngle);
-
-                //Projections TODO
-                double mov = pawns[i].getSpeed() * Pawn.MAX_SPEED;
-                double angle = pawns[i].getAbsAngle();
-                float xMov = (float) (Math.cos(angle) * mov);
-                float yMov = (float) (Math.sin(angle) * mov);
-
-                pawns[i].addX(xMov);
-                pawns[i].addY(-yMov);
-
-                if (pawns[i].isInDangerZone()) {
-                    pawns[i].dangerZonePenalty++;
-                }
-
-                pawns[i].distance += Math.abs(xMov);
-                pawns[i].distance += Math.abs(yMov);
+        for (Pawn pawn : Game.pawns) {
+            if (pawn.isAlive()) {
+                setRelativeToFood(pawn);
+                setRelativeToEnemy(pawn);
+                pawn.calculate();
+                pawn.updateCoords();
+                dangerZoneProcess(pawn);
             }
-
         }
     }
 
-    private void processBullets() {
-        Game.bullets.forEach((bullet) -> {
-            bullet.updateCoords();
-        });
+    private void processKillers() {
+        for (int i = 0; i < Game.killers.size(); i++) {
+            if (Game.killers.get(i).isInDangerZone()) {
+                Game.killers.get(i).placeInCenter();
+            } else {
+                Game.killers.get(i).updateCoords(Killer.MAX_SPEED);
+            }
+        }
+    }
+
+    private void dangerZoneProcess(Pawn p) {
+        if (p.isInDangerZone()) {
+            p.dangerZonePenalty++;
+            p.attack(5);
+            if (p.isAlive()) {
+                if (Base.chance(7, 0)) {
+                    p.smite();
+                }
+            }
+        }
     }
 
     private void collisionSensor() {
@@ -147,7 +147,7 @@ public class UpdThread extends Thread {
                     }
                 }
                 Generator.generateFood(deleted);
-                
+
                 for (Iterator<Killer> itr = Game.killers.iterator(); itr.hasNext();) {
                     Killer killer = itr.next();
                     if (Game.pawns[i].getX() + Panel.PAWN_DIAMETER / 2 >= killer.getX()
@@ -155,16 +155,20 @@ public class UpdThread extends Thread {
                             && Game.pawns[i].getY() + Panel.PAWN_DIAMETER / 2 >= killer.getY()
                             && Game.pawns[i].getY() - Panel.PAWN_DIAMETER / 2 <= killer.getY()) {
                         Game.pawns[i].attack(Game.KILLER_DAMAGE);
-                        if(Base.chance(60, 0)) Game.pawns[i].attack(Game.pawns[i].getMass()+1);
+                        if (Base.chance(60, 0)) {
+                            Game.pawns[i].smite();
+                        }
                     }
                 }
             }
         }
     }
 
-    private void setRelatives(Pawn p) {
+    private void setRelativeToFood(Pawn p) {
         Agent food = Game.foods.get(getNearestFood(p.getX(), p.getY()));
+
         p.setRltAngleToFood(getAngle(p.getX(), p.getY(), food.getX(), food.getY()));
+        p.setDistToFood((float) getDistance(p.getX(), p.getY(), food.getX(), food.getY()));
     }
 
     protected static double getAngle(float x1, float y1, float x2, float y2) {
@@ -247,6 +251,22 @@ public class UpdThread extends Thread {
             }
         }
         return lastID;
+    }
+
+    /**
+     *
+     * @param half If half new speed will be half of current; if false speed doubles
+     */
+    public void changeSpeed(boolean half) {
+        if (half) {
+            newTickDuration = newTickDuration * 2;
+            newDurationOfRound = newDurationOfRound * 2;
+        } else {
+            if (newTickDuration > 4 && newDurationOfRound > 3) {
+                newTickDuration = newTickDuration / 2;
+                newDurationOfRound = newDurationOfRound / 2;
+            }
+        }
     }
 
 }

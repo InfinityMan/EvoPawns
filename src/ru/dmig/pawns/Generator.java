@@ -51,10 +51,8 @@ public class Generator {
     }
 
     private static Agent generateFood() {
-        float x = Base.randomNumber(Game.DANGER_ZONE + 1, Game.LENGTH_OF_FIELD - Game.DANGER_ZONE - 1);
-        float y = Base.randomNumber(Game.DANGER_ZONE + 1, Game.HEIGHT_OF_FIELD - Game.DANGER_ZONE - 1);
         float mass = Base.randomNumber(Game.MIN_MASS_OF_FOOD, Game.MAX_MASS_OF_FOOD);
-        return new Agent(0, 0, x, y, mass);
+        return new Agent(mass);
     }
 
     /**
@@ -98,9 +96,7 @@ public class Generator {
     }
     
     public static Killer generateKiller() {
-        float x = Base.randomNumber(Game.DANGER_ZONE + 1, Game.LENGTH_OF_FIELD - Game.DANGER_ZONE - 1);
-        float y = Base.randomNumber(Game.DANGER_ZONE + 1, Game.HEIGHT_OF_FIELD - Game.DANGER_ZONE - 1);
-        return new Killer(x, y);
+        return new Killer(1,randomAngle(),5);
     }
     
     public static void regenerateKillers(int chance) {
@@ -114,5 +110,4 @@ public class Generator {
             throw new IllegalArgumentException();
         }
     }
-    
 }

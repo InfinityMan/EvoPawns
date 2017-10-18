@@ -17,6 +17,7 @@
 package ru.dmig.pawns.gui;
 
 import ru.dmig.pawns.Game;
+import ru.dmig.pawns.UpdThread;
 
 /**
  *
@@ -169,19 +170,11 @@ public class Activity extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void speedPlusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_speedPlusActionPerformed
-        if(Game.TICK_DURATION > 4 && Game.DURATION_OF_ROUND > 3) {
-            Game.TICK_DURATION = Game.TICK_DURATION / 2;
-            Game.DURATION_OF_ROUND = Game.DURATION_OF_ROUND / 2;
-            gameSpeed = gameSpeed*2;
-            update();
-        }
+        Game.upThread.changeSpeed(false);
     }//GEN-LAST:event_speedPlusActionPerformed
 
     private void speedMinusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_speedMinusActionPerformed
-        Game.TICK_DURATION = Game.TICK_DURATION * 2;
-        Game.DURATION_OF_ROUND = Game.DURATION_OF_ROUND * 2;
-        gameSpeed = gameSpeed/2;
-        update();
+        Game.upThread.changeSpeed(true);
     }//GEN-LAST:event_speedMinusActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

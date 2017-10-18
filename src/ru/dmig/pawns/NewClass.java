@@ -16,19 +16,11 @@
  */
 package ru.dmig.pawns;
 
-import java.io.FileNotFoundException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import ru.dmig.pawns.agents.Pawn;
-import ru.dmig.pawns.net.Network;
-
 /**
  *
  * @author Dmig
  */
 public class NewClass {
     public static void main(String[] args) throws InterruptedException {
-        
     }
 }

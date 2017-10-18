@@ -22,12 +22,20 @@ package ru.dmig.pawns.agents;
  */
 public class Killer extends Agent {
 
-    public static final double MAX_SPEED = 2;
+    public static final double MAX_SPEED = 1.5;
 
     private double rltAngleToPawn;
 
     public Killer(float x, float y) {
         super(x, y);
+    }
+    
+    public Killer() {
+        super();
+    }
+
+    public Killer(double speed, double absAngle, double mass) {
+        super(speed, absAngle, mass);
     }
     
     public void calculate() {

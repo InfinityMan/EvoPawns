@@ -74,7 +74,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns.
      */
-    public static final int[] LAYERS_OF_NET = {7, 6, 5, 3, 2};
+    public static final int[] LAYERS_OF_NET = {9, 8, 5, 3, 3};
 
     /**
      * Length of field to simulate.
@@ -89,12 +89,12 @@ public class Game {
     /**
      * Duration of one tick of game.
      */
-    public static int TICK_DURATION = 32; // 4 is min
+    public static int TICK_DURATION = 20; // 2 is min
 
     /**
      * Duration of one generation playing in milliseconds.
      */
-    public static double DURATION_OF_ROUND = 12 * 1000; //3 is min
+    public static double DURATION_OF_ROUND = 16 * 1000; //1500 is min
 
     /**
      * Amount of rounds (generations) to play.
@@ -115,7 +115,7 @@ public class Game {
 
     public static final double KILLER_DAMAGE = 45;
     
-    public static final int KILLER_AMOUNT = 62;
+    public static final int KILLER_AMOUNT = 30;
 
     /**
      * Generation index, when <code>new.gen</code> loads.
@@ -169,8 +169,8 @@ public class Game {
             JOptionPane.showMessageDialog(null, HELP);
             int maxSpeed = JOptionPane.showConfirmDialog(null, "Установить максимальную скорость?", "Скорость", JOptionPane.YES_NO_OPTION);
             if(maxSpeed == JOptionPane.YES_OPTION) {
-                TICK_DURATION = 4;
-                DURATION_OF_ROUND = 3 * 1000;
+                TICK_DURATION = 2;
+                DURATION_OF_ROUND = 1.5 * 1000;
             }
             
             String amountOfPawnsStr = JOptionPane.showInputDialog(null,
