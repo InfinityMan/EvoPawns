@@ -116,6 +116,8 @@ public class Game {
     public static final double KILLER_DAMAGE = 45;
     
     public static final int KILLER_AMOUNT = 30;
+    
+    public static final int PAWN_SCAN_RANGE = 200;
 
     /**
      * Generation index, when <code>new.gen</code> loads.
