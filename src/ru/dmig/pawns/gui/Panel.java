@@ -20,6 +20,7 @@ import ru.dmig.pawns.agents.Pawn;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import javax.swing.JPanel;
 import ru.dmig.pawns.Game;
@@ -35,7 +36,7 @@ public class Panel extends JPanel {
     public static final int PAWN_DIAMETER = 6;
     public static final int BULLET_DIAMETER = 6;
     public static final int FOOD_DIAMETER = 3;
-    
+
     public static final int KILLER_DIAMETER = 4;
 
     public static final Color MY_ORANGE = new Color(219, 118, 67);
@@ -74,22 +75,31 @@ public class Panel extends JPanel {
         });
 
         gr2d.setColor(MY_BLUE);
+        synchronized (Game.foods) {
 
-        for (Iterator<Agent> itr = Game.foods.iterator(); itr.hasNext();) {
-            Agent food = itr.next();
-            int x = Math.round(food.getX());
-            int y = Math.round(food.getY());
-            gr2d.drawOval(x - FOOD_DIAMETER / 2, y - FOOD_DIAMETER / 2, FOOD_DIAMETER, FOOD_DIAMETER);
+            for (Iterator<Agent> itr = Game.foods.iterator(); itr.hasNext();) {
+                try {
+                    Agent food = itr.next();
+                    int x = Math.round(food.getX());
+                    int y = Math.round(food.getY());
+                    gr2d.drawOval(x - FOOD_DIAMETER / 2, y - FOOD_DIAMETER / 2, FOOD_DIAMETER, FOOD_DIAMETER);
+                } catch (ConcurrentModificationException ex) {
+                    System.err.println("ConcurrentEx: " + ex);
+                }
+            }
+
         }
-        
+
         gr2d.setColor(Color.RED);
-        
+
         for (int i = 0; i < Game.killers.size(); i++) {
             int x = Math.round(Game.killers.get(i).getX());
             int y = Math.round(Game.killers.get(i).getY());
             gr2d.drawOval(x - KILLER_DIAMETER / 2, y - KILLER_DIAMETER / 2, KILLER_DIAMETER, KILLER_DIAMETER);
         }
 
+        //gr2d.setColor(Color.BLACK);
+        //gr2d.drawLine(300, 300, 500, 300);
     }
 
     private void drawDangerZone(Graphics2D g) {
