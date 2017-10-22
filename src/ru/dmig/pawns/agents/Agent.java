@@ -16,8 +16,8 @@
  */
 package ru.dmig.pawns.agents;
 
+import java.util.Objects;
 import ru.dmig.pawns.Game;
-import ru.dmig.pawns.Generator;
 import ru.epiclib.base.Base;
 
 /**
@@ -160,9 +160,7 @@ public class Agent {
      * @param absAngle new value of absAngle
      */
     public final void setAbsAngle(double absAngle) throws IllegalArgumentException {
-        if(absAngle >= 0 && absAngle < 2*Math.PI) {
-            this.absAngle = absAngle;
-        } else throw new IllegalArgumentException();
+        this.absAngle = testAngle(absAngle);
     }
     
     /**
@@ -251,5 +249,55 @@ public class Agent {
         this.mass = mass;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + Objects.hashCode(this.t);
+        hash = 29 * hash + (int) (Double.doubleToLongBits(this.speed) ^ (Double.doubleToLongBits(this.speed) >>> 32));
+        hash = 29 * hash + (int) (Double.doubleToLongBits(this.absAngle) ^ (Double.doubleToLongBits(this.absAngle) >>> 32));
+        hash = 29 * hash + Float.floatToIntBits(this.x);
+        hash = 29 * hash + Float.floatToIntBits(this.y);
+        hash = 29 * hash + (int) (Double.doubleToLongBits(this.mass) ^ (Double.doubleToLongBits(this.mass) >>> 32));
+        hash = 29 * hash + Objects.hashCode(this.authorOfBullet);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Agent other = (Agent) obj;
+        if (Double.doubleToLongBits(this.speed) != Double.doubleToLongBits(other.speed)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.absAngle) != Double.doubleToLongBits(other.absAngle)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.x) != Float.floatToIntBits(other.x)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.y) != Float.floatToIntBits(other.y)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.mass) != Double.doubleToLongBits(other.mass)) {
+            return false;
+        }
+        return true;
+    }
+
+    public static double testAngle(double angle) {
+        if(angle >= 0 && angle < 2*Math.PI) {
+            return angle;
+        } else if(angle == Math.PI * 2) {
+            return 0;
+        } else throw new IllegalArgumentException();
+    }
     
 }
