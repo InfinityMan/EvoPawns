@@ -287,6 +287,8 @@ public class Game {
 
         double[][] newGens = new double[pawns.length][];
         Pawn[] newPawns = new Pawn[pawns.length];
+        
+        boolean[] willMutate = new boolean[pawns.length];
 
         if (pawns.length > 3) {
             double[] fitnesses = new double[pawns.length];
@@ -304,9 +306,17 @@ public class Game {
                 double[] genomBA = new double[genomB.length];
                 EvoAlg.crossover(genomA, genomB, genomAB, genomBA);
                 newGens[i] = genomA;
+                //no chance of mutation for alpha
+                willMutate[i] = false;
                 newGens[i + 1] = genomB;
+                //5% chance of mutation for beta
+                willMutate[i] = Base.chance(5, 0);
                 newGens[pawns.length - i - 1] = genomAB;
+                //80% chance of mutation for child
+                willMutate[pawns.length - i - 1] = Base.chance(80, 0); 
                 newGens[pawns.length - i - 2] = genomBA;
+                //80% chance of mutation for child
+                willMutate[pawns.length - i - 2] = Base.chance(80, 0);
             }
             //Creating new pawns from gens
 
@@ -319,7 +329,9 @@ public class Game {
 
             //Mutation
             for (i = 0; i < newPawns.length; i++) {
-                newPawns[i].network.mutate();
+                if(willMutate[i]) {
+                    newPawns[i].network.mutate();
+                }
             }
         } else {
             for (i = 0; i < newGens.length; i++) {
