@@ -30,6 +30,7 @@ import ru.dmig.pawns.gui.ChartPanel;
 import ru.dmig.pawns.gui.Frame;
 import ru.dmig.pawns.gui.Panel;
 import ru.dmig.pawns.net.Network;
+import ru.dmig.pawns.net.Neuron;
 import ru.epiclib.base.Arrayer;
 import ru.epiclib.base.Base;
 import ru.epiclib.base.FileWorker;
@@ -45,12 +46,16 @@ public class Game {
     /**
      * Amount of pawns for game.
      */
-    public static int AMOUNT_OF_PAWNS = 32;
+    public static int AMOUNT_OF_PAWNS = 60;
+
+    public static int TURN_PAWN_AMOUNT = 10;
 
     /**
      * Interplanetary pawns array.
      */
     public static Pawn[] pawns;
+
+    public static Pawn[][] allPawns;
 
     /**
      * Interplanetary food list.
@@ -61,7 +66,7 @@ public class Game {
      * Interplanetary bullets list.
      */
     public static ArrayList<Agent> bullets;
-    
+
     public static ArrayList<Killer> killers;
 
     /**
@@ -74,7 +79,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns.
      */
-    public static final int[] LAYERS_OF_NET = {9, 8, 5, 3, 3};
+    public static final int[] LAYERS_OF_NET = {5, 6, 6, 2};
 
     /**
      * Length of field to simulate.
@@ -89,12 +94,12 @@ public class Game {
     /**
      * Duration of one tick of game.
      */
-    public static int TICK_DURATION = 20; // 2 is min
+    public static int TICK_DURATION = 20; // 2 is min, 20 is normal
 
     /**
      * Duration of one generation playing in milliseconds.
      */
-    public static double DURATION_OF_ROUND = 16 * 1000; //1500 is min
+    public static double DURATION_OF_ROUND = 16 * 1000; //1 500 is min, 16 000 is normal
 
     /**
      * Amount of rounds (generations) to play.
@@ -104,26 +109,26 @@ public class Game {
     /**
      * Chance of mutation of every paricular weight. From 0 to 100. "By definition at 100 mutation rate, every variable is chosen randomly each generation and no information is retained."
      */
-    public static final int MUTATION_RATE = 5;
+    public static final int MUTATION_RATE = 3;
 
     public static int FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
 
     public static final int MIN_MASS_OF_FOOD = 5;
     public static final int MAX_MASS_OF_FOOD = 5;
 
-    public static final int DANGER_ZONE = 25;
+    public static final int DANGER_ZONE = 23;
 
     public static final double KILLER_DAMAGE = 45;
-    
+
     public static final int KILLER_AMOUNT = 30;
-    
+
     public static final int PAWN_SCAN_RANGE = 200;
 
     /**
      * Generation index, when <code>new.gen</code> loads.
      */
     public static final int GENERATION_FOR_UPDATE = 5;
-    
+
     public static final String HELP = "Программа представляет собой симулятор развития нейронных сетей с помощью эволюционного алгоритма.\n"
             + "Оранжевый кружок на поле - это пешка, она принимает решения с помощью нейронной сети, получая на вход:\n"
             + "Свою скорость, свой угл движения, угол к ближайшей еде, угол к ближайшей угрозе, дистанцию до угрозы, свои координаты.\n"
@@ -139,14 +144,15 @@ public class Game {
     public static void newRun() {
         try {
             ChartPanel.lauch();
-            pawns = Generator.generatePawns();
+            allPawns = arrayToMatrix(Generator.generatePawns(AMOUNT_OF_PAWNS), TURN_PAWN_AMOUNT);
+            pawns = allPawns[0];
             foods = new ArrayList<>();
             bullets = new ArrayList<>();
             killers = new ArrayList<>();
             Generator.generateFood(FOOD_AMOUNT);
-            for (int i = 0; i < KILLER_AMOUNT; i++) {
-                killers.add(Generator.generateKiller());
-            }
+//            for (int i = 0; i < KILLER_AMOUNT; i++) {
+//                killers.add(Generator.generateKiller());
+//            }
 
             Frame.panel = new Panel();
 
@@ -170,20 +176,20 @@ public class Game {
         if (set == JOptionPane.YES_OPTION) {
             JOptionPane.showMessageDialog(null, HELP);
             int maxSpeed = JOptionPane.showConfirmDialog(null, "Установить максимальную скорость?", "Скорость", JOptionPane.YES_NO_OPTION);
-            if(maxSpeed == JOptionPane.YES_OPTION) {
-                TICK_DURATION = 2;
-                DURATION_OF_ROUND = 1.5 * 1000;
+            if (maxSpeed == JOptionPane.YES_OPTION) {
+                TICK_DURATION = 1;
+                DURATION_OF_ROUND = 2 * 1000;
             }
-            
+
             String amountOfPawnsStr = JOptionPane.showInputDialog(null,
                     "Введите количество пешек для игры [По умолчанию: 16]: ");
-            
+
             int amountOfPawns;
-            
+
             if (!amountOfPawnsStr.isEmpty()) {
                 try {
                     amountOfPawns = Integer.valueOf(amountOfPawnsStr);
-                    FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
+                    
                     if (amountOfPawns < 4 || amountOfPawns > 40 || amountOfPawns % 4 != 0) {
                         throw new NumberFormatException();
                     }
@@ -196,6 +202,7 @@ public class Game {
             }
 
             AMOUNT_OF_PAWNS = amountOfPawns;
+            FOOD_AMOUNT = 320;
         }
 
     }
@@ -248,6 +255,19 @@ public class Game {
         return ret;
     }
 
+    public static double[] getGenomFromNet(Network net) {
+        double[] genom = new double[net.getGenomSize()];
+        double[] wGenom = weightsIntoGenom(net.getWeights());
+        for (int i = 0; i < wGenom.length; i++) {
+            genom[i] = wGenom[i];
+        }
+        Neuron[] neurons = net.getNeurons();
+        for (int i = 0; i < net.getGenomSize() - net.getSize(); i++) {
+            genom[i + wGenom.length] = neurons[i].getRadius();
+        }
+        return genom;
+    }
+
     /**
      * Evolution algorithms for pawns array with ready fitnesses
      *
@@ -265,12 +285,11 @@ public class Game {
         }
         int i;
 
-        double[][] newGens = new double[AMOUNT_OF_PAWNS][];
-        Pawn[] newPawns = new Pawn[AMOUNT_OF_PAWNS];
+        double[][] newGens = new double[pawns.length][];
+        Pawn[] newPawns = new Pawn[pawns.length];
 
-        if (pawns.length
-                > 3) {
-            double[] fitnesses = new double[AMOUNT_OF_PAWNS];
+        if (pawns.length > 3) {
+            double[] fitnesses = new double[pawns.length];
             for (i = 0; i < pawns.length; i++) {
                 fitnesses[i] = pawns[i].calcFitness();
             }
@@ -279,35 +298,28 @@ public class Game {
             int[] parents = getParents(fitnesses); //test for %4
 
             for (i = 0; i < parents.length; i += 2) {
-                double[] genomA = weightsIntoGenom(pawns[parents[i]].network.getWeights());
-                double[] genomB = weightsIntoGenom(pawns[parents[i + 1]].network.getWeights());
+                double[] genomA = getGenomFromNet(pawns[parents[i]].network);
+                double[] genomB = getGenomFromNet(pawns[parents[i + 1]].network);
                 double[] genomAB = new double[genomA.length];
                 double[] genomBA = new double[genomB.length];
                 EvoAlg.crossover(genomA, genomB, genomAB, genomBA);
                 newGens[i] = genomA;
                 newGens[i + 1] = genomB;
-                newGens[AMOUNT_OF_PAWNS - i - 1] = genomAB;
-                newGens[AMOUNT_OF_PAWNS - i - 2] = genomBA;
-            }
-            //Mutation
-            for (i = 0; i < newGens.length; i++) {
-                for (int j = 0; j < newGens[i].length; j++) {
-                    if (Base.chance(MUTATION_RATE, 0)) {
-                        newGens[i][j] = Math.random(); //TODO mutation
-                    }
-                }
+                newGens[pawns.length - i - 1] = genomAB;
+                newGens[pawns.length - i - 2] = genomBA;
             }
             //Creating new pawns from gens
 
-            for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
+            for (i = 0; i < pawns.length; i++) {
                 newPawns[i] = Generator.generatePawn();
-                newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
+                if (Base.chance(96, 0)) {
+                    newPawns[i].network = new Network(newGens[i], LAYERS_OF_NET);
+                }
             }
 
+            //Mutation
             for (i = 0; i < newPawns.length; i++) {
-                if (Base.chance(4, 0)) {
-                    newPawns[i] = Generator.generatePawn();
-                }
+                newPawns[i].network.mutate();
             }
         } else {
             for (i = 0; i < newGens.length; i++) {
@@ -320,8 +332,8 @@ public class Game {
                     }
                 }
             }
-            newPawns = Generator.generatePawns();
-            for (i = 0; i < AMOUNT_OF_PAWNS; i++) {
+            newPawns = Generator.generatePawns(pawns.length);
+            for (i = 0; i < pawns.length; i++) {
                 newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
             }
         }
@@ -375,11 +387,13 @@ public class Game {
     }
 
     /**
-     * Prints on screen info about last generation
+     * Prints on screen info about pawns successes
+     *
+     * @param pawns Pawn[] to print
      */
-    public static void viewStats() {
-        double[] fitnesses = new double[AMOUNT_OF_PAWNS];
-        for (int i = 0; i < AMOUNT_OF_PAWNS; i++) {
+    public static void viewStats(Pawn[] pawns) {
+        double[] fitnesses = new double[pawns.length];
+        for (int i = 0; i < pawns.length; i++) {
             fitnesses[i] = pawns[i].calcFitness();
         }
         double avg = Arrayer.mediumValueOfArray(fitnesses);
@@ -387,7 +401,7 @@ public class Game {
 
         ChartPanel.cp.update(fit, avg);
 
-        double[] pens = new double[AMOUNT_OF_PAWNS];
+        double[] pens = new double[pawns.length];
         for (int i = 0; i < pens.length; i++) {
             pens[i] = pawns[i].dangerZonePenalty;
         }
@@ -453,6 +467,34 @@ public class Game {
             pawns[i].network.setWeights(genomIntoWeights(gens[i], LAYERS_OF_NET));
         }
         return pawns;
+    }
+
+    public static Pawn[][] arrayToMatrix(Pawn[] array, int period) {
+        Pawn[][] ret = new Pawn[array.length / period][period];
+        for (int i = 0; i < array.length; i++) {
+            if (i % period == 0 && i != 0) {
+            }
+            ret[i / period][i % period] = array[i];
+        }
+        return ret;
+    }
+
+    public static Pawn[] getPawnArray(Pawn[][] matrix) {
+        return matrixToArray(matrix);
+    }
+    
+    public static Pawn[] matrixToArray(Pawn[][] matrix) {
+        if(matrix == null) throw new IllegalArgumentException("Matrix is null");
+        if(matrix.length == 0) throw new IllegalArgumentException("Matrix have size 0");
+        if(matrix[0].length == 0) throw new IllegalArgumentException("Matrix element 0 have size 0");
+        Pawn[] ret = new Pawn[matrix.length * matrix[0].length];
+        int len = matrix[0].length;
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < len; j++) {
+                ret[i * len + j] = matrix[i][j];
+            }
+        }
+        return ret;
     }
 
 }

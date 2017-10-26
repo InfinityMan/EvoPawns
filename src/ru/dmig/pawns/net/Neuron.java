@@ -25,25 +25,73 @@ import ru.epiclib.base.Base;
  * Implements the neural network neuron
  *
  * @author Dmig
- * @author jnemec (on github)
- * @author honzour (on github)
  */
 public final class Neuron implements Serializable {
-    
-    
 
     //http://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
     private static final long serialVersionUID = 1734654068548880380L;
-    // weights[0] is -treshold
+    // weights[0] is bias
     public double[] weights;
     public double output;
 
-    public Neuron(List<Double> weights) {
-        int inputCount = weights.size();
-        this.weights = new double[inputCount];
+    private int radius;
 
-        for (int i = 0; i < inputCount; i++) {
-            this.weights[i] = weights.get(i);
+    public static double calc(double[] inputs, double[] weights, int radius) {
+        if (inputs.length != weights.length - 1) {
+            throw new IllegalArgumentException();
+        }
+        double potential = 0;
+        for (int i = 1; i < weights.length; i++) {
+            potential += inputs[i - 1] * weights[i]; //sum inputs
+        }
+        potential += weights[0];
+        return lineFunc(radius, potential, false);
+    }
+
+    public void calc(Layer prevLayer) {
+        double[] inps = new double[prevLayer.neurons.length];
+        for (int i = 0; i < inps.length; i++) {
+            inps[i] = prevLayer.neurons[i].output;
+        }
+        calc(inps);
+    }
+
+    public void calc(double[] inputs) {
+        output = calc(inputs, weights, getRadius());
+    }
+
+    public static double lineFunc(int radius, double value, boolean simmetric) {
+        if (radius < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (radius == 0) {
+            if (value < 0) {
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            if (simmetric) {
+                if (value >= radius) {
+                    return 1;
+                } else if (value <= -radius) {
+                    return 0;
+                } else {
+                    if (value < 0) {
+                        return Math.abs(value / (radius * 2));
+                    } else {
+                        return (value / (radius * 2)) + 0.5;
+                    }
+                }
+            } else {
+                if (value >= radius) {
+                    return 1;
+                } else if (value <= 0) {
+                    return 0;
+                } else {
+                    return (value / radius);
+                }
+            }
         }
     }
 
@@ -56,39 +104,56 @@ public final class Neuron implements Serializable {
         inputCount++;
         weights = new double[inputCount];
         restart(pause);
+        genRadius();
     }
 
     /**
      * Restarts the neuron
+     *
      * @param pause Need pause after restarting?
      */
     public void restart(boolean pause) {
-        final int MAX = 10;
-        final int MIN = -10;
-        
-        final int BMAX = 6;
-        final int BMIN = -4;
-        
-        final int amountOfPeriods = MAX - MIN;
-        final int BamountOfPeriods = BMAX - BMIN;
-        
-        int inputCount = weights.length;
-
         weights[0] = 0;
-        for (int i = 0; i < inputCount; i++) {
-            if(i != 0) {
-                int periodId = Base.randomNumber(0, amountOfPeriods - 1);
-                weights[i] = MIN + periodId + Math.random();
-            } else {
-                int periodId = Base.randomNumber(0, BamountOfPeriods - 1);
-                weights[i] = BMIN + periodId + Math.random();
-            }
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = genWeight();
         }
-        if(pause) {
+
+//        weights[0] = 0;
+//        for (int i = 0; i < weights.length; i++) {
+//            if (Base.chance(50, 0)) {
+//                weights[i] = -Math.random();
+//            } else {
+//                weights[i] = Math.random();
+//            }
+//        }
+        if (pause) {
             try {
                 Thread.sleep(0, 2);
             } catch (InterruptedException ex) {
                 Game.exception();
+            }
+        }
+    }
+
+    public static double genWeight() {
+        final byte MAX = 10;
+        final byte MIN = -10;
+
+        final short amountOfPeriods = MAX - MIN;
+        final int periodId = Base.randomNumber(0, amountOfPeriods - 1);
+        return (MIN + periodId + Math.random());
+    }
+
+    public void tryToMutate() {
+        for (int i = -1; i < weights.length; i++) {
+            if (Base.chance(Game.MUTATION_RATE, 0)) {
+                if (i == -1) {
+                    if(Base.chance(60, 0)) {
+                        genRadius();
+                    }
+                } else {
+                    weights[i] = genWeight();
+                }
             }
         }
     }
@@ -105,6 +170,33 @@ public final class Neuron implements Serializable {
         }
         sb.append(']');
         return sb.toString();
+    }
+
+    /**
+     * Get the value of radius
+     *
+     * @return the value of radius
+     */
+    public int getRadius() {
+        return radius;
+    }
+
+    /**
+     * Set the value of radius
+     *
+     * @param radius new value of radius
+     */
+    public void setRadius(int radius) {
+        this.radius = radius;
+    }
+
+    public void genRadius() {
+        setRadius(genRandRadius());
+    }
+
+    public static int genRandRadius() {
+        if(Base.chance(5, 0)) return 1;
+        return Base.randomNumber(0, 50);
     }
 
 }

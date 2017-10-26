@@ -17,116 +17,112 @@
 package ru.dmig.pawns.net;
 
 import java.io.Serializable;
-import java.util.List;
+import ru.dmig.pawns.Game;
 import ru.epiclib.base.Base;
 
 /**
  * Implements the neural network
  *
  * @author Dmig
- * @author jnemec (on github)
- * @author honzour (on github)
  */
-public class Network implements Serializable {
+public final class Network implements Serializable {
 
-    private static final long serialVersionUID = -6200117127679042346L;
+    private static final long serialVersionUID = -6200117127679042366L;
 
-    public double[][] mInputScale;
-    protected double[][] mOutputScale;
+    protected double[] output;
 
-    protected double[] mOutput;
-
-    public Layer[] mLayers;
-
-    private long mIteration;
+    public Layer[] layers;
 
     static double sigma(double x) {
-        return 1.0 / (1.0 + Math.exp(-x));
+        //1.0/(1.0+e^(-1.4e*x))
+        return 1.0 / (1.0 + Math.exp(-(1.4 * Math.E * x)));
     }
 
     public int getInputDimension() {
-        if (mLayers == null || mLayers.length == 0 || mLayers[0] == null || mLayers[0].neurons == null || mLayers[0].neurons[0] == null || mLayers[0].neurons[0].weights == null) {
+        if (layers == null || layers.length == 0 || layers[0] == null || layers[0].neurons == null || layers[0].neurons[0] == null || layers[0].neurons[0].weights == null) {
             return 0;
         }
-        return mLayers[0].neurons[0].weights.length - 1;
+        return layers[0].neurons[0].weights.length - 1;
     }
 
     public int getOutputDimension() {
-        if (mLayers == null || mLayers.length == 0 || mLayers[mLayers.length - 1] == null || mLayers[mLayers.length - 1].neurons == null) {
+        if (layers == null || layers.length == 0 || layers[layers.length - 1] == null || layers[layers.length - 1].neurons == null) {
             return 0;
         }
-        return mLayers[mLayers.length - 1].neurons.length;
-    }
-
-    /**
-     * Parsing constructor
-     *
-     * @param layersData
-     */
-    public Network(List<List<List<Double>>> layersData) {
-        mLayers = new Layer[layersData.size()];
-        for (int i = 0; i < mLayers.length; i++) {
-            mLayers[i] = new Layer(layersData.get(i));
-        }
+        return layers[layers.length - 1].neurons.length;
     }
 
     public Network(int[] layersDimensions) {
-        mLayers = new Layer[layersDimensions.length - 1];
+        if (layersDimensions.length < 3 || layersDimensions.length > 12) {
+            throw new IllegalArgumentException();
+        }
+        layers = new Layer[layersDimensions.length - 1];
         for (int i = 0; i < layersDimensions.length - 1; i++) {
-            mLayers[i] = new Layer(layersDimensions[i + 1], layersDimensions[i], true);
+            layers[i] = new Layer(layersDimensions[i + 1], layersDimensions[i], true);
+        }
+    }
+    
+    public Network(double[] genom, int[] layers) {
+        this(layers);
+        if(genom.length != getGenomSize(layers)) throw new IllegalArgumentException();
+        double[] wGens = new double[getSize(layers)];
+        double[] rGens = new double[genom.length - wGens.length];
+        for (int i = 0; i < wGens.length; i++) {
+            wGens[i] = genom[i];
+        }
+        for (int i = 0; i < rGens.length; i++) {
+            rGens[i] = genom[i + wGens.length];
+        }
+        setWeights(Game.genomIntoWeights(wGens, layers));
+        int index = 0;
+        for (Layer layer : this.layers) {
+            for (Neuron neuron : layer.neurons) {
+                neuron.setRadius((int) rGens[index]);
+                index++;
+            }
         }
     }
 
-    /**
-     * Input and output are like in the training set, all scaling is done here
-     *
-     * @param input before scaling. Array data will not be changed in this method.
-     * @param output after scaling
-     * @param scaleOutput
-     */
-    public void calculate(double[] input, double output[], boolean scaleOutput) {
-        int i, j, k;
+    public double[] calculate(double[] input) {
+        if(input.length != getInputDimension()) {
+            throw new IllegalArgumentException(); //Control for in
+        }
+        int i, j;
 
-        for (i = 0; i < mLayers.length; i++) {
-            Layer l = mLayers[i];
-            for (j = 0; j < l.neurons.length; j++) {
-                Neuron n = l.neurons[j];
-                double potential = 0;
-                for (k = 1; k < n.weights.length; k++) {
-                    potential += (i == 0 ? (mInputScale == null ? input[k - 1] : input[k - 1] * mInputScale[k - 1][0] + mInputScale[k - 1][1])
-                            : mLayers[i - 1].neurons[k - 1].output) * n.weights[k];
+        for (i = 0; i < layers.length; i++) { //i - layerID
+            Layer l = layers[i];
+            for (j = 0; j < l.neurons.length; j++) { //j - neuronID
+                if(i == 0) {
+                    l.neurons[j].calc(input);
+                } else {
+                    l.neurons[j].calc(layers[i - 1]);
                 }
-                potential += n.weights[0];
-                n.output = sigma(potential);
             }
         }
-        Layer last = mLayers[mLayers.length - 1];
-        for (i = 0; i < last.neurons.length; i++) {
-            output[i] = last.neurons[i].output;
+        
+        double[] out = new double[getOutputDimension()];
+        Layer lastLayer = layers[layers.length - 1];
+        if(out.length != lastLayer.neurons.length) {
+            throw new IllegalStateException(); //Control for out
         }
-        if (mOutputScale != null && scaleOutput) {
-            for (i = 0; i < mOutputScale.length; i++) {
-                output[i] = output[i] * mOutputScale[i][0] + mOutputScale[i][1];
-            }
+        for (i = 0; i < lastLayer.neurons.length; i++) {
+            out[i] = lastLayer.neurons[i].output;
         }
-    }
-
-    public long getItration() {
-        return mIteration;
+        return out;
     }
 
     public double[][][] getWeights() {
-        double[][][] weights = new double[mLayers.length][][];
+        double[][][] weights = new double[layers.length][][];
         for (int i = 0; i < weights.length; i++) {
-            weights[i] = mLayers[i].getWeights();
+            weights[i] = layers[i].getWeights();
         }
         return weights;
     }
 
     public void setWeights(double[][][] w) {
-        if (w.length == mLayers.length) {
+        if (w.length == layers.length) {
             for (int i = 0; i < w.length; i++) {
-                mLayers[i].setWeights(w[i]);
+                layers[i].setWeights(w[i]);
             }
         } else {
             throw new IllegalArgumentException();
@@ -134,7 +130,7 @@ public class Network implements Serializable {
     }
 
     public void printWeights() {
-        for (Layer mLayer : mLayers) {
+        for (Layer mLayer : layers) {
             for (Neuron neuron : mLayer.neurons) {
                 for (int k = 0; k < neuron.weights.length; k++) {
                     System.out.print(Base.maximumFractionDigits(2, neuron.weights[k]) + " ");
@@ -146,12 +142,12 @@ public class Network implements Serializable {
     }
 
     public int getSize() {
-        int[] layersD = new int[mLayers.length + 1];
+        int[] layersD = new int[layers.length + 1];
         for (int i = 0; i < layersD.length; i++) {
             if (i != 0) {
-                layersD[i] = mLayers[i - 1].neurons.length;
+                layersD[i] = layers[i - 1].neurons.length;
             } else {
-                layersD[0] = mLayers[0].neurons[0].weights.length - 1;
+                layersD[0] = layers[0].neurons[0].weights.length - 1;
             }
         }
         return getSize(layersD);
@@ -159,13 +155,53 @@ public class Network implements Serializable {
 
     public static int getSize(int[] layersD) {
         int size = 0;
-        for (int i = 0; i < layersD.length-1; i++) {
+        for (int i = 0; i < layersD.length - 1; i++) {
             size += (layersD[i] * layersD[i + 1]);
         }
         for (int i = 1; i < layersD.length; i++) {
             size += layersD[i];
         }
         return size;
+    }
+    
+    public static int getGenomSize(int[] layersD) {
+        int size = getSize(layersD);
+        for (int i = 1; i < layersD.length; i++) {
+            size += layersD[i];
+        }
+        return size;
+    }
+    
+    public int getGenomSize() {
+        return getSize() + getNeuronAmount();
+    }
+    
+    public int getNeuronAmount() {
+        int ret = 0;
+        for (Layer layer : layers) {
+            ret += layer.neurons.length;
+        }
+        return ret;
+    }
+    
+    public Neuron[] getNeurons() {
+        Neuron[] neurons = new Neuron[getNeuronAmount()];
+        int index = 0;
+        for (Layer layer : layers) {
+            for (Neuron neuron : layer.neurons) {
+                neurons[index] = neuron;
+                index++;
+            }
+        }
+        return neurons;
+    }
+    
+    public void mutate() {
+        for (Layer layer : layers) {
+            for (Neuron neuron : layer.neurons) {
+                neuron.tryToMutate();
+            }
+        }
     }
 
 }

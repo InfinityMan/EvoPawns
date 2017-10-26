@@ -34,25 +34,31 @@ public final class Pawn extends Agent {
 
     /*
         Inputs of neuron net:
-    0: speed
-    1: absolute angle of movement
-    2: relative angle to nearest food
-    3: relative angle to nearest killer
-    4: distance to nearest food
-    4: distance to nearest killer
-    5: x
-    6: y
-    7: memory previous value
+    0:  speed
+    1:  absolute angle of movement
+    2:  relative angle to nearest food
+    3:  distance to nearest food
+    4:  relative angle to alternative food
+    5:  distance to alternative food
+    6:  relative angle to nearest killer
+    7:  absolute angle of nearest killer
+    8:  distance to nearest killer
+    9:  x
+    10: y
+    11: memory previous value
         Outputs:
     0: new speed
     1: new absolute angle
     2: memory new value
      */
     private double rltAngleToFood;
+    private double rltAngleToAltFood;
     private double rltAngleToEnemy;
+    private double absAngleOfEnemy;
 
     private float distToEnemy;
     private float distToFood;
+    private float distToAltFood;
 
     private double memory;
 
@@ -79,34 +85,50 @@ public final class Pawn extends Agent {
     /**
      * Calculate out parameters from input parameters by network.
      */
-    public void calculate() {
+    public void calculate(boolean pr) {
         double x = getX() / Game.LENGTH_OF_FIELD;
         double y = getY() / Game.LENGTH_OF_FIELD;
         double aangl = getAbsAngle() / (Math.PI * 2);
         double ranglF = getRltAngleToFood() / (Math.PI * 2);
-        double ranglE = getRltAngleToEnemy() / (Math.PI * 2);
+//        double ranglAF = getRltAngleToAltFood() / (Math.PI * 2);
+//        double ranglE = getRltAngleToEnemy() / (Math.PI * 2);
+//        double aanglE = getAbsAngleOfEnemy() / (Math.PI * 2);
         double distE = 1;
         double distF = 1;
+        double distAF = 1;
         if (getDistToEnemy() <= 200) {
             distE = getDistToEnemy() / 200;
         }
         if (getDistToFood() <= 200) {
             distF = getDistToFood() / 200;
         }
+        if (getDistToAltFood() <= 200) {
+            distAF = getDistToAltFood() / 200;
+        }
 
-        double newSpeed = 0, newAbsAngle = 0;
+        if (pr) {
+            System.out.println("x " + x);
+            System.out.println("y " + y);
+            System.out.println("angle " + getAbsAngle());
+            System.out.println("angle food " + getRltAngleToFood());
+            System.out.println("dist food " + distF);
+            System.out.println("angle afood " + getRltAngleToAltFood());
+            System.out.println("dist afood " + distAF);
+            System.out.println("angle enemy " + getRltAngleToEnemy());
+            System.out.println("dist enemy " + distE);
+            System.out.println("mem" + getMemory());
+        }
 
-        double[] in = {getSpeed(), aangl, ranglF, ranglE, distE, distF, x, y, getMemory()};
-        double[] out = {newSpeed, newAbsAngle, getMemory()};
+        double[] in = {getSpeed(), aangl, ranglF, x, y};
 
-        network.calculate(in, out, true);
+        double[] out = network.calculate(in);
 
         try {
             setSpeed(out[0]);
             setAbsAngle(out[1] * Math.PI * 2);
-            setMemory(out[2]);
+            //setMemory(out[2]);
         } catch (IllegalArgumentException ex) {
-            System.out.println("Ill: " + out[0] + " " + out[1] * Math.PI * 2 + " " + out[2]);
+            System.out.println("Ill: " + out[0] + " " + out[1] * Math.PI * 2);
         }
     }
 
@@ -159,7 +181,7 @@ public final class Pawn extends Agent {
         setMass(0);
         dangerZonePenalty += 10; //Some negative fitness for dying
     }
-    
+
     /**
      * Hurt the maximal damage to pawn. Pawn will be killed
      */
@@ -284,6 +306,77 @@ public final class Pawn extends Agent {
      */
     public void setDistToFood(float distToFood) {
         this.distToFood = distToFood;
+    }
+
+    /**
+     * Get the value of rltAngleToAltFood
+     *
+     * @return the value of rltAngleToAltFood
+     */
+    public double getRltAngleToAltFood() {
+        return rltAngleToAltFood;
+    }
+
+    /**
+     * Set the value of rltAngleToAltFood
+     *
+     * @param rltAngleToAltFood new value of rltAngleToAltFood
+     */
+    public void setRltAngleToAltFood(double rltAngleToAltFood) {
+        this.rltAngleToAltFood = rltAngleToAltFood;
+    }
+
+    /**
+     * Get the value of distToAltFood
+     *
+     * @return the value of distToAltFood
+     */
+    public float getDistToAltFood() {
+        return distToAltFood;
+    }
+
+    /**
+     * Set the value of distToAltFood
+     *
+     * @param distToAltFood new value of distToAltFood
+     */
+    public void setDistToAltFood(float distToAltFood) {
+        this.distToAltFood = distToAltFood;
+    }
+
+    /**
+     * Get the value of absAngleOfEnemy
+     *
+     * @return the value of absAngleOfEnemy
+     */
+    public double getAbsAngleOfEnemy() {
+        return absAngleOfEnemy;
+    }
+
+    /**
+     * Set the value of absAngleOfEnemy
+     *
+     * @param absAngleOfEnemy new value of absAngleOfEnemy
+     */
+    public void setAbsAngleOfEnemy(double absAngleOfEnemy) {
+        this.absAngleOfEnemy = absAngleOfEnemy;
+    }
+
+    public double getPawnConcentration() {
+        int amount = getPawnAmount(Game.PAWN_SCAN_RANGE);
+        return (amount > 10 ? 1 : amount / 10);
+    }
+
+    public int getPawnAmount(int RADIUS) {
+        int ret = 0;
+        for (Pawn pawn : Game.pawns) {
+            if (!equals(pawn)) {
+                if (Math.abs(getX() - pawn.getX()) < RADIUS && Math.abs(getY() - pawn.getY()) < RADIUS) {
+                    ret++;
+                }
+            }
+        }
+        return ret;
     }
 
     @Override

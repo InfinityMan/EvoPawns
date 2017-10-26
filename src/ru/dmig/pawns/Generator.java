@@ -87,9 +87,9 @@ public class Generator {
         return radAngle;
     }
 
-    public static Pawn[] generatePawns() {
-        Pawn[] pawns = new Pawn[Game.AMOUNT_OF_PAWNS];
-        for (int i = 0; i < pawns.length; i++) {
+    public static Pawn[] generatePawns(int amount) {
+        Pawn[] pawns = new Pawn[amount];
+        for (int i = 0; i < amount; i++) {
             pawns[i] = generatePawn();
         }
         return pawns;

@@ -31,15 +31,6 @@ public class Layer implements Serializable {
     private static final long serialVersionUID = -4328364654490455402L;
     public Neuron[] neurons;
 
-    public Layer(List<List<Double>> layersData) {
-        final int count = layersData.size();
-
-        neurons = new Neuron[count];
-        for (int i = 0; i < count; i++) {
-            neurons[i] = new Neuron(layersData.get(i));
-        }
-    }
-
     public Layer(int count, int previousCount, boolean pause) {
         neurons = new Neuron[count];
         for (int i = 0; i < count; i++) {
