@@ -127,7 +127,7 @@ public class Game {
     /**
      * Generation index, when <code>new.gen</code> loads.
      */
-    public static final int GENERATION_FOR_UPDATE = 5;
+    public static final int GENERATION_FOR_UPDATE = 3;
 
     public static final String HELP = "Программа представляет собой симулятор развития нейронных сетей с помощью эволюционного алгоритма.\n"
             + "Оранжевый кружок на поле - это пешка, она принимает решения с помощью нейронной сети, получая на вход:\n"
@@ -297,7 +297,7 @@ public class Game {
             }
 
             //Crossover
-            int[] parents = getParents(fitnesses); //test for %4
+            final int[] parents = getParents(fitnesses); //test for %4
 
             for (i = 0; i < parents.length; i += 2) {
                 double[] genomA = getGenomFromNet(pawns[parents[i]].network);
@@ -372,18 +372,19 @@ public class Game {
         if (fitnesses.length % 4 != 0) {
             throw new IllegalArgumentException(); //TODO normal crossover
         }
+        int i, j;
         int[] parentsIDs = new int[fitnesses.length / 2];
         double[] lFitnesses = fitnesses;
         double[] chances = new double[fitnesses.length];
         int[] thousChances = new int[fitnesses.length];
 
-        for (int i = 0; i < parentsIDs.length; i++) {
+        for (i = 0; i < parentsIDs.length; i++) {
             double totalSumm = 0;
 
-            for (int j = 0; j < lFitnesses.length; j++) {
+            for (j = 0; j < lFitnesses.length; j++) {
                 totalSumm += lFitnesses[j];
             }
-            for (int j = 0; j < lFitnesses.length; j++) {
+            for (j = 0; j < lFitnesses.length; j++) {
                 chances[j] = (lFitnesses[j] / totalSumm) * 100;
                 thousChances[j] = (int) Math.round(chances[j] * 1000);
             }
@@ -426,7 +427,7 @@ public class Game {
     public static void saveGenoms(Pawn[] pawns, String fileName) {
         double[][] genoms = new double[pawns.length][];
         for (int i = 0; i < genoms.length; i++) {
-            genoms[i] = weightsIntoGenom(pawns[i].network.getWeights());
+            genoms[i] = getGenomFromNet(pawns[i].network);
         }
 
         String genomsStr = "";
@@ -469,14 +470,13 @@ public class Game {
             }
 
         }
-        if (Network.getSize(LAYERS_OF_NET) != len) {
+        if (Network.getGenomSize(LAYERS_OF_NET) != len) {
             throw new ParsingException("Invalid model of neural network");
         }
         Pawn[] pawns = new Pawn[genoms.length];
         for (int i = 0; i < pawns.length; i++) {
             pawns[i] = Generator.generatePawn();
-            pawns[i].network = new Network(LAYERS_OF_NET);
-            pawns[i].network.setWeights(genomIntoWeights(gens[i], LAYERS_OF_NET));
+            pawns[i].network = new Network(gens[i], LAYERS_OF_NET);
         }
         return pawns;
     }

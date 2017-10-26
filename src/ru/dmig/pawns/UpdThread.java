@@ -31,10 +31,6 @@ import ru.epiclib.base.Base;
  */
 public class UpdThread extends Thread {
 
-    private double startTime;
-    private double currentTime;
-    private double finishTime;
-
     private int newTickDuration = Game.TICK_DURATION;
     private double newDurationOfRound = Game.DURATION_OF_ROUND;
 
@@ -60,9 +56,9 @@ public class UpdThread extends Thread {
             Game.DURATION_OF_ROUND = newDurationOfRound;
             
 
-            startTime = Calendar.getInstance().getTimeInMillis();
-            finishTime = startTime + Game.DURATION_OF_ROUND;
-            currentTime = startTime;
+            final double startTime = Calendar.getInstance().getTimeInMillis();
+            final double finishTime = startTime + Game.DURATION_OF_ROUND;
+            double currentTime = startTime;
             
             double halfOfRoundTime = startTime + Game.DURATION_OF_ROUND / 2;
             while (finishTime > currentTime) {
