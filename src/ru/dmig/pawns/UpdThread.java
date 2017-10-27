@@ -29,13 +29,11 @@ import ru.epiclib.base.Base;
  *
  * @author Dmig
  */
-public class UpdThread extends Thread {
+public final class UpdThread extends Thread {
 
     private int newTickDuration = Game.TICK_DURATION;
-    private double newDurationOfRound = Game.DURATION_OF_ROUND;
 
     public UpdThread() {
-        this.start();
     }
 
     @Override
@@ -45,63 +43,57 @@ public class UpdThread extends Thread {
         }
     }
 
+    @SuppressWarnings("SleepWhileInLoop")
     private void simulateRound() {
         Game.generation++;
-    
-        for (int i = 0; i < (Game.AMOUNT_OF_PAWNS/Game.TURN_PAWN_AMOUNT); i++) {
-            Game.pawns = Game.allPawns[i];
-            
-            //Changing global speed in start of new round
-            Game.TICK_DURATION = newTickDuration;
-            Game.DURATION_OF_ROUND = newDurationOfRound;
-            
+        int tick = Game.TICK_DURATION;
 
-            final double startTime = Calendar.getInstance().getTimeInMillis();
-            final double finishTime = startTime + Game.DURATION_OF_ROUND;
-            double currentTime = startTime;
-            
-            double halfOfRoundTime = startTime + Game.DURATION_OF_ROUND / 2;
-            while (finishTime > currentTime) {
-                
-                if (currentTime <= halfOfRoundTime && (currentTime + Game.TICK_DURATION >= halfOfRoundTime)) {
+        double timeIn = System.currentTimeMillis();
+        for (int i = 0; i < (Game.AMOUNT_OF_PAWNS / Game.TURN_PAWN_AMOUNT); i++) {
+            Game.pawns = Game.allPawns[i];
+
+            //Changing global speed in start of new round
+            if (newTickDuration != tick) {
+                tick = newTickDuration;
+                Game.TICK_DURATION = newTickDuration;
+            }
+
+            final boolean isTickZero = (tick == 0);
+            for (int cyc = 0; cyc < Game.CYCLE_AMOUNT; cyc++) {
+                if (cyc == Game.CYCLE_AMOUNT / 2) {
                     Generator.regenerateFood(20);
                 }
-                
+
                 processPawns();
                 processKillers();
-                
+
                 collisionSensor();
-                
-                try {
-                    Frame.frame.update();
-                    Thread.sleep(Game.TICK_DURATION);
-                    currentTime += Game.TICK_DURATION;
-                } catch (InterruptedException ex) {
-                    System.exit(-122112);
+
+                if (!isTickZero) {
+                    try {
+                        Thread.sleep(tick);
+                    } catch (InterruptedException ex) {
+                        System.exit(-122112);
+                    }
                 }
+                Frame.frame.update();
             }
         }
+        System.err.print((System.currentTimeMillis() - timeIn) + ": ");
         Game.viewStats(Game.pawns);
+        timeIn = System.currentTimeMillis();
         Game.allPawns = Game.arrayToMatrix(Game.evolution(Game.getPawnArray(Game.allPawns)), Game.TURN_PAWN_AMOUNT);
+        System.err.println(System.currentTimeMillis() - timeIn);
     }
 
     private void processPawns() {
-//        for (Pawn pawn : Game.pawns) {
-//            if (pawn.isAlive()) {
-//                setRelativeToFood(pawn);
-//                setRelativeToEnemy(pawn);
-//                pawn.calculate();
-//                pawn.updateCoords();
-//                dangerZoneProcess(pawn);
-//            }
-//        }
-        for (int i = 0; i < Game.pawns.length; i++) {
-            if (Game.pawns[i].isAlive()) {
-                setRelativeToFood(Game.pawns[i]);
-                //setRelativeToEnemy(Game.pawns[i]);
-                Game.pawns[i].calculate(false);
-                Game.pawns[i].updateCoords();
-                dangerZoneProcess(Game.pawns[i]);
+        for (Pawn pawn : Game.pawns) {
+            if (pawn.isAlive()) {
+                setRelativeToFood(pawn);
+                setRelativeToEnemy(pawn);
+                pawn.calculate(false);
+                pawn.updateCoords();
+                dangerZoneProcess(pawn);
             }
         }
     }
@@ -109,7 +101,7 @@ public class UpdThread extends Thread {
     private void processKillers() {
         for (int i = 0; i < Game.killers.size(); i++) {
             if (Game.killers.get(i).isInDangerZone()) {
-                Game.killers.get(i).placeInCenter();
+                Game.killers.get(i).placeInRandomPosition();
             } else {
                 //Game.killers.get(i).updateCoords(Killer.MAX_SPEED);
             }
@@ -130,46 +122,33 @@ public class UpdThread extends Thread {
 
     private void collisionSensor() {
 
-        for (int i = 0; i < Game.pawns.length; i++) {
-            if (Game.pawns[i].isAlive()) {
+        for (Pawn pawn : Game.pawns) {
+            if (pawn.isAlive()) {
                 for (Agent bullet : Game.bullets) {
-                    if (Game.pawns[i].getX() + Panel.PAWN_DIAMETER / 2 >= bullet.getX()
-                            && Game.pawns[i].getX() - Panel.PAWN_DIAMETER / 2 <= bullet.getX()
-                            && Game.pawns[i].getY() + Panel.PAWN_DIAMETER / 2 >= bullet.getY()
-                            && Game.pawns[i].getY() - Panel.PAWN_DIAMETER / 2 <= bullet.getY()) {
-                        if (bullet.authorOfBullet != Game.pawns[i]) {
-                            Game.pawns[i].attack(bullet.getMass());
+                    if (testCollision(pawn.getX(), pawn.getY(), bullet.getX(), bullet.getY(), Panel.PAWN_DIAMETER / 2)) {
+                        if (bullet.authorOfBullet != pawn) {
+                            pawn.attack(bullet.getMass());
                         }
                     }
                 }
-
                 synchronized (Game.foods) {
-
                     int deleted = 0;
                     for (Iterator<Agent> itr = Game.foods.iterator(); itr.hasNext();) {
                         Agent food = itr.next();
-                        if (Game.pawns[i].getX() + Panel.PAWN_DIAMETER / 2 >= food.getX()
-                                && Game.pawns[i].getX() - Panel.PAWN_DIAMETER / 2 <= food.getX()
-                                && Game.pawns[i].getY() + Panel.PAWN_DIAMETER / 2 >= food.getY()
-                                && Game.pawns[i].getY() - Panel.PAWN_DIAMETER / 2 <= food.getY()) {
-                            Game.pawns[i].feed(food.getMass());
+                        if (pawn.getX() + Panel.PAWN_DIAMETER / 2 >= food.getX() && pawn.getX() - Panel.PAWN_DIAMETER / 2 <= food.getX() && pawn.getY() + Panel.PAWN_DIAMETER / 2 >= food.getY() && pawn.getY() - Panel.PAWN_DIAMETER / 2 <= food.getY()) {
+                            pawn.feed(food.getMass());
                             itr.remove();
                             deleted++;
                         }
                     }
                     Generator.generateFood(deleted);
-
                 }
-
-                for (Iterator<Killer> itr = Game.killers.iterator(); itr.hasNext();) {
-                    Killer killer = itr.next();
-                    if (Game.pawns[i].getX() + Panel.PAWN_DIAMETER / 2 >= killer.getX()
-                            && Game.pawns[i].getX() - Panel.PAWN_DIAMETER / 2 <= killer.getX()
-                            && Game.pawns[i].getY() + Panel.PAWN_DIAMETER / 2 >= killer.getY()
-                            && Game.pawns[i].getY() - Panel.PAWN_DIAMETER / 2 <= killer.getY()) {
-                        Game.pawns[i].attack(Game.KILLER_DAMAGE);
+                for (Iterator<Killer> it = Game.killers.iterator(); it.hasNext();) {
+                    Killer killer = it.next();
+                    if (testCollision(pawn.getX(), pawn.getY(), killer.getX(), killer.getY(), Panel.PAWN_DIAMETER / 2)) {
+                        pawn.attack(Game.KILLER_DAMAGE);
                         if (Base.chance(60, 0)) {
-                            Game.pawns[i].smite();
+                            pawn.smite();
                         }
                     }
                 }
@@ -230,10 +209,10 @@ public class UpdThread extends Thread {
     }
 
     private void setRelativeToEnemy(Pawn p) {
-        Agent killer = Game.killers.get(getNearestAgent(p.getX(), p.getY(), Game.killers));
+        final Agent killer = Game.killers.get(getNearestAgent(p.getX(), p.getY(), Game.killers));
 
         p.setRltAngleToEnemy(getAngle(p.getX(), p.getY(), killer.getX(), killer.getY()));
-        p.setAbsAngleOfEnemy(killer.getAbsAngle());
+        //p.setAbsAngleOfEnemy(killer.getAbsAngle());
         p.setDistToEnemy((float) getDistance(p.getX(), p.getY(), killer.getX(), killer.getY()));
     }
 
@@ -275,16 +254,28 @@ public class UpdThread extends Thread {
      *
      * @param half If half new speed will be half of current; if false speed doubles
      */
-    public void changeSpeed(boolean half) {
+    public boolean changeSpeed(boolean half) {
         if (half) {
-            newTickDuration = newTickDuration * 2;
-            newDurationOfRound = newDurationOfRound * 2;
+            if(Game.TICK_DURATION > 0) {
+                newTickDuration = newTickDuration * 2;
+            } else {
+                newTickDuration = 24;
+            }
+            return true;
         } else {
-            if (newTickDuration > 4 && newDurationOfRound > 3) {
+            if (newTickDuration > 12) {
                 newTickDuration = newTickDuration / 2;
-                newDurationOfRound = newDurationOfRound / 2;
+                return true;
+            } else if(newTickDuration == 12) {
+                newTickDuration = 0;
+                return true;
             }
         }
+        return false;
+    }
+
+    public static boolean testCollision(float x1, float y1, float x2, float y2, int rad) {
+        return (x1 + rad >= x2) && (x1 - rad <= x2) && (y1 + rad >= y2) && (y1 - rad <= y2);
     }
 
 }

@@ -30,7 +30,7 @@ public final class Pawn extends Agent {
     /**
      * Max speed for every pawn in every direction. (Maybe, I don't sure)
      */
-    public static final double MAX_SPEED = 4;
+    public static final double MAX_SPEED = 6;
 
     /*
         Inputs of neuron net:
@@ -86,13 +86,13 @@ public final class Pawn extends Agent {
      * Calculate out parameters from input parameters by network.
      */
     public void calculate(boolean pr) {
-        double x = getX() / Game.LENGTH_OF_FIELD;
-        double y = getY() / Game.LENGTH_OF_FIELD;
-        double aangl = getAbsAngle() / (Math.PI * 2);
-        double ranglF = getRltAngleToFood() / (Math.PI * 2);
-//        double ranglAF = getRltAngleToAltFood() / (Math.PI * 2);
-//        double ranglE = getRltAngleToEnemy() / (Math.PI * 2);
-//        double aanglE = getAbsAngleOfEnemy() / (Math.PI * 2);
+        final double x = getX() / Game.LENGTH_OF_FIELD;
+        final double y = getY() / Game.LENGTH_OF_FIELD;
+        final double aangl = getAbsAngle() / (Math.PI * 2);
+        final double ranglF = getRltAngleToFood() / (Math.PI * 2);
+        final double ranglAF = getRltAngleToAltFood() / (Math.PI * 2);
+        final double ranglE = getRltAngleToEnemy() / (Math.PI * 2);
+//        final double aanglE = getAbsAngleOfEnemy() / (Math.PI * 2);
         double distE = 1;
         double distF = 1;
         double distAF = 1;
@@ -119,7 +119,7 @@ public final class Pawn extends Agent {
             System.out.println("mem" + getMemory());
         }
 
-        double[] in = {getSpeed(), aangl, ranglF, x, y};
+        double[] in = {getSpeed(), aangl, ranglF, distF, ranglAF, distAF, ranglE, distE, x, y};
 
         double[] out = network.calculate(in);
 
@@ -164,10 +164,10 @@ public final class Pawn extends Agent {
      * @return Fitness of this pawn
      */
     public double calcFitness() {
-        double distanceFit = distance * 0.01;
-        double foodFit = foodGathered * 18;
-        double dngPenalty = dangerZonePenalty * 0.12;
-        double massFit = getMass() * 0.9;
+        double distanceFit = distance * 0.0102;
+        double foodFit = foodGathered * 17.5;
+        double dngPenalty = dangerZonePenalty * 0.14;
+        double massFit = getMass() * 0.447;
 
         return distanceFit + foodFit + massFit - dngPenalty;
     }

@@ -18,6 +18,7 @@ package ru.dmig.pawns;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,9 +47,9 @@ public class Game {
     /**
      * Amount of pawns for game.
      */
-    public static int AMOUNT_OF_PAWNS = 60;
+    public static int AMOUNT_OF_PAWNS = 96;
 
-    public static int TURN_PAWN_AMOUNT = 10;
+    public static int TURN_PAWN_AMOUNT = 8;
 
     /**
      * Interplanetary pawns array.
@@ -79,7 +80,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns.
      */
-    public static final int[] LAYERS_OF_NET = {5, 6, 6, 2};
+    public static final int[] LAYERS_OF_NET = {10, 12, 11, 2};
 
     /**
      * Length of field to simulate.
@@ -94,12 +95,9 @@ public class Game {
     /**
      * Duration of one tick of game.
      */
-    public static int TICK_DURATION = 20; // 2 is min, 20 is normal
-
-    /**
-     * Duration of one generation playing in milliseconds.
-     */
-    public static double DURATION_OF_ROUND = 16 * 1000; //1 500 is min, 16 000 is normal
+    public static int TICK_DURATION = 20; // 20 is normal
+    
+    public static int CYCLE_AMOUNT = 10000;
 
     /**
      * Amount of rounds (generations) to play.
@@ -120,7 +118,7 @@ public class Game {
 
     public static final double KILLER_DAMAGE = 45;
 
-    public static final int KILLER_AMOUNT = 30;
+    public static final int KILLER_AMOUNT = 40;
 
     public static final int PAWN_SCAN_RANGE = 200;
 
@@ -150,9 +148,9 @@ public class Game {
             bullets = new ArrayList<>();
             killers = new ArrayList<>();
             Generator.generateFood(FOOD_AMOUNT);
-//            for (int i = 0; i < KILLER_AMOUNT; i++) {
-//                killers.add(Generator.generateKiller());
-//            }
+            for (int i = 0; i < KILLER_AMOUNT; i++) {
+                killers.add(Generator.generateKiller());
+            }
 
             Frame.panel = new Panel();
 
@@ -166,6 +164,7 @@ public class Game {
             Thread.sleep(2000);
 
             upThread = new UpdThread();
+            upThread.start();
         } catch (InterruptedException ex) {
             System.exit(-12121121);
         }
@@ -177,8 +176,7 @@ public class Game {
             JOptionPane.showMessageDialog(null, HELP);
             int maxSpeed = JOptionPane.showConfirmDialog(null, "Установить максимальную скорость?", "Скорость", JOptionPane.YES_NO_OPTION);
             if (maxSpeed == JOptionPane.YES_OPTION) {
-                TICK_DURATION = 1;
-                DURATION_OF_ROUND = 2 * 1000;
+                TICK_DURATION = 0;
             }
 
             String amountOfPawnsStr = JOptionPane.showInputDialog(null,
@@ -418,6 +416,9 @@ public class Game {
         for (int i = 0; i < pens.length; i++) {
             pens[i] = pawns[i].dangerZonePenalty;
         }
+        
+        Activity.fittest = fit;
+        Activity.avg = avg;
     }
 
     public static void exception() {
