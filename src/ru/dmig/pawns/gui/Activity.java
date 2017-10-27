@@ -16,14 +16,20 @@
  */
 package ru.dmig.pawns.gui;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import ru.dmig.pawns.Game;
 import ru.dmig.pawns.UpdThread;
+import ru.epiclib.base.Base;
 
 /**
  *
  * @author Dmig
  */
-public class Activity extends javax.swing.JFrame {
+public final class Activity extends javax.swing.JFrame {
+    
+    public static double fittest = 0;
+    public static double avg = 0;
     
     private float gameSpeed = 0.5f;
     
@@ -38,10 +44,24 @@ public class Activity extends javax.swing.JFrame {
      */
     public Activity() {
         initComponents();
+        setupUpdater();
     }
     
     public void update() {
         curSpeedL.setText("Current speed: "+gameSpeed+"x");
+        genL.setText("Generation: "+ (Game.generation - 1));
+        fitL.setText("Fittest: "+Base.maximumFractionDigits(2, fittest));
+        avgL.setText("Average: " +Base.maximumFractionDigits(2, avg));
+    }
+    
+    public void setupUpdater() {
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                update();
+            }
+        }, 100, 100);
     }
 
     /**
@@ -170,11 +190,17 @@ public class Activity extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void speedPlusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_speedPlusActionPerformed
-        Game.upThread.changeSpeed(false);
+        if(Game.upThread.changeSpeed(false)) {
+            gameSpeed = gameSpeed / 2;
+        }
+        update();
     }//GEN-LAST:event_speedPlusActionPerformed
 
     private void speedMinusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_speedMinusActionPerformed
-        Game.upThread.changeSpeed(true);
+        if(Game.upThread.changeSpeed(true)) {
+            gameSpeed *= 2;
+        }
+        update();
     }//GEN-LAST:event_speedMinusActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
