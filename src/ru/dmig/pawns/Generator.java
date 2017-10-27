@@ -28,35 +28,39 @@ import ru.epiclib.base.Base;
 public class Generator {
 
     /**
-     * Generates new pawn in spawn zone of the field: (1/4;3/4).
-     * Also set random angle to pawn
+     * Generates new pawn in spawn zone of the field: (1/4;3/4). Also set random angle to pawn
+     *
      * @return New generated pawn
      */
     public static Pawn generatePawn() {
-        Pawn pawn = new Pawn(Base.randomNumber(Game.LENGTH_OF_FIELD / 4, Game.LENGTH_OF_FIELD * 3 / 4), Base.randomNumber(Game.HEIGHT_OF_FIELD / 4, Game.HEIGHT_OF_FIELD * 3 / 4));
+        final Pawn pawn = new Pawn(Base.randomNumber(Game.LENGTH_OF_FIELD / 4, Game.LENGTH_OF_FIELD * 3 / 4), Base.randomNumber(Game.HEIGHT_OF_FIELD / 4, Game.HEIGHT_OF_FIELD * 3 / 4));
         pawn.setAbsAngle(randomAngle());
         return pawn;
     }
 
     /**
      * Generate the food out of danger zone.
+     *
      * @param amount Generated food. <code> 0 <= amount <= 1 000 000 </code>
      */
     public static void generateFood(int amount) {
-        if(amount >= 0 && amount <= 1000000) {
-        for (int i = 0; i < amount; i++) {
-            Game.foods.add(generateFood());
+        if (amount >= 0 && amount <= 1000000) {
+            for (int i = 0; i < amount; i++) {
+                Game.foods.add(generateFood());
+            }
+        } else {
+            throw new IllegalArgumentException();
         }
-        } else throw new IllegalArgumentException();
     }
 
     private static Agent generateFood() {
-        float mass = Base.randomNumber(Game.MIN_MASS_OF_FOOD, Game.MAX_MASS_OF_FOOD);
+        final float mass = Base.randomNumber(Game.MIN_MASS_OF_FOOD, Game.MAX_MASS_OF_FOOD);
         return new Agent(mass);
     }
 
     /**
      * Regenerate every single piece of food if(chance).
+     *
      * @param chance Chance of respawning particular piece. <code> 0 <= chance <= 100 </code>
      */
     public static void regenerateFood(int chance) {
@@ -79,11 +83,12 @@ public class Generator {
 
     /**
      * Generates new random radian angle.
+     *
      * @return Radian angle from 0 to ~Math.Pi*2
      */
     public static double randomAngle() {
-        int angle = Base.randomNumber(0, 359);
-        double radAngle = angle * (Math.PI / 180);
+        final int angle = Base.randomNumber(0, 359);
+        final double radAngle = angle * (Math.PI / 180);
         return radAngle;
     }
 
@@ -94,11 +99,12 @@ public class Generator {
         }
         return pawns;
     }
-    
+
     public static Killer generateKiller() {
-        return new Killer(1,randomAngle(),5);
+        //return new Killer(1,randomAngle(),5);
+        return new Killer(0, randomAngle(), 5);
     }
-    
+
     public static void regenerateKillers(int chance) {
         if (chance >= 0 && chance <= 100) {
             for (int i = 0; i < Game.killers.size(); i++) {
