@@ -16,8 +16,13 @@
  */
 package ru.dmig.pawns;
 
+import java.util.Arrays;
+import ru.dmig.pawns.agents.Agent;
 import ru.dmig.pawns.net.Network;
 import ru.dmig.pawns.net.Neuron;
+import ru.dmig.util.Angler;
+import ru.epiclib.base.Arrayer;
+import ru.epiclib.base.Base;
 
 /**
  *
@@ -26,11 +31,8 @@ import ru.dmig.pawns.net.Neuron;
 public class NewClass {
 
     public static void main(String[] args) throws InterruptedException {
-        int[] layers = {2,3,2,7,2,1};
-        double[] input = {0.82,0.93};
-        Network a = new Network(layers);
-        System.out.println(a.calculate(input)[0]);
-        Network b = new Network(Game.getGenomFromNet(a), layers);
-        System.out.println(b.calculate(input)[0]);
+        double deg = Angler.doAngle(Math.PI * 2);
+        deg = Angler.radToDeg(deg);
+        System.out.println(deg);
     }
 }

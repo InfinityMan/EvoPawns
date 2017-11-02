@@ -18,6 +18,7 @@ package ru.dmig.pawns;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -47,7 +48,7 @@ public class Game {
     /**
      * Amount of pawns for game.
      */
-    public static int AMOUNT_OF_PAWNS = 96;
+    public static int AMOUNT_OF_PAWNS = 240;
 
     public static int TURN_PAWN_AMOUNT = 8;
 
@@ -80,7 +81,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns.
      */
-    public static final int[] LAYERS_OF_NET = {10, 12, 11, 2};
+    public static final int[] LAYERS_OF_NET = {6, 8, 4, 2};
 
     /**
      * Length of field to simulate.
@@ -95,19 +96,15 @@ public class Game {
     /**
      * Duration of one tick of game.
      */
-    public static int TICK_DURATION = 20; // 20 is normal
-    
+    public static int TICK_DURATION = 2; // 20 is normal
+
     public static int CYCLE_AMOUNT = 10000;
 
     /**
      * Amount of rounds (generations) to play.
      */
-    public static final int AMOUNT_OF_ROUNDS = 10000;
+    public static final int AMOUNT_OF_ROUNDS = 9000;
 
-    /**
-     * Chance of mutation of every paricular weight. From 0 to 100. "By definition at 100 mutation rate, every variable is chosen randomly each generation and no information is retained."
-     */
-    public static final int MUTATION_RATE = 3;
 
     public static int FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
 
@@ -118,14 +115,19 @@ public class Game {
 
     public static final double KILLER_DAMAGE = 45;
 
-    public static final int KILLER_AMOUNT = 40;
+    public static final int KILLER_AMOUNT = 38;
 
     public static final int PAWN_SCAN_RANGE = 200;
+    
+    public static final boolean KILLER_ENABLED = true;
+    public static final boolean SAVING_ENABLED = true;
 
     /**
      * Generation index, when <code>new.gen</code> loads.
      */
-    public static final int GENERATION_FOR_UPDATE = 3;
+    public static final int GENERATION_FOR_UPDATE = 2;
+    
+    public static double[] fits;
 
     public static final String HELP = "Программа представляет собой симулятор развития нейронных сетей с помощью эволюционного алгоритма.\n"
             + "Оранжевый кружок на поле - это пешка, она принимает решения с помощью нейронной сети, получая на вход:\n"
@@ -142,15 +144,17 @@ public class Game {
     public static void newRun() {
         try {
             ChartPanel.lauch();
-            allPawns = arrayToMatrix(Generator.generatePawns(AMOUNT_OF_PAWNS), TURN_PAWN_AMOUNT);
+            allPawns = Evolution.arrayToMatrix(Generator.generatePawns(AMOUNT_OF_PAWNS), TURN_PAWN_AMOUNT);
             pawns = allPawns[0];
             foods = new ArrayList<>();
             bullets = new ArrayList<>();
-            killers = new ArrayList<>();
-            Generator.generateFood(FOOD_AMOUNT);
-            for (int i = 0; i < KILLER_AMOUNT; i++) {
-                killers.add(Generator.generateKiller());
+            if (KILLER_ENABLED) {
+                killers = new ArrayList<>();
+                for (int i = 0; i < KILLER_AMOUNT; i++) {
+                    killers.add(Generator.generateKiller());
+                }
             }
+            Generator.generateFood(FOOD_AMOUNT);
 
             Frame.panel = new Panel();
 
@@ -187,7 +191,7 @@ public class Game {
             if (!amountOfPawnsStr.isEmpty()) {
                 try {
                     amountOfPawns = Integer.valueOf(amountOfPawnsStr);
-                    
+
                     if (amountOfPawns < 4 || amountOfPawns > 40 || amountOfPawns % 4 != 0) {
                         throw new NumberFormatException();
                     }
@@ -205,197 +209,6 @@ public class Game {
 
     }
 
-    /**
-     * Converts weights matrix into genom array
-     *
-     * @param w weights matrix for converting
-     * @return genom array
-     */
-    public static double[] weightsIntoGenom(double[][][] w) {
-        int i, j, k;
-        ArrayList<Double> retu = new ArrayList<>();
-        for (i = 0; i < w.length; i++) {
-            for (j = 0; j < w[i].length; j++) {
-                for (k = 0; k < w[i][j].length; k++) {
-                    retu.add(w[i][j][k]);
-                }
-            }
-        }
-        double[] ret = new double[retu.size()];
-        for (i = 0; i < retu.size(); i++) {
-            ret[i] = retu.get(i);
-        }
-        return ret;
-    }
-
-    /**
-     * Converts genom array into weights matrix of layers
-     *
-     * @param g genom array for converting
-     * @param layers to setting output weights matrix
-     * @return weight matrix for layers
-     */
-    public static double[][][] genomIntoWeights(double[] g, int[] layers) {
-        double[][][] ret = new double[layers.length - 1][][];
-        int indexOfG = 0, neuronAmount, prevNeuronAmount;
-        for (int i = 0; i < layers.length - 1; i++) {
-            prevNeuronAmount = layers[i];
-            neuronAmount = layers[i + 1];
-            ret[i] = new double[neuronAmount][];
-            for (int j = 0; j < neuronAmount; j++) {
-                ret[i][j] = new double[prevNeuronAmount + 1];
-                for (int k = 0; k < prevNeuronAmount + 1; k++) {
-                    ret[i][j][k] = g[indexOfG];
-                    indexOfG++;
-                }
-            }
-        }
-        return ret;
-    }
-
-    public static double[] getGenomFromNet(Network net) {
-        double[] genom = new double[net.getGenomSize()];
-        double[] wGenom = weightsIntoGenom(net.getWeights());
-        for (int i = 0; i < wGenom.length; i++) {
-            genom[i] = wGenom[i];
-        }
-        Neuron[] neurons = net.getNeurons();
-        for (int i = 0; i < net.getGenomSize() - net.getSize(); i++) {
-            genom[i + wGenom.length] = neurons[i].getRadius();
-        }
-        return genom;
-    }
-
-    /**
-     * Evolution algorithms for pawns array with ready fitnesses
-     *
-     * @param pawns Pawns array ready for crossover and mutation
-     * @return Pawns array after crossover and mutation on start pawns
-     */
-    public static Pawn[] evolution(Pawn[] pawns) {
-        if (generation == GENERATION_FOR_UPDATE) {
-            try {
-                return loadGenoms("gens//new.gen");
-            } catch (FileNotFoundException ex) {
-            } catch (ParsingException ex) {
-                ex.printStackTrace();
-            }
-        }
-        int i;
-
-        double[][] newGens = new double[pawns.length][];
-        Pawn[] newPawns = new Pawn[pawns.length];
-        
-        boolean[] willMutate = new boolean[pawns.length];
-
-        if (pawns.length > 3) {
-            double[] fitnesses = new double[pawns.length];
-            for (i = 0; i < pawns.length; i++) {
-                fitnesses[i] = pawns[i].calcFitness();
-            }
-
-            //Crossover
-            final int[] parents = getParents(fitnesses); //test for %4
-
-            for (i = 0; i < parents.length; i += 2) {
-                double[] genomA = getGenomFromNet(pawns[parents[i]].network);
-                double[] genomB = getGenomFromNet(pawns[parents[i + 1]].network);
-                double[] genomAB = new double[genomA.length];
-                double[] genomBA = new double[genomB.length];
-                EvoAlg.crossover(genomA, genomB, genomAB, genomBA);
-                newGens[i] = genomA;
-                //no chance of mutation for alpha
-                willMutate[i] = false;
-                newGens[i + 1] = genomB;
-                //5% chance of mutation for beta
-                willMutate[i] = Base.chance(5, 0);
-                newGens[pawns.length - i - 1] = genomAB;
-                //80% chance of mutation for child
-                willMutate[pawns.length - i - 1] = Base.chance(80, 0); 
-                newGens[pawns.length - i - 2] = genomBA;
-                //80% chance of mutation for child
-                willMutate[pawns.length - i - 2] = Base.chance(80, 0);
-            }
-            //Creating new pawns from gens
-
-            for (i = 0; i < pawns.length; i++) {
-                newPawns[i] = Generator.generatePawn();
-                if (Base.chance(96, 0)) {
-                    newPawns[i].network = new Network(newGens[i], LAYERS_OF_NET);
-                }
-            }
-
-            //Mutation
-            for (i = 0; i < newPawns.length; i++) {
-                if(willMutate[i]) {
-                    newPawns[i].network.mutate();
-                }
-            }
-        } else {
-            for (i = 0; i < newGens.length; i++) {
-                newGens[i] = weightsIntoGenom(pawns[i].network.getWeights());
-            }
-            for (i = 0; i < newGens.length; i++) {
-                for (int j = 0; j < newGens[i].length; j++) {
-                    if (Base.chance(MUTATION_RATE, 0)) {
-                        newGens[i][j] = Math.random(); //TODO mutation
-                    }
-                }
-            }
-            newPawns = Generator.generatePawns(pawns.length);
-            for (i = 0; i < pawns.length; i++) {
-                newPawns[i].network.setWeights(genomIntoWeights(newGens[i], LAYERS_OF_NET));
-            }
-        }
-        if (generation % 5 == 0) {
-            Generator.regenerateFood(100);
-            Generator.regenerateKillers(91);
-            if (generation % 10 == 0) {
-                saveGenoms(newPawns, "gens//gen" + generation + ".gen");
-            }
-        } else {
-            Generator.regenerateFood(50);
-            Generator.regenerateKillers(20);
-        }
-        return newPawns;
-    }
-
-    /**
-     * Calculate indexes of fittest pawns in given array
-     *
-     * @param fitnesses Array of fitnesses of pawns
-     * @return Indexes of fittest pawns
-     */
-    public static int[] getParents(double[] fitnesses) {
-        if (fitnesses.length % 4 != 0) {
-            throw new IllegalArgumentException(); //TODO normal crossover
-        }
-        int i, j;
-        int[] parentsIDs = new int[fitnesses.length / 2];
-        double[] lFitnesses = fitnesses;
-        double[] chances = new double[fitnesses.length];
-        int[] thousChances = new int[fitnesses.length];
-
-        for (i = 0; i < parentsIDs.length; i++) {
-            double totalSumm = 0;
-
-            for (j = 0; j < lFitnesses.length; j++) {
-                totalSumm += lFitnesses[j];
-            }
-            for (j = 0; j < lFitnesses.length; j++) {
-                chances[j] = (lFitnesses[j] / totalSumm) * 100;
-                thousChances[j] = (int) Math.round(chances[j] * 1000);
-            }
-            if (Base.chance(70, 0)) {
-                parentsIDs[i] = Base.chances(thousChances, 3);
-            } else {
-                parentsIDs[i] = Base.randomNumber(0, lFitnesses.length - 1);
-            }
-
-            lFitnesses[parentsIDs[i]] = 0; //TODO normal deleting
-        }
-        return parentsIDs;
-    }
 
     /**
      * Prints on screen info about pawns successes
@@ -412,23 +225,21 @@ public class Game {
 
         ChartPanel.cp.update(fit, avg);
 
-        double[] pens = new double[pawns.length];
-        for (int i = 0; i < pens.length; i++) {
-            pens[i] = pawns[i].dangerZonePenalty;
-        }
-        
         Activity.fittest = fit;
         Activity.avg = avg;
+        Activity.killerKilled = (double) (UpdThread.getKillerKilled()) / AMOUNT_OF_PAWNS;
+        Activity.borderKilled = (double) (UpdThread.getBorderKilled()) / AMOUNT_OF_PAWNS;
     }
 
     public static void exception() {
         System.err.println("EXXXXXXXXXXXXX!!1!");
+        System.exit(-122112);
     }
 
     public static void saveGenoms(Pawn[] pawns, String fileName) {
         double[][] genoms = new double[pawns.length][];
         for (int i = 0; i < genoms.length; i++) {
-            genoms[i] = getGenomFromNet(pawns[i].network);
+            genoms[i] = Evolution.getGenomFromNet(pawns[i].network);
         }
 
         String genomsStr = "";
@@ -482,32 +293,5 @@ public class Game {
         return pawns;
     }
 
-    public static Pawn[][] arrayToMatrix(Pawn[] array, int period) {
-        Pawn[][] ret = new Pawn[array.length / period][period];
-        for (int i = 0; i < array.length; i++) {
-            if (i % period == 0 && i != 0) {
-            }
-            ret[i / period][i % period] = array[i];
-        }
-        return ret;
-    }
-
-    public static Pawn[] getPawnArray(Pawn[][] matrix) {
-        return matrixToArray(matrix);
-    }
     
-    public static Pawn[] matrixToArray(Pawn[][] matrix) {
-        if(matrix == null) throw new IllegalArgumentException("Matrix is null");
-        if(matrix.length == 0) throw new IllegalArgumentException("Matrix have size 0");
-        if(matrix[0].length == 0) throw new IllegalArgumentException("Matrix element 0 have size 0");
-        Pawn[] ret = new Pawn[matrix.length * matrix[0].length];
-        int len = matrix[0].length;
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < len; j++) {
-                ret[i * len + j] = matrix[i][j];
-            }
-        }
-        return ret;
-    }
-
 }

@@ -19,37 +19,38 @@ package ru.dmig.pawns.agents;
 import java.util.Objects;
 import ru.dmig.pawns.Game;
 import ru.dmig.pawns.net.Network;
+import ru.dmig.util.Angler;
 
 /**
  * Basic unit in game. Has own neuron network for thinking.
  *
  * @author Dmig
  */
-public final class Pawn extends Agent {
+public final class Pawn extends Agent implements Comparable<Pawn> {
 
     /**
      * Max speed for every pawn in every direction. (Maybe, I don't sure)
      */
-    public static final double MAX_SPEED = 6;
+    public static final double MAX_SPEED = 8;
+
+    public static final double MAX_DEGREE_PER_TICK = 30;
 
     /*
         Inputs of neuron net:
-    0:  speed
-    1:  absolute angle of movement
-    2:  relative angle to nearest food
-    3:  distance to nearest food
-    4:  relative angle to alternative food
-    5:  distance to alternative food
-    6:  relative angle to nearest killer
-    7:  absolute angle of nearest killer
-    8:  distance to nearest killer
-    9:  x
-    10: y
-    11: memory previous value
+    0:  relative angle to nearest food
+    1:  distance to nearest food
+    2:  relative angle to alternative food
+    3:  distance to alternative food
+    4:  relative angle to nearest killer
+    5:  absolute angle of nearest killer
+    6:  distance to nearest killer
+    7:  x
+    8:  y
+    9:  memory cell value
         Outputs:
-    0: new speed
-    1: new absolute angle
-    2: memory new value
+    0:  new speed
+    1:  new absolute angle
+    2:  memory cell new value
      */
     private double rltAngleToFood;
     private double rltAngleToAltFood;
@@ -88,10 +89,10 @@ public final class Pawn extends Agent {
     public void calculate(boolean pr) {
         final double x = getX() / Game.LENGTH_OF_FIELD;
         final double y = getY() / Game.LENGTH_OF_FIELD;
-        final double aangl = getAbsAngle() / (Math.PI * 2);
-        final double ranglF = getRltAngleToFood() / (Math.PI * 2);
-        final double ranglAF = getRltAngleToAltFood() / (Math.PI * 2);
-        final double ranglE = getRltAngleToEnemy() / (Math.PI * 2);
+        final double aangl = Angler.radToRoul(getAbsAngle());
+        final double ranglF = Angler.radToRoul(getRltAngleToFood());
+        final double ranglAF = Angler.radToRoul(getRltAngleToAltFood());
+        final double ranglE = Angler.radToRoul(getRltAngleToEnemy());
 //        final double aanglE = getAbsAngleOfEnemy() / (Math.PI * 2);
         double distE = 1;
         double distF = 1;
@@ -119,16 +120,43 @@ public final class Pawn extends Agent {
             System.out.println("mem" + getMemory());
         }
 
-        double[] in = {getSpeed(), aangl, ranglF, distF, ranglAF, distAF, ranglE, distE, x, y};
+        final double[] in = {ranglF, distF, ranglE, distE, x, y};
 
-        double[] out = network.calculate(in);
+        setNews(in);
+    }
 
-        try {
-            setSpeed(out[0]);
-            setAbsAngle(out[1] * Math.PI * 2);
-            //setMemory(out[2]);
-        } catch (IllegalArgumentException ex) {
-            System.out.println("Ill: " + out[0] + " " + out[1] * Math.PI * 2);
+    private void setNews(final double[] in) throws IllegalArgumentException {
+        final double[] out = network.calculate(in);
+        final double newSpeed = out[0];
+        final double newAngle = out[1];
+        
+        final double ang = Angler.radToRoul(getAbsAngle());
+
+        if (!(Double.isNaN(newSpeed) || Double.isInfinite(newAngle))) {
+            try {
+                final double diff = ang - newAngle;
+                if (Math.abs(diff) > (360 - MAX_DEGREE_PER_TICK)) { //Tranfer cross axis
+                    setAbsAngle(Angler.roulToRad(newAngle));
+                } else if (Math.abs(diff) < MAX_DEGREE_PER_TICK) { //Standart rotate < MAX
+                    setAbsAngle(Angler.roulToRad(newAngle));
+                } else { //Illegal (>Max) rotate
+                    if(diff > 0) {
+                        setAbsAngle(Angler.roulToRad(ang - Angler.degToRoul(MAX_DEGREE_PER_TICK)));
+                    } else {
+                        setAbsAngle(Angler.roulToRad(ang + Angler.degToRoul(MAX_DEGREE_PER_TICK)));
+                    }
+                }
+
+                setSpeed(newSpeed);
+                //setMemory(out[2]);
+            } catch (IllegalArgumentException ex) {
+                System.out.println("Ill: " + newSpeed + " " + Angler.roulToRad(newAngle));
+                setSpeed(1);
+                setAbsAngle(0);
+            }
+        } else {
+            setSpeed(1);
+            setAbsAngle(0);
         }
     }
 
@@ -150,6 +178,17 @@ public final class Pawn extends Agent {
         updateCoords(MAX_SPEED);
     }
 
+    public float updateCoords(boolean dist) {
+        if (dist) {
+            float distA = distance;
+            updateCoords();
+            return (distance - distA);
+        } else {
+            updateCoords();
+            return 0;
+        }
+    }
+
     public void attack(double damage) {
         if (damage >= getMass()) {
             kill();
@@ -158,18 +197,22 @@ public final class Pawn extends Agent {
         }
     }
 
+    public static final float MIN_DISTANCE = 60;
+
     /**
      * Calculate fitness of this pawn
      *
      * @return Fitness of this pawn
      */
     public double calcFitness() {
-        double distanceFit = distance * 0.0102;
-        double foodFit = foodGathered * 17.5;
-        double dngPenalty = dangerZonePenalty * 0.14;
-        double massFit = getMass() * 0.447;
+        final double distanceFit = distance * 0.0102;
+        final double foodFit = foodGathered * 17.5;
+        final double dngPenalty = dangerZonePenalty * 0.14;
+        final double massFit = getMass() * 0.447;
 
-        return distanceFit + foodFit + massFit - dngPenalty;
+        double totalA = distanceFit + foodFit + massFit - dngPenalty;
+
+        return totalA;
     }
 
     public boolean isAlive() {
@@ -198,7 +241,7 @@ public final class Pawn extends Agent {
      * Get category of pawn. If mass: 0 < x < 100 : 0 100 < x < 400 : 1 400 < x < 700 : 2 700 < x < 1000 : 3 @r
      *
      *
-     * eturn code of category
+     * return code of category
      */
     public int getCategory() {
         if (getMass() >= 0 && getMass() <= 100) {
@@ -229,7 +272,7 @@ public final class Pawn extends Agent {
      * @param rltAngleToFood new value of rltAngleToFood
      */
     public void setRltAngleToFood(double rltAngleToFood) {
-        this.rltAngleToFood = rltAngleToFood;
+        this.rltAngleToFood = Angler.doAngle(rltAngleToFood);
     }
 
     /**
@@ -247,7 +290,7 @@ public final class Pawn extends Agent {
      * @param rltAngleToEnemy new value of rltAngleToEnemy
      */
     public void setRltAngleToEnemy(double rltAngleToEnemy) {
-        this.rltAngleToEnemy = rltAngleToEnemy;
+        this.rltAngleToEnemy = Angler.doAngle(rltAngleToEnemy);
     }
 
     /**
@@ -323,7 +366,7 @@ public final class Pawn extends Agent {
      * @param rltAngleToAltFood new value of rltAngleToAltFood
      */
     public void setRltAngleToAltFood(double rltAngleToAltFood) {
-        this.rltAngleToAltFood = rltAngleToAltFood;
+        this.rltAngleToAltFood = Angler.doAngle(rltAngleToAltFood);
     }
 
     /**
@@ -359,7 +402,7 @@ public final class Pawn extends Agent {
      * @param absAngleOfEnemy new value of absAngleOfEnemy
      */
     public void setAbsAngleOfEnemy(double absAngleOfEnemy) {
-        this.absAngleOfEnemy = absAngleOfEnemy;
+        this.absAngleOfEnemy = Angler.doAngle(absAngleOfEnemy);
     }
 
     public double getPawnConcentration() {
@@ -430,6 +473,11 @@ public final class Pawn extends Agent {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int compareTo(Pawn o) {
+        return Double.compare(calcFitness(), o.calcFitness());
     }
 
 }

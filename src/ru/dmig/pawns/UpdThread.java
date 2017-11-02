@@ -19,6 +19,8 @@ package ru.dmig.pawns;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import ru.dmig.pawns.agents.*;
 import ru.dmig.pawns.gui.Frame;
 import ru.dmig.pawns.gui.Panel;
@@ -32,6 +34,14 @@ import ru.epiclib.base.Base;
 public final class UpdThread extends Thread {
 
     private int newTickDuration = Game.TICK_DURATION;
+
+    public static final boolean TIME_PRINT = false;
+
+    private static final int MAX_REMAIN = 1000;
+    private int remainingCycles = MAX_REMAIN;
+    
+    private static int killerKilled = 0;
+    private static int borderKilled = 0;
 
     public UpdThread() {
     }
@@ -47,8 +57,13 @@ public final class UpdThread extends Thread {
     private void simulateRound() {
         Game.generation++;
         int tick = Game.TICK_DURATION;
+        int cyc = 0;
 
         double timeIn = System.currentTimeMillis();
+
+        if (TIME_PRINT) {
+            System.out.print("Cycles: ");
+        }
         for (int i = 0; i < (Game.AMOUNT_OF_PAWNS / Game.TURN_PAWN_AMOUNT); i++) {
             Game.pawns = Game.allPawns[i];
 
@@ -59,43 +74,83 @@ public final class UpdThread extends Thread {
             }
 
             final boolean isTickZero = (tick == 0);
-            for (int cyc = 0; cyc < Game.CYCLE_AMOUNT; cyc++) {
+
+            for (cyc = 0; cyc < Game.CYCLE_AMOUNT; cyc++) {
                 if (cyc == Game.CYCLE_AMOUNT / 2) {
-                    Generator.regenerateFood(20);
+                    Generator.regenerateFood(24);
                 }
 
-                processPawns();
-                processKillers();
+                if (!processPawns()) {
+                    break;
+                }
+                if (Game.KILLER_ENABLED) {
+                    processKillers();
+                }
 
                 collisionSensor();
+                if (remainingCycles == 0) {
+                    break;
+                }
 
                 if (!isTickZero) {
                     try {
                         Thread.sleep(tick);
                     } catch (InterruptedException ex) {
-                        System.exit(-122112);
+                        Game.exception();
                     }
                 }
                 Frame.frame.update();
             }
+            if (TIME_PRINT) {
+                System.out.print(cyc + " ");
+            }
+            Generator.regenerateFood(75);
         }
-        System.err.print((System.currentTimeMillis() - timeIn) + ": ");
+        if (TIME_PRINT) {
+            System.out.print("\nSIM: " + (System.currentTimeMillis() - timeIn) + "\nEVO: ");
+        }
+        
         Game.viewStats(Game.pawns);
+        killerKilled = 0;
+        borderKilled = 0;
+        
         timeIn = System.currentTimeMillis();
-        Game.allPawns = Game.arrayToMatrix(Game.evolution(Game.getPawnArray(Game.allPawns)), Game.TURN_PAWN_AMOUNT);
-        System.err.println(System.currentTimeMillis() - timeIn);
+        Game.allPawns = Evolution.arrayToMatrix(Evolution.evolution(Evolution.getPawnArray(Game.allPawns)), Game.TURN_PAWN_AMOUNT);
+        if (TIME_PRINT) {
+            System.out.println(System.currentTimeMillis() - timeIn);
+        }
+        
+        System.gc();
+
+        Generator.regenerateFood(100);
+        if (Game.generation % 5 == 0) {
+            if (Game.KILLER_ENABLED) {
+                Generator.regenerateKillers(91);
+            }
+            if (Game.SAVING_ENABLED && Game.generation % 50 == 0) {
+                Game.saveGenoms(Evolution.matrixToArray(Game.allPawns), "gens//gen" + Game.generation + ".gen");
+            }
+        } else {
+            if (Game.KILLER_ENABLED) {
+                Generator.regenerateKillers(23);
+            }
+        }
     }
 
-    private void processPawns() {
+    private boolean processPawns() {
+        float distSum = 0;
         for (Pawn pawn : Game.pawns) {
             if (pawn.isAlive()) {
                 setRelativeToFood(pawn);
-                setRelativeToEnemy(pawn);
+                if (Game.KILLER_ENABLED) {
+                    setRelativeToEnemy(pawn);
+                }
                 pawn.calculate(false);
-                pawn.updateCoords();
+                distSum += pawn.updateCoords(true);
                 dangerZoneProcess(pawn);
             }
         }
+        return distSum >= 1;
     }
 
     private void processKillers() {
@@ -115,6 +170,7 @@ public final class UpdThread extends Thread {
             if (p.isAlive()) {
                 if (Base.chance(7, 0)) {
                     p.smite();
+                    borderKilled++;
                 }
             }
         }
@@ -141,14 +197,24 @@ public final class UpdThread extends Thread {
                             deleted++;
                         }
                     }
-                    Generator.generateFood(deleted);
+                    if (deleted == 0) {
+                        remainingCycles--;
+                    } else {
+                        Generator.generateFood(deleted);
+                        remainingCycles = MAX_REMAIN;
+                    }
                 }
-                for (Iterator<Killer> it = Game.killers.iterator(); it.hasNext();) {
-                    Killer killer = it.next();
-                    if (testCollision(pawn.getX(), pawn.getY(), killer.getX(), killer.getY(), Panel.PAWN_DIAMETER / 2)) {
-                        pawn.attack(Game.KILLER_DAMAGE);
-                        if (Base.chance(60, 0)) {
-                            pawn.smite();
+                if (Game.KILLER_ENABLED) {
+                    for (Iterator<Killer> it = Game.killers.iterator(); it.hasNext();) {
+                        Killer killer = it.next();
+                        if (testCollision(pawn.getX(), pawn.getY(), killer.getX(), killer.getY(), Panel.PAWN_DIAMETER / 2)) {
+                            pawn.attack(Game.KILLER_DAMAGE);
+                            if (Base.chance(60, 0)) {
+                                pawn.smite();
+                            }
+                            if(!pawn.isAlive()) {
+                                killerKilled++;
+                            }
                         }
                     }
                 }
@@ -191,8 +257,10 @@ public final class UpdThread extends Thread {
             degreeToAdd = 0;
         }
         if (sqr == 4 || sqr == 2) {
+            if(yDiff == 0) return 0;
             return (degreeToAdd + Math.atan(xDiff / yDiff));
         } else {
+            if(xDiff == 0) return 0;
             return (degreeToAdd + Math.atan(yDiff / xDiff));
         }
     }
@@ -256,7 +324,7 @@ public final class UpdThread extends Thread {
      */
     public boolean changeSpeed(boolean half) {
         if (half) {
-            if(Game.TICK_DURATION > 0) {
+            if (Game.TICK_DURATION > 0) {
                 newTickDuration = newTickDuration * 2;
             } else {
                 newTickDuration = 24;
@@ -266,7 +334,7 @@ public final class UpdThread extends Thread {
             if (newTickDuration > 12) {
                 newTickDuration = newTickDuration / 2;
                 return true;
-            } else if(newTickDuration == 12) {
+            } else if (newTickDuration != 0) {
                 newTickDuration = 0;
                 return true;
             }
@@ -278,4 +346,12 @@ public final class UpdThread extends Thread {
         return (x1 + rad >= x2) && (x1 - rad <= x2) && (y1 + rad >= y2) && (y1 - rad <= y2);
     }
 
+    public static int getKillerKilled() {
+        return killerKilled;
+    }
+
+    public static int getBorderKilled() {
+        return borderKilled;
+    }
+    
 }

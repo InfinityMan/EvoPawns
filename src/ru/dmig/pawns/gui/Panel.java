@@ -90,12 +90,14 @@ public class Panel extends JPanel {
 
         }
 
-        gr2d.setColor(Color.RED);
+        if (Game.KILLER_ENABLED) {
+            gr2d.setColor(Color.RED);
 
-        for (int i = 0; i < Game.killers.size(); i++) {
-            int x = Math.round(Game.killers.get(i).getX());
-            int y = Math.round(Game.killers.get(i).getY());
-            gr2d.drawOval(x - KILLER_DIAMETER / 2, y - KILLER_DIAMETER / 2, KILLER_DIAMETER, KILLER_DIAMETER);
+            for (int i = 0; i < Game.killers.size(); i++) {
+                int x = Math.round(Game.killers.get(i).getX());
+                int y = Math.round(Game.killers.get(i).getY());
+                gr2d.drawOval(x - KILLER_DIAMETER / 2, y - KILLER_DIAMETER / 2, KILLER_DIAMETER, KILLER_DIAMETER);
+            }
         }
 
         //gr2d.setColor(Color.BLACK);

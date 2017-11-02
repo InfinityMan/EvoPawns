@@ -4,13 +4,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/net/Layer.java</file>
-            <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/UpdThread.java</file>
+            <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/Evolution.java</file>
             <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/agents/Agent.java</file>
+            <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/UpdThread.java</file>
             <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/Generator.java</file>
             <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/agents/Pawn.java</file>
             <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/NewClass.java</file>
-            <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/agents/Killer.java</file>
             <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/gui/ChartPanel.java</file>
+            <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/agents/Killer.java</file>
             <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/net/Network.java</file>
             <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/Game.java</file>
             <file>file:/D:/Dima/Java/Pawns/src/ru/dmig/pawns/net/Neuron.java</file>

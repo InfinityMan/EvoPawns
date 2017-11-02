@@ -31,6 +31,9 @@ public final class Activity extends javax.swing.JFrame {
     public static double fittest = 0;
     public static double avg = 0;
     
+    public static double killerKilled = 0;
+    public static double borderKilled = 0;
+    
     private float gameSpeed = 0.5f;
     
     public static void init() {
@@ -52,6 +55,8 @@ public final class Activity extends javax.swing.JFrame {
         genL.setText("Generation: "+ (Game.generation - 1));
         fitL.setText("Fittest: "+Base.maximumFractionDigits(2, fittest));
         avgL.setText("Average: " +Base.maximumFractionDigits(2, avg));
+        killKL.setText("Killer: "+Base.maximumFractionDigits(2,killerKilled));
+        bordKL.setText("Border: "+Base.maximumFractionDigits(2,borderKilled));
     }
     
     public void setupUpdater() {
@@ -80,6 +85,8 @@ public final class Activity extends javax.swing.JFrame {
         genL = new javax.swing.JLabel();
         fitL = new javax.swing.JLabel();
         avgL = new javax.swing.JLabel();
+        killKL = new javax.swing.JLabel();
+        bordKL = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Activity");
@@ -144,6 +151,14 @@ public final class Activity extends javax.swing.JFrame {
         avgL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         avgL.setText("Average: ");
 
+        killKL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        killKL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        killKL.setText("Killer: ");
+
+        bordKL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        bordKL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        bordKL.setText("Border: ");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -151,6 +166,8 @@ public final class Activity extends javax.swing.JFrame {
             .addComponent(genL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(fitL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(avgL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(killKL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(bordKL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -159,7 +176,11 @@ public final class Activity extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(fitL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(avgL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(avgL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(killKL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(bordKL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -205,11 +226,13 @@ public final class Activity extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel avgL;
+    private javax.swing.JLabel bordKL;
     private javax.swing.JLabel curSpeedL;
     private javax.swing.JLabel fitL;
     private javax.swing.JLabel genL;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel killKL;
     private javax.swing.JButton speedMinus;
     private javax.swing.JPanel speedPanel;
     private javax.swing.JButton speedPlus;
