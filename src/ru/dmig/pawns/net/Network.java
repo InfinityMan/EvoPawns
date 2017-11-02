@@ -17,6 +17,7 @@
 package ru.dmig.pawns.net;
 
 import java.io.Serializable;
+import ru.dmig.pawns.Evolution;
 import ru.dmig.pawns.Game;
 import ru.epiclib.base.Base;
 
@@ -53,17 +54,21 @@ public final class Network implements Serializable {
     }
 
     public Network(int[] layersDimensions) {
+        this(layersDimensions, true);
+    }
+    
+    public Network(int[] layersDimensions, boolean pause) {
         if (layersDimensions.length < 3 || layersDimensions.length > 12) {
             throw new IllegalArgumentException();
         }
         layers = new Layer[layersDimensions.length - 1];
         for (int i = 0; i < layersDimensions.length - 1; i++) {
-            layers[i] = new Layer(layersDimensions[i + 1], layersDimensions[i], true);
+            layers[i] = new Layer(layersDimensions[i + 1], layersDimensions[i], pause);
         }
     }
     
     public Network(double[] genom, int[] layers) {
-        this(layers);
+        this(layers, false);
         if(genom.length != getGenomSize(layers)) throw new IllegalArgumentException();
         double[] wGens = new double[getSize(layers)];
         double[] rGens = new double[genom.length - wGens.length];
@@ -73,7 +78,7 @@ public final class Network implements Serializable {
         for (int i = 0; i < rGens.length; i++) {
             rGens[i] = genom[i + wGens.length];
         }
-        setWeights(Game.genomIntoWeights(wGens, layers));
+        setWeights(Evolution.genomIntoWeights(wGens, layers));
         int index = 0;
         for (Layer layer : this.layers) {
             for (Neuron neuron : layer.neurons) {
@@ -83,9 +88,9 @@ public final class Network implements Serializable {
         }
     }
 
-    public double[] calculate(double[] input) {
+    public double[] calculate(final double[] input) {
         if(input.length != getInputDimension()) {
-            throw new IllegalArgumentException(); //Control for in
+            throw new IllegalArgumentException("Wrong input dimension"); //Control for in
         }
         int i, j;
 
@@ -197,9 +202,13 @@ public final class Network implements Serializable {
     }
     
     public void mutate() {
+        int i = 0, id = Base.randomNumber(0, getNeuronAmount() - 1);
         for (Layer layer : layers) {
             for (Neuron neuron : layer.neurons) {
-                neuron.tryToMutate();
+                if(i == id) {
+                    neuron.tryToMutate();
+                    return;
+                } else i++;
             }
         }
     }

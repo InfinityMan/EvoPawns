@@ -18,6 +18,7 @@ package ru.dmig.pawns.net;
 
 import java.io.Serializable;
 import java.util.List;
+import ru.dmig.pawns.Evolution;
 import ru.dmig.pawns.Game;
 import ru.epiclib.base.Base;
 
@@ -36,7 +37,7 @@ public final class Neuron implements Serializable {
 
     private int radius;
 
-    public static double calc(double[] inputs, double[] weights, int radius) {
+    public static double calc(final double[] inputs, final double[] weights, final int radius) {
         if (inputs.length != weights.length - 1) {
             throw new IllegalArgumentException();
         }
@@ -48,15 +49,15 @@ public final class Neuron implements Serializable {
         return lineFunc(radius, potential, false);
     }
 
-    public void calc(Layer prevLayer) {
-        double[] inps = new double[prevLayer.neurons.length];
+    public void calc(final Layer prevLayer) {
+        final double[] inps = new double[prevLayer.neurons.length];
         for (int i = 0; i < inps.length; i++) {
             inps[i] = prevLayer.neurons[i].output;
         }
         calc(inps);
     }
 
-    public void calc(double[] inputs) {
+    public void calc(final double[] inputs) {
         output = calc(inputs, weights, getRadius());
     }
 
@@ -145,16 +146,13 @@ public final class Neuron implements Serializable {
     }
 
     public void tryToMutate() {
-        for (int i = -1; i < weights.length; i++) {
-            if (Base.chance(Game.MUTATION_RATE, 0)) {
-                if (i == -1) {
-                    if(Base.chance(60, 0)) {
-                        genRadius();
-                    }
-                } else {
-                    weights[i] = genWeight();
-                }
-            }
+        int id = Base.randomNumber(0, weights.length);
+        //id = 0 is genRadius();
+        //id = x != 0 is w[i-1] = genWeight;
+        if(id == 0) {
+            genRadius();
+        } else {
+            weights[id - 1] = genWeight();
         }
     }
 
@@ -195,8 +193,8 @@ public final class Neuron implements Serializable {
     }
 
     public static int genRandRadius() {
-        if(Base.chance(5, 0)) return 1;
-        return Base.randomNumber(0, 50);
+        if(Base.chance(25, 0)) return 1;
+        return Base.randomNumber(0, 40);
     }
 
 }
