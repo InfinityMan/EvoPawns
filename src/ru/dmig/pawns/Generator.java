@@ -19,6 +19,7 @@ package ru.dmig.pawns;
 import ru.dmig.pawns.agents.Agent;
 import ru.dmig.pawns.agents.Killer;
 import ru.dmig.pawns.agents.Pawn;
+import ru.dmig.pawns.net.Network;
 import ru.epiclib.base.Base;
 
 /**
@@ -34,6 +35,18 @@ public class Generator {
      */
     public static Pawn generatePawn() {
         final Pawn pawn = new Pawn(Base.randomNumber(Game.LENGTH_OF_FIELD / 4, Game.LENGTH_OF_FIELD * 3 / 4), Base.randomNumber(Game.HEIGHT_OF_FIELD / 4, Game.HEIGHT_OF_FIELD * 3 / 4));
+        pawn.setAbsAngle(randomAngle());
+        return pawn;
+    }
+    
+    /**
+     * Generates new pawn in spawn zone of the field: (1/4;3/4). Also set random angle to pawn
+     *
+     * @param net Network for setuping in pawn
+     * @return New generated pawn
+     */
+    public static Pawn generatePawn(Network net) {
+        final Pawn pawn = new Pawn(Base.randomNumber(Game.LENGTH_OF_FIELD / 4, Game.LENGTH_OF_FIELD * 3 / 4), Base.randomNumber(Game.HEIGHT_OF_FIELD / 4, Game.HEIGHT_OF_FIELD * 3 / 4), net);
         pawn.setAbsAngle(randomAngle());
         return pawn;
     }

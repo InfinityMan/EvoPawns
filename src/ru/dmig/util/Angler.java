@@ -17,10 +17,8 @@
 package ru.dmig.util;
 
 /**
- * Class for working with angles.
- * Rad: radians: 0 - !(Math.Pi * 2)
- * Deg: degrees: 0 - !360
- * Roul: roulette 0 - (~!)1 idk
+ * Class for working with angles. Rad: radians: 0 - !(Math.Pi * 2) Deg: degrees: 0 - !360 Roul: roulette 0 - (~!)1 idk
+ *
  * @author Dmig
  */
 public final class Angler {
@@ -50,16 +48,13 @@ public final class Angler {
     }
 
     /**
-     * Converts any angle to normal. Radian in and out.
-     * Some examples, but in degrees:
-     * 65 -> 65
-     * 365 -> 5
-     * -65 -> 295
-     * -365 -> 355
+     * Converts any angle to normal. Radian in and out. Some examples, but in degrees: 65 -> 65 365 -> 5 -65 -> 295 -365 -> 355
+     *
      * @param angle Angle to convert
      * @return Angle between 0 and ~359 (inclusive) in radians
      */
     public static double doAngle(double angle) {
+        if (Double.isNaN(angle) || Double.isInfinite(angle)) throw new IllegalArgumentException();
         if (angle >= 0 && angle < 2 * Math.PI) {
             return angle;
         } else if (angle == Math.PI * 2) {
@@ -70,5 +65,5 @@ public final class Angler {
             return doAngle(angle - Math.PI * 2);
         }
     }
-    
+
 }

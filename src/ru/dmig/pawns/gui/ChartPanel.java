@@ -18,6 +18,9 @@ package ru.dmig.pawns.gui;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.JFrame;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
@@ -39,8 +42,10 @@ public class ChartPanel extends JFrame {
     public XYChart chart;
     public static ChartPanel cp;
 
-    private static final int MIN_LENGTH = 1200;
-    private static final int MIN_HEIGHT = 700;
+    private static final int MIN_LENGTH = 1920;
+    private static final int MIN_HEIGHT = 1000;
+
+    private static boolean INITED = false;
 
     public ChartPanel() {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -65,14 +70,10 @@ public class ChartPanel extends JFrame {
     }
 
     public void update() {
-        chart.removeSeries("Fittest");
-        chart.removeSeries("Averages");
         ArrayList<Integer> gen = new ArrayList<>();
         for (int i = 1; i < fittests.size() + 1; i++) {
             gen.add(i);
         }
-        chart.removeSeries("FittestA");
-        chart.removeSeries("AveragesA");
         if (fittests.size() >= 21) {
 
             double[] lastFits = new double[20];
@@ -83,17 +84,29 @@ public class ChartPanel extends JFrame {
             }
             aFittests.add(Arrayer.mediumValueOfArray(lastFits));
             aAverages.add(Arrayer.mediumValueOfArray(lastAvgs));
-            ArrayList<Integer> genA = new ArrayList<>();
 
         } else {
             aFittests.add(0d);
             aAverages.add(0d);
         }
+        
+        ArrayList<Integer> nil = new ArrayList<>();
+        for (int i = 0; i < fittests.size(); i++) {
+            nil.add(0);
+        }
 
-        chart.addSeries("Fittest", gen, fittests);
-        chart.addSeries("Averages", gen, averages);
-        chart.addSeries("FittestA", gen, aFittests);
-        chart.addSeries("AveragesA", gen, aAverages);
+        if (INITED) {
+            chart.updateXYSeries("Fittest", gen, fittests, nil);
+            chart.updateXYSeries("Averages", gen, averages, nil);
+            chart.updateXYSeries("FittestA", gen, aFittests, nil);
+            chart.updateXYSeries("AveragesA", gen, aAverages, nil);
+        } else {
+            chart.addSeries("Fittest", gen, fittests);
+            chart.addSeries("Averages", gen, averages);
+            chart.addSeries("FittestA", gen, aFittests);
+            chart.addSeries("AveragesA", gen, aAverages);
+            INITED = true;
+        }
 
         pack();
         repaint();

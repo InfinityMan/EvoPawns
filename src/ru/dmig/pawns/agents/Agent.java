@@ -18,6 +18,7 @@ package ru.dmig.pawns.agents;
 
 import java.util.Objects;
 import ru.dmig.pawns.Game;
+import ru.dmig.util.Angler;
 import ru.epiclib.base.Base;
 
 /**
@@ -160,7 +161,7 @@ public class Agent {
      * @param absAngle new value of absAngle
      */
     public final void setAbsAngle(double absAngle) throws IllegalArgumentException {
-        this.absAngle = testAngle(absAngle);
+        this.absAngle = Angler.doAngle(absAngle);
     }
     
     /**
@@ -292,12 +293,5 @@ public class Agent {
         return true;
     }
 
-    public static double testAngle(double angle) {
-        if(angle >= 0 && angle < 2*Math.PI) {
-            return angle;
-        } else if(angle == Math.PI * 2) {
-            return 0;
-        } else throw new IllegalArgumentException();
-    }
     
 }
