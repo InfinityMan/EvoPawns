@@ -31,7 +31,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     /**
      * Max speed for every pawn in every direction. (Maybe, I don't sure)
      */
-    public static final double MAX_SPEED = 8;
+    public static final double MAX_SPEED = 10;
 
     public static final double MAX_DEGREE_PER_TICK = 30;
 
@@ -128,29 +128,18 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     private void setNews(final double[] in) throws IllegalArgumentException {
         final double[] out = network.calculate(in);
         final double newSpeed = out[0];
-        final double newAngle = out[1];
+        double newAngle = out[1];
         
         final double ang = Angler.radToRoul(getAbsAngle());
 
         if (!(Double.isNaN(newSpeed) || Double.isInfinite(newAngle))) {
             try {
-                final double diff = ang - newAngle;
-                if (Math.abs(diff) > (360 - MAX_DEGREE_PER_TICK)) { //Tranfer cross axis
-                    setAbsAngle(Angler.roulToRad(newAngle));
-                } else if (Math.abs(diff) < MAX_DEGREE_PER_TICK) { //Standart rotate < MAX
-                    setAbsAngle(Angler.roulToRad(newAngle));
-                } else { //Illegal (>Max) rotate
-                    if(diff > 0) {
-                        setAbsAngle(Angler.roulToRad(ang - Angler.degToRoul(MAX_DEGREE_PER_TICK)));
-                    } else {
-                        setAbsAngle(Angler.roulToRad(ang + Angler.degToRoul(MAX_DEGREE_PER_TICK)));
-                    }
-                }
-
+                setAbsAngle(Angler.roulToRad(newAngle));
+                
                 setSpeed(newSpeed);
                 //setMemory(out[2]);
             } catch (IllegalArgumentException ex) {
-                System.out.println("Ill: " + newSpeed + " " + Angler.roulToRad(newAngle));
+                System.err.println(ex);
                 setSpeed(1);
                 setAbsAngle(0);
             }

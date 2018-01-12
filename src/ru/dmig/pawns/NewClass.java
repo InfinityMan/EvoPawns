@@ -31,8 +31,7 @@ import ru.epiclib.base.Base;
 public class NewClass {
 
     public static void main(String[] args) throws InterruptedException {
-        double deg = Angler.doAngle(Math.PI * 2);
-        deg = Angler.radToDeg(deg);
-        System.out.println(deg);
+        System.out.println(Network.getSize(Game.LAYERS_OF_NET));
+        System.out.println(Network.getGenomSize(Game.LAYERS_OF_NET));
     }
 }

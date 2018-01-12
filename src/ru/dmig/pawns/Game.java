@@ -48,9 +48,9 @@ public class Game {
     /**
      * Amount of pawns for game.
      */
-    public static int AMOUNT_OF_PAWNS = 240;
+    public static int AMOUNT_OF_PAWNS = 180;
 
-    public static int TURN_PAWN_AMOUNT = 8;
+    public static int TURN_PAWN_AMOUNT = 6;
 
     /**
      * Interplanetary pawns array.
@@ -81,7 +81,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns.
      */
-    public static final int[] LAYERS_OF_NET = {6, 8, 4, 2};
+    public static final int[] LAYERS_OF_NET = {6, 10, 5, 2};
 
     /**
      * Length of field to simulate.
@@ -98,12 +98,12 @@ public class Game {
      */
     public static int TICK_DURATION = 2; // 20 is normal
 
-    public static int CYCLE_AMOUNT = 10000;
+    public static int CYCLE_AMOUNT = 9000;
 
     /**
      * Amount of rounds (generations) to play.
      */
-    public static final int AMOUNT_OF_ROUNDS = 9000;
+    public static final int AMOUNT_OF_ROUNDS = 10000;
 
 
     public static int FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
@@ -111,7 +111,7 @@ public class Game {
     public static final int MIN_MASS_OF_FOOD = 5;
     public static final int MAX_MASS_OF_FOOD = 5;
 
-    public static final int DANGER_ZONE = 23;
+    public static final int DANGER_ZONE = 22;
 
     public static final double KILLER_DAMAGE = 45;
 
@@ -204,7 +204,7 @@ public class Game {
             }
 
             AMOUNT_OF_PAWNS = amountOfPawns;
-            FOOD_AMOUNT = 320;
+            FOOD_AMOUNT = 360;
         }
 
     }
