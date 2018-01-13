@@ -34,8 +34,6 @@ public final class Activity extends javax.swing.JFrame {
     public static double killerKilled = 0;
     public static double borderKilled = 0;
     
-    private float gameSpeed = 0.5f;
-    
     public static void init() {
         java.awt.EventQueue.invokeLater(() -> {
             new Activity().setVisible(true);
@@ -51,7 +49,8 @@ public final class Activity extends javax.swing.JFrame {
     }
     
     public void update() {
-        curSpeedL.setText("Current speed: "+gameSpeed+"x");
+        String speed = (Game.TICK_DURATION == 0 ? "max" : (Game.TICK_DURATION+" tks"));
+        curSpeedL.setText("Current speed: "+speed);
         genL.setText("Generation: "+ (Game.generation - 1));
         fitL.setText("Fittest: "+Base.maximumFractionDigits(2, fittest));
         avgL.setText("Average: " +Base.maximumFractionDigits(2, avg));
@@ -211,16 +210,12 @@ public final class Activity extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void speedPlusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_speedPlusActionPerformed
-        if(Game.upThread.changeSpeed(false)) {
-            gameSpeed = gameSpeed / 2;
-        }
+        Game.upThread.changeSpeed(false);
         update();
     }//GEN-LAST:event_speedPlusActionPerformed
 
     private void speedMinusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_speedMinusActionPerformed
-        if(Game.upThread.changeSpeed(true)) {
-            gameSpeed *= 2;
-        }
+        Game.upThread.changeSpeed(true);
         update();
     }//GEN-LAST:event_speedMinusActionPerformed
 

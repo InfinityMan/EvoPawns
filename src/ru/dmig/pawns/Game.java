@@ -48,9 +48,9 @@ public class Game {
     /**
      * Amount of pawns for game.
      */
-    public static int AMOUNT_OF_PAWNS = 180;
+    public static int AMOUNT_OF_PAWNS = 160;
 
-    public static int TURN_PAWN_AMOUNT = 6;
+    public static int TURN_PAWN_AMOUNT = 16;
 
     /**
      * Interplanetary pawns array.
@@ -81,7 +81,7 @@ public class Game {
     /**
      * Setting of minds anatomy of pawns.
      */
-    public static final int[] LAYERS_OF_NET = {6, 10, 5, 2};
+    public static final int[] LAYERS_OF_NET = {8, 12, 8, 4};
 
     /**
      * Length of field to simulate.
@@ -96,7 +96,7 @@ public class Game {
     /**
      * Duration of one tick of game.
      */
-    public static int TICK_DURATION = 2; // 20 is normal
+    public static int TICK_DURATION = 24; // 20 is normal
 
     public static int CYCLE_AMOUNT = 9000;
 
@@ -104,7 +104,6 @@ public class Game {
      * Amount of rounds (generations) to play.
      */
     public static final int AMOUNT_OF_ROUNDS = 10000;
-
 
     public static int FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
 
@@ -118,15 +117,18 @@ public class Game {
     public static final int KILLER_AMOUNT = 38;
 
     public static final int PAWN_SCAN_RANGE = 200;
-    
+
     public static final boolean KILLER_ENABLED = true;
     public static final boolean SAVING_ENABLED = true;
+    public static final boolean LOADING_ENABLED = false;
+    public static final boolean DEBUG = false;
+    public static final boolean MINI = false;
 
     /**
      * Generation index, when <code>new.gen</code> loads.
      */
     public static final int GENERATION_FOR_UPDATE = 2;
-    
+
     public static double[] fits;
 
     public static final String HELP = "Программа представляет собой симулятор развития нейронных сетей с помощью эволюционного алгоритма.\n"
@@ -143,6 +145,10 @@ public class Game {
 
     public static void newRun() {
         try {
+            if (MINI) {
+                AMOUNT_OF_PAWNS = 2;
+                TURN_PAWN_AMOUNT = 2;
+            }
             ChartPanel.lauch();
             allPawns = Evolution.arrayToMatrix(Generator.generatePawns(AMOUNT_OF_PAWNS), TURN_PAWN_AMOUNT);
             pawns = allPawns[0];
@@ -208,7 +214,6 @@ public class Game {
         }
 
     }
-
 
     /**
      * Prints on screen info about pawns successes
@@ -293,5 +298,4 @@ public class Game {
         return pawns;
     }
 
-    
 }

@@ -31,7 +31,6 @@ import ru.epiclib.base.Base;
 public class NewClass {
 
     public static void main(String[] args) throws InterruptedException {
-        System.out.println(Network.getSize(Game.LAYERS_OF_NET));
-        System.out.println(Network.getGenomSize(Game.LAYERS_OF_NET));
+        System.out.println(Angler.roulToRad(0.4));
     }
 }

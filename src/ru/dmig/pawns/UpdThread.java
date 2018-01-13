@@ -36,10 +36,11 @@ public final class UpdThread extends Thread {
     private int newTickDuration = Game.TICK_DURATION;
 
     public static final boolean TIME_PRINT = false;
+    public static final int CYCLE_AMOUNT_BEFORE_TICK_TEST = 20;
 
     private static final int MAX_REMAIN = 1000;
     private int remainingCycles = MAX_REMAIN;
-    
+
     private static int killerKilled = 0;
     private static int borderKilled = 0;
 
@@ -67,15 +68,19 @@ public final class UpdThread extends Thread {
         for (int i = 0; i < (Game.AMOUNT_OF_PAWNS / Game.TURN_PAWN_AMOUNT); i++) {
             Game.pawns = Game.allPawns[i];
 
-            //Changing global speed in start of new round
-            if (newTickDuration != tick) {
-                tick = newTickDuration;
-                Game.TICK_DURATION = newTickDuration;
-            }
-
-            final boolean isTickZero = (tick == 0);
-
+            //Do tick
+            boolean isTickZero = (tick == 0);
             for (cyc = 0; cyc < Game.CYCLE_AMOUNT; cyc++) {
+                //Changing global speed in Cycling
+                if (cyc % CYCLE_AMOUNT_BEFORE_TICK_TEST == 0) {
+                    if (newTickDuration != tick) {
+                        tick = newTickDuration;
+                        Game.TICK_DURATION = newTickDuration;
+                    }
+
+                    isTickZero = (tick == 0);
+                }
+
                 if (cyc == Game.CYCLE_AMOUNT / 2) {
                     Generator.regenerateFood(24);
                 }
@@ -109,17 +114,17 @@ public final class UpdThread extends Thread {
         if (TIME_PRINT) {
             System.out.print("\nSIM: " + (System.currentTimeMillis() - timeIn) + "\nEVO: ");
         }
-        
+
         Game.viewStats(Game.pawns);
         killerKilled = 0;
         borderKilled = 0;
-        
+
         timeIn = System.currentTimeMillis();
         Game.allPawns = Evolution.arrayToMatrix(Evolution.evolution(Evolution.getPawnArray(Game.allPawns)), Game.TURN_PAWN_AMOUNT);
         if (TIME_PRINT) {
             System.out.println(System.currentTimeMillis() - timeIn);
         }
-        
+
         System.gc();
 
         Generator.regenerateFood(100);
@@ -145,7 +150,7 @@ public final class UpdThread extends Thread {
                 if (Game.KILLER_ENABLED) {
                     setRelativeToEnemy(pawn);
                 }
-                pawn.calculate(false);
+                pawn.calculate(Game.DEBUG);
                 distSum += pawn.updateCoords(true);
                 dangerZoneProcess(pawn);
             }
@@ -212,7 +217,7 @@ public final class UpdThread extends Thread {
                             if (Base.chance(60, 0)) {
                                 pawn.smite();
                             }
-                            if(!pawn.isAlive()) {
+                            if (!pawn.isAlive()) {
                                 killerKilled++;
                             }
                         }
@@ -257,10 +262,14 @@ public final class UpdThread extends Thread {
             degreeToAdd = 0;
         }
         if (sqr == 4 || sqr == 2) {
-            if(yDiff == 0) return 0;
+            if (yDiff == 0) {
+                return 0;
+            }
             return (degreeToAdd + Math.atan(xDiff / yDiff));
         } else {
-            if(xDiff == 0) return 0;
+            if (xDiff == 0) {
+                return 0;
+            }
             return (degreeToAdd + Math.atan(yDiff / xDiff));
         }
     }
@@ -327,7 +336,7 @@ public final class UpdThread extends Thread {
             if (Game.TICK_DURATION > 0) {
                 newTickDuration = newTickDuration * 2;
             } else {
-                newTickDuration = 24;
+                newTickDuration = 12;
             }
             return true;
         } else {
@@ -353,5 +362,5 @@ public final class UpdThread extends Thread {
     public static int getBorderKilled() {
         return borderKilled;
     }
-    
+
 }

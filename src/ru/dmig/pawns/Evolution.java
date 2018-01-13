@@ -35,7 +35,7 @@ public final class Evolution {
     /**
      * Chance of mutation of every paricular weight. From 0 to 100. "By definition at 100 mutation rate, every variable is chosen randomly each generation and no information is retained."
      */
-    public static int MUTATION_RATE = 11;
+    public static int MUTATION_RATE = 17;
     public static int ELITE_AMOUNT = 2;
 
     public static double fitTime = 0;
@@ -70,9 +70,9 @@ public final class Evolution {
     public static Pawn[][] arrayToMatrix(Pawn[] array, int period) {
         Pawn[][] ret = new Pawn[array.length / period][period];
         for (int i = 0; i < array.length; i++) {
-            if (i % period == 0 && i != 0) {
-            }
+            //if (i % period == 0 && i != 0) {
             ret[i / period][i % period] = array[i];
+            //}
         }
         return ret;
     }
@@ -84,7 +84,7 @@ public final class Evolution {
      * @return Indexes of fittest pawns
      */
     public static int[] getParents(double[] fitnesses) {
-        if (fitnesses.length % 4 != 0) {
+        if (fitnesses.length % 4 != 0 && !Game.MINI) {
             throw new IllegalArgumentException(); //TODO normal crossover
         }
 
@@ -173,9 +173,13 @@ public final class Evolution {
      */
     public static Pawn[] evolution(Pawn[] pawns) {
         double timeIn = System.currentTimeMillis();
-        if (Game.generation == Game.GENERATION_FOR_UPDATE) {
+        if (Game.LOADING_ENABLED && Game.generation == Game.GENERATION_FOR_UPDATE) {
             try {
-                return Game.loadGenoms("gens//new.gen");
+                System.out.println("Try to load");
+                Pawn[] p = Game.loadGenoms("gens//new.gen");
+                if(p.length == Game.AMOUNT_OF_PAWNS) {
+                    return p;
+                }
             } catch (FileNotFoundException ex) {
             } catch (ParsingException ex) {
                 ex.printStackTrace();

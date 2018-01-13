@@ -68,6 +68,8 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     public float distance = 0;
     public float foodGathered = 0;
     public float dangerZonePenalty = 0;
+    
+    private float tempDistance = 0;
 
     private boolean alive = true;
 
@@ -85,6 +87,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
 
     /**
      * Calculate out parameters from input parameters by network.
+     * @param pr Print?
      */
     public void calculate(boolean pr) {
         final double x = getX() / Game.LENGTH_OF_FIELD;
@@ -120,12 +123,12 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
             System.out.println("mem" + getMemory());
         }
 
-        final double[] in = {ranglF, distF, ranglE, distE, x, y};
+        final double[] in = {ranglF, distF, ranglAF, distAF, ranglE, distE, x, y};
 
-        setNews(in);
+        setNews(in, pr);
     }
 
-    private void setNews(final double[] in) throws IllegalArgumentException {
+    private void setNews(final double[] in, boolean pr) throws IllegalArgumentException {
         final double[] out = network.calculate(in);
         final double newSpeed = out[0];
         double newAngle = out[1];
@@ -137,6 +140,11 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
                 setAbsAngle(Angler.roulToRad(newAngle));
                 
                 setSpeed(newSpeed);
+                
+                if(pr) {
+                    System.out.println("Rad new angle: raw("+newAngle+"), new(" + Angler.roulToRad(newAngle)+")");
+                    System.out.println("New speed: "+newSpeed);
+                }
                 //setMemory(out[2]);
             } catch (IllegalArgumentException ex) {
                 System.err.println(ex);
@@ -469,4 +477,3 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         return Double.compare(calcFitness(), o.calcFitness());
     }
 
-}
