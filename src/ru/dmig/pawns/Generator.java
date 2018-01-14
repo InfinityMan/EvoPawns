@@ -67,7 +67,7 @@ public class Generator {
     }
 
     private static Agent generateFood() {
-        final float mass = Base.randomNumber(Game.MIN_MASS_OF_FOOD, Game.MAX_MASS_OF_FOOD);
+        final float mass = pointRandom(Game.MIN_MASS_OF_FOOD, Game.MAX_MASS_OF_FOOD);
         return new Agent(mass);
     }
 
@@ -128,5 +128,14 @@ public class Generator {
         } else {
             throw new IllegalArgumentException();
         }
+    }
+    
+    /**
+     * Generates random float from min to max with 0.1 precision
+     * @return 
+     */
+    public static float pointRandom(float min, float max) {
+        float gen = Base.randomNumber((int) Math.floor(min*10), (int) Math.floor(max*10));
+        return gen/10;
     }
 }

@@ -42,6 +42,8 @@ public class Panel extends JPanel {
     public static final Color MY_ORANGE = new Color(219, 118, 67);
     public static final Color MY_WHITE = new Color(255, 255, 255);
     public static final Color MY_BLUE = new Color(25, 42, 90);
+    
+    private static final boolean DRAW_HUNDRED = false;
 
     @Override
     public void paint(Graphics g) {
@@ -100,8 +102,10 @@ public class Panel extends JPanel {
             }
         }
 
-        //gr2d.setColor(Color.BLACK);
-        //gr2d.drawLine(300, 300, 500, 300);
+        if(DRAW_HUNDRED) {
+            gr2d.setColor(Color.GRAY);
+            gr2d.drawLine(100, 100, 200, 100);
+        }
     }
 
     private void drawDangerZone(Graphics2D g) {

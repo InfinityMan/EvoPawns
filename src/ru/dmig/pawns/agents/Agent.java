@@ -246,7 +246,7 @@ public class Agent {
      *
      * @param mass new value of mass
      */
-    public final void setMass(double mass) {
+    public void setMass(double mass) {
         this.mass = mass;
     }
 

@@ -36,7 +36,7 @@ public final class Evolution {
      * Chance of mutation of every paricular weight. From 0 to 100. "By definition at 100 mutation rate, every variable is chosen randomly each generation and no information is retained."
      */
     public static int MUTATION_RATE = 17;
-    public static int ELITE_AMOUNT = 2;
+    public static int ELITE_AMOUNT = 4;
 
     public static double fitTime = 0;
     public static double parentsTime = 0;

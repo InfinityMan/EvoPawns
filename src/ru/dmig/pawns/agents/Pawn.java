@@ -157,6 +157,11 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         }
     }
 
+    public void addDistance(float amount) {
+        distance += amount;
+        addTempDist(amount);
+    }
+    
     @Override
     public void updateCoords(double maxSpeed) {
         double mov = getSpeed() * maxSpeed;
@@ -166,9 +171,9 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
 
         addX(xMov);
         addY(-yMov);
-
-        distance += Math.abs(xMov);
-        distance += Math.abs(yMov);
+        
+        float tMov = Math.abs(xMov) + Math.abs(yMov);
+        addDistance(tMov);
     }
 
     public void updateCoords() {
@@ -218,7 +223,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
 
     protected void kill() {
         alive = false;
-        setMass(0);
+        super.setMass(0);
         dangerZonePenalty += 10; //Some negative fitness for dying
     }
 
@@ -476,4 +481,41 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     public int compareTo(Pawn o) {
         return Double.compare(calcFitness(), o.calcFitness());
     }
+    
+    //When you need to eat your mass?
+    private static final float distq = 20;
+    
+    //How much mass you spend for moving by distq?
+    private static final float amountqForDist = 1;
+    
+    public void addTempDist(float amount) {
+        float massConsumption = 0;
+        while(tempDistance + amount >= distq) {
+            amount -= distq;
+            massConsumption += amountqForDist;
+        }
+        tempDistance += amount;
+        if(massConsumption > 0) {
+            spendMassForMove(massConsumption);
+        }
+    }
+    
+    public void spendMassForMove(float amount) {
+        setMass(getMass() - amount);
+    }
+    
+    /**
+     * Set the value of mass
+     *
+     * @param mass new value of mass
+     */
+    @Override
+    public final void setMass(double mass) {
+        if(mass > 0) {
+            super.setMass(mass);
+        } else {
+            kill();
+        }
+    }
 
+}

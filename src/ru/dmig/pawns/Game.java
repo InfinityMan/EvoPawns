@@ -48,9 +48,9 @@ public class Game {
     /**
      * Amount of pawns for game.
      */
-    public static int AMOUNT_OF_PAWNS = 160;
+    public static int AMOUNT_OF_PAWNS = 120;
 
-    public static int TURN_PAWN_AMOUNT = 16;
+    public static int TURN_PAWN_AMOUNT = 12;
 
     /**
      * Interplanetary pawns array.
@@ -105,10 +105,11 @@ public class Game {
      */
     public static final int AMOUNT_OF_ROUNDS = 10000;
 
-    public static int FOOD_AMOUNT = (int) Math.ceil(AMOUNT_OF_PAWNS * 5) + 8;
+    public static int FOOD_AMOUNT = 620;
 
-    public static final int MIN_MASS_OF_FOOD = 5;
-    public static final int MAX_MASS_OF_FOOD = 5;
+    //!!! Only 1 after point sign is work right !!!
+    public static final float MIN_MASS_OF_FOOD = 4.8f;
+    public static final float MAX_MASS_OF_FOOD = 5.2f;
 
     public static final int DANGER_ZONE = 22;
 
@@ -118,7 +119,7 @@ public class Game {
 
     public static final int PAWN_SCAN_RANGE = 200;
 
-    public static final boolean KILLER_ENABLED = true;
+    public static final boolean KILLER_ENABLED = false;
     public static final boolean SAVING_ENABLED = true;
     public static final boolean LOADING_ENABLED = false;
     public static final boolean DEBUG = false;
