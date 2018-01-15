@@ -67,7 +67,11 @@ public final class VarChange extends javax.swing.JFrame {
         killerAL = new javax.swing.JLabel();
         killerAC = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Globals");
+        setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        setName("globals"); // NOI18N
+        setResizable(false);
 
         pawnAL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         pawnAL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
