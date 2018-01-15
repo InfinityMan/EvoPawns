@@ -43,6 +43,7 @@ public final class UpdThread extends Thread {
 
     private static int killerKilled = 0;
     private static int borderKilled = 0;
+    private static int starveKilled = 0;
 
     public UpdThread() {
     }
@@ -118,6 +119,7 @@ public final class UpdThread extends Thread {
         Game.viewStats(Game.pawns);
         killerKilled = 0;
         borderKilled = 0;
+        starveKilled = 0;
 
         timeIn = System.currentTimeMillis();
         Game.allPawns = Evolution.arrayToMatrix(Evolution.evolution(Evolution.getPawnArray(Game.allPawns)), Game.TURN_PAWN_AMOUNT);
@@ -170,7 +172,7 @@ public final class UpdThread extends Thread {
 
     private void dangerZoneProcess(Pawn p) {
         if (p.isInDangerZone()) {
-            p.dangerZonePenalty++;
+            p.addPenalty(Pawn.ZONE_PENALTY);
             p.attack(5);
             if (p.isAlive()) {
                 if (Base.chance(7, 0)) {
@@ -361,6 +363,14 @@ public final class UpdThread extends Thread {
 
     public static int getBorderKilled() {
         return borderKilled;
+    }
+    
+    public static void incStarveKilled() {
+        starveKilled++;
+    }
+    
+    public static int getStarveKilled() {
+        return starveKilled;
     }
 
 }

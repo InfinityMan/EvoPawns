@@ -33,6 +33,7 @@ public final class Activity extends javax.swing.JFrame {
     
     public static double killerKilled = 0;
     public static double borderKilled = 0;
+    public static double starveKilled = 0;
     
     public static void init() {
         java.awt.EventQueue.invokeLater(() -> {
@@ -49,13 +50,14 @@ public final class Activity extends javax.swing.JFrame {
     }
     
     public void update() {
-        String speed = (Game.TICK_DURATION == 0 ? "max" : (Game.TICK_DURATION+" tks"));
-        curSpeedL.setText("Current speed: "+speed);
-        genL.setText("Generation: "+ (Game.generation - 1));
-        fitL.setText("Fittest: "+Base.maximumFractionDigits(2, fittest));
-        avgL.setText("Average: " +Base.maximumFractionDigits(2, avg));
-        killKL.setText("Killer: "+Base.maximumFractionDigits(2,killerKilled));
-        bordKL.setText("Border: "+Base.maximumFractionDigits(2,borderKilled));
+        String speed = (Game.TICK_DURATION == 0 ? "max" : (Game.TICK_DURATION + " tks"));
+        curSpeedL.setText("Current speed: " + speed);
+        genL.setText("Generation: " + (Game.generation - 1));
+        fitL.setText("Fittest: " + Base.maximumFractionDigits(2, fittest));
+        avgL.setText("Average: " + Base.maximumFractionDigits(2, avg));
+        killKL.setText("Killer: " + Base.maximumFractionDigits(0, killerKilled * 100) + " %");
+        bordKL.setText("Border: " + Base.maximumFractionDigits(0, borderKilled * 100) + " %");
+        strvKL.setText("Starve: " + Base.maximumFractionDigits(0, starveKilled * 100) + " %");
     }
     
     public void setupUpdater() {
@@ -86,6 +88,7 @@ public final class Activity extends javax.swing.JFrame {
         avgL = new javax.swing.JLabel();
         killKL = new javax.swing.JLabel();
         bordKL = new javax.swing.JLabel();
+        strvKL = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Activity");
@@ -158,6 +161,10 @@ public final class Activity extends javax.swing.JFrame {
         bordKL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         bordKL.setText("Border: ");
 
+        strvKL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        strvKL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        strvKL.setText("Starve: ");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -167,6 +174,7 @@ public final class Activity extends javax.swing.JFrame {
             .addComponent(avgL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(killKL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(bordKL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(strvKL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -179,7 +187,9 @@ public final class Activity extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(killKL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bordKL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(bordKL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(strvKL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -231,5 +241,6 @@ public final class Activity extends javax.swing.JFrame {
     private javax.swing.JButton speedMinus;
     private javax.swing.JPanel speedPanel;
     private javax.swing.JButton speedPlus;
+    private javax.swing.JLabel strvKL;
     // End of variables declaration//GEN-END:variables
 }
