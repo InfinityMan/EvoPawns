@@ -28,7 +28,7 @@ import ru.epiclib.base.Base;
  */
 public final class Network implements Serializable {
 
-    private static final long serialVersionUID = -6200117127679042366L;
+    private static final long serialVersionUID = -6200117127679042364L;
 
     protected double[] output;
 
@@ -69,23 +69,12 @@ public final class Network implements Serializable {
     
     public Network(double[] genom, int[] layers) {
         this(layers, false);
-        if(genom.length != getGenomSize(layers)) throw new IllegalArgumentException();
-        double[] wGens = new double[getSize(layers)];
-        double[] rGens = new double[genom.length - wGens.length];
-        for (int i = 0; i < wGens.length; i++) {
-            wGens[i] = genom[i];
+        if(genom.length != getSize(layers)) throw new IllegalArgumentException();
+        double[] gens = new double[getSize(layers)];
+        for (int i = 0; i < gens.length; i++) {
+            gens[i] = genom[i];
         }
-        for (int i = 0; i < rGens.length; i++) {
-            rGens[i] = genom[i + wGens.length];
-        }
-        setWeights(Evolution.genomIntoWeights(wGens, layers));
-        int index = 0;
-        for (Layer layer : this.layers) {
-            for (Neuron neuron : layer.neurons) {
-                neuron.setRadius((int) rGens[index]);
-                index++;
-            }
-        }
+        setWeights(Evolution.genomIntoWeights(gens, layers));
     }
 
     public double[] calculate(final double[] input) {
@@ -167,18 +156,6 @@ public final class Network implements Serializable {
             size += layersD[i];
         }
         return size;
-    }
-    
-    public static int getGenomSize(int[] layersD) {
-        int size = getSize(layersD);
-        for (int i = 1; i < layersD.length; i++) {
-            size += layersD[i];
-        }
-        return size;
-    }
-    
-    public int getGenomSize() {
-        return getSize() + getNeuronAmount();
     }
     
     public int getNeuronAmount() {

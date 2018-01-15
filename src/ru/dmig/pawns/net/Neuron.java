@@ -35,9 +35,7 @@ public final class Neuron implements Serializable {
     public double[] weights;
     public double output;
 
-    private int radius;
-
-    public static double calc(final double[] inputs, final double[] weights, final int radius) {
+    public static double calc(final double[] inputs, final double[] weights) {
         if (inputs.length != weights.length - 1) {
             throw new IllegalArgumentException();
         }
@@ -46,7 +44,8 @@ public final class Neuron implements Serializable {
             potential += inputs[i - 1] * weights[i]; //sum inputs
         }
         potential += weights[0];
-        return lineFunc(radius, potential, false);
+        //return lineFunc(radius, potential, false);
+        return potential;
     }
 
     public void calc(final Layer prevLayer) {
@@ -58,7 +57,7 @@ public final class Neuron implements Serializable {
     }
 
     public void calc(final double[] inputs) {
-        output = calc(inputs, weights, getRadius());
+        output = calc(inputs, weights);
     }
 
     public static double lineFunc(int radius, double value, boolean simmetric) {
@@ -105,7 +104,6 @@ public final class Neuron implements Serializable {
         inputCount++;
         weights = new double[inputCount];
         restart(pause);
-        genRadius();
     }
 
     /**
@@ -146,14 +144,7 @@ public final class Neuron implements Serializable {
     }
 
     public void tryToMutate() {
-        int id = Base.randomNumber(0, weights.length);
-        //id = 0 is genRadius();
-        //id = x != 0 is w[i-1] = genWeight;
-        if(id == 0) {
-            genRadius();
-        } else {
-            weights[id - 1] = genWeight();
-        }
+        weights[Base.randomNumber(0, weights.length - 1)] = genWeight();
     }
 
     @Override
@@ -168,33 +159,6 @@ public final class Neuron implements Serializable {
         }
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * Get the value of radius
-     *
-     * @return the value of radius
-     */
-    public int getRadius() {
-        return radius;
-    }
-
-    /**
-     * Set the value of radius
-     *
-     * @param radius new value of radius
-     */
-    public void setRadius(int radius) {
-        this.radius = radius;
-    }
-
-    public void genRadius() {
-        setRadius(genRandRadius());
-    }
-
-    public static int genRandRadius() {
-        if(Base.chance(25, 0)) return 1;
-        return Base.randomNumber(0, 40);
     }
 
 }
