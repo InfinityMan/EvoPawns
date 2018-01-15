@@ -161,8 +161,8 @@ public final class UpdThread extends Thread {
         for (int i = 0; i < Game.killers.size(); i++) {
             if (Game.killers.get(i).isInDangerZone()) {
                 Game.killers.get(i).placeInRandomPosition();
-            } else {
-                //Game.killers.get(i).updateCoords(Killer.MAX_SPEED);
+            } else if(Game.KILLER_MOVING) {
+                Game.killers.get(i).updateCoords(Killer.MAX_SPEED);
             }
         }
     }
@@ -213,7 +213,7 @@ public final class UpdThread extends Thread {
                         Killer killer = it.next();
                         if (testCollision(pawn.getX(), pawn.getY(), killer.getX(), killer.getY(), Panel.PAWN_DIAMETER / 2)) {
                             pawn.attack(Game.KILLER_DAMAGE);
-                            if (Base.chance(60, 0)) {
+                            if (Base.chance((int) KILLER_SMITE_CHANCE*100, 0)) {
                                 pawn.smite();
                             }
                             if (!pawn.isAlive()) {
@@ -225,6 +225,8 @@ public final class UpdThread extends Thread {
             }
         }
     }
+    
+    private static double KILLER_SMITE_CHANCE = 0.07;
 
     private void setRelativeToFood(Pawn p) {
         Agent food = Game.foods.get(getNearestAgent(p.getX(), p.getY(), Game.foods));
