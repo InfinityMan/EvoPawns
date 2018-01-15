@@ -107,7 +107,7 @@ public class Game {
 
     public static final double KILLER_DAMAGE = 52;
 
-    public static final int KILLER_AMOUNT = 150;
+    public static int KILLER_AMOUNT = 150;
 
     public static final int PAWN_SCAN_RANGE = 200;
 
@@ -151,7 +151,7 @@ public class Game {
                 for (int i = 0; i < KILLER_AMOUNT; i++) {
                     killers.add(Generator.generateKiller());
                 }
-            }
+            } else KILLER_AMOUNT = 0;
             Generator.generateFood(FOOD_AMOUNT);
 
             Frame.panel = new Panel();
@@ -291,4 +291,12 @@ public class Game {
         return pawns;
     }
 
+    public static double askUserValue(String message) throws NumberFormatException {
+        return Double.valueOf(JOptionPane.showInputDialog(null, message, "Enter a value", JOptionPane.QUESTION_MESSAGE));
+    }
+    
+    public static double askUserValue() throws NumberFormatException {
+        return askUserValue("");
+    }
+    
 }

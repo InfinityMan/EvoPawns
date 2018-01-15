@@ -21,10 +21,14 @@ import java.util.TimerTask;
 import ru.dmig.pawns.Game;
 
 /**
- *
+ * Class of GUI for changing main variables (Game and Pawn classes)
  * @author Dmig
  */
-public class VarChange extends javax.swing.JFrame {
+public final class VarChange extends javax.swing.JFrame {
+
+    protected static enum ValueType {
+        PAWN, TURN, CYCLE, FOOD, KILLER
+    };
 
     public static void init() {
         java.awt.EventQueue.invokeLater(() -> {
@@ -241,24 +245,93 @@ public class VarChange extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void pawnACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pawnACActionPerformed
-        // TODO add your handling code here:
+        Game.AMOUNT_OF_PAWNS = (int) getUserValue(ValueType.PAWN);
     }//GEN-LAST:event_pawnACActionPerformed
 
     private void turnACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_turnACActionPerformed
-        // TODO add your handling code here:
+        Game.TURN_PAWN_AMOUNT = (int) getUserValue(ValueType.TURN);
     }//GEN-LAST:event_turnACActionPerformed
 
     private void cycleACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cycleACActionPerformed
-        // TODO add your handling code here:
+        Game.CYCLE_AMOUNT = (int) getUserValue(ValueType.CYCLE);
     }//GEN-LAST:event_cycleACActionPerformed
 
     private void foodACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foodACActionPerformed
-        // TODO add your handling code here:
+        Game.FOOD_AMOUNT = (int) getUserValue(ValueType.FOOD);
     }//GEN-LAST:event_foodACActionPerformed
 
     private void killerACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_killerACActionPerformed
-        // TODO add your handling code here:
+        Game.KILLER_AMOUNT = (int) getUserValue(ValueType.KILLER);
     }//GEN-LAST:event_killerACActionPerformed
+
+    public static double getUserValue(ValueType valueType) {
+        double newValue;
+        String subject;
+        switch (valueType) {
+            case PAWN:
+                subject = "pawn ";
+                break;
+            case TURN:
+                subject = "turn ";
+                break;
+            case CYCLE:
+                subject = "cycle ";
+                break;
+            case FOOD:
+                subject = "food ";
+                break;
+            case KILLER:
+                subject = "killer ";
+                break;
+            default:
+                subject = "";
+                throw new AssertionError();
+        }
+        subject += "amount";
+        while (true) {
+            try {
+                newValue = Game.askUserValue("Enter a new " + subject + ".");
+                if(newValue % 1 != 0) throw new NumberFormatException();
+                switch (valueType) {
+                    case PAWN:
+                        if(newValue > 0 && newValue % 4 == 0) {
+                            return newValue;
+                        } else {
+                            throw new NumberFormatException();
+                        }
+                    case TURN:
+                        if(newValue > 0 && newValue <= Game.AMOUNT_OF_PAWNS &&
+                                Game.AMOUNT_OF_PAWNS % newValue == 0) {
+                            return newValue;
+                        } else {
+                            throw new NumberFormatException();
+                        }
+                    case CYCLE:
+                        if(newValue >= 1000 && newValue % 1000 == 0) {
+                            return newValue;
+                        } else {
+                            throw new NumberFormatException();
+                        }
+                    case FOOD:
+                        if(newValue > 0) {
+                            return newValue;
+                        } else {
+                            throw new NumberFormatException();
+                        }
+                    case KILLER:
+                        if(newValue > 0) {
+                            return newValue;
+                        } else {
+                            throw new NumberFormatException();
+                        }
+                    default:
+                        throw new AssertionError();
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("!Problem with entering new " + subject);
+            }
+        }
+    }
 
     public void setupUpdater() {
         Timer timer = new Timer();
@@ -279,8 +352,8 @@ public class VarChange extends javax.swing.JFrame {
         pawnAL.setText("Pawn amount: " + pawn);
         turnAL.setText("Turn amount: " + turn);
         cycleAL.setText("Cycle amount: " + (cycle / 1000) + "k");
-        foodAL.setText("Food amount: "+food);
-        killerAL.setText("Kilr amount: "+killers);
+        foodAL.setText("Food amount: " + food);
+        killerAL.setText("Kilr amount: " + killers);
     }
 
 
