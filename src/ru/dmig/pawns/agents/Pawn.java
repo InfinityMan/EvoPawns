@@ -16,10 +16,13 @@
  */
 package ru.dmig.pawns.agents;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import ru.dmig.pawns.Game;
+import ru.dmig.pawns.UpdThread;
 import ru.dmig.pawns.net.Network;
 import ru.dmig.util.Angler;
+import ru.epiclib.base.Base;
 
 /**
  * Basic unit in game. Has own neuron network for thinking.
@@ -31,7 +34,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     /**
      * Max speed for every pawn in every direction. (Maybe, I don't sure)
      */
-    public static final double MAX_SPEED = 10;
+    public static final double MAX_SPEED = 1;
 
     public static final double MAX_DEGREE_PER_TICK = 30;
 
@@ -67,14 +70,17 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
 
     public float distance = 0;
     public float foodGathered = 0;
-    public float dangerZonePenalty = 0;
-    
+    private float penalty = 0;
+
     private float tempDistance = 0;
 
     private boolean alive = true;
+    
+    public static final float ZONE_PENALTY = 10;
+    public static final double START_MASS = 20;
 
     public Pawn(float x, float y, Network network) {
-        super(0.2, 0, x, y, 100);
+        super(1, 0, x, y, START_MASS);
 
         setRltAngleToFood(0);
 
@@ -95,7 +101,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         final double aangl = Angler.radToRoul(getAbsAngle());
         final double ranglF = Angler.radToRoul(getRltAngleToFood());
         final double ranglAF = Angler.radToRoul(getRltAngleToAltFood());
-        final double ranglE = Angler.radToRoul(getRltAngleToEnemy());
+        double ranglE = Angler.radToRoul(getRltAngleToEnemy());
 //        final double aanglE = getAbsAngleOfEnemy() / (Math.PI * 2);
         double distE = 1;
         double distF = 1;
@@ -122,28 +128,32 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
             System.out.println("dist enemy " + distE);
             System.out.println("mem" + getMemory());
         }
-
+        
+        if(!Game.KILLER_ENABLED) {
+            ranglE = 0;
+            distE = 0;
+        }
+        
         final double[] in = {ranglF, distF, ranglAF, distAF, ranglE, distE, x, y};
-
         setNews(in, pr);
     }
 
     private void setNews(final double[] in, boolean pr) throws IllegalArgumentException {
         final double[] out = network.calculate(in);
-        final double newSpeed = out[0];
-        double newAngle = out[1];
-        
-        final double ang = Angler.radToRoul(getAbsAngle());
+        double newAngle = out[0];
+        //final double newSpeed = out[0];
 
-        if (!(Double.isNaN(newSpeed) || Double.isInfinite(newAngle))) {
+        //if (!(Double.isNaN(newSpeed) || Double.isInfinite(newAngle))) {
+        if (!Double.isInfinite(newAngle)) {
             try {
                 setAbsAngle(Angler.roulToRad(newAngle));
                 
-                setSpeed(newSpeed);
+                //setSpeed(newSpeed);
+                setSpeed(1);
                 
                 if(pr) {
                     System.out.println("Rad new angle: raw("+newAngle+"), new(" + Angler.roulToRad(newAngle)+")");
-                    System.out.println("New speed: "+newSpeed);
+                    //System.out.println("New speed: "+newSpeed);
                 }
                 //setMemory(out[2]);
             } catch (IllegalArgumentException ex) {
@@ -200,6 +210,9 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     }
 
     public static final float MIN_DISTANCE = 60;
+    
+    public static final boolean PRINT_FIT = false;
+    public static final boolean PRINT_BAD_FIT = false;
 
     /**
      * Calculate fitness of this pawn
@@ -207,14 +220,43 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
      * @return Fitness of this pawn
      */
     public double calcFitness() {
-        final double distanceFit = distance * 0.0102;
-        final double foodFit = foodGathered * 17.5;
-        final double dngPenalty = dangerZonePenalty * 0.14;
-        final double massFit = getMass() * 0.447;
+        final double distanceFit = distance * 0.01;
+        final double foodFit = foodGathered * 3.5;
+        final double penalty = getPenalty();
+        final double massFit = getMass();
 
-        double totalA = distanceFit + foodFit + massFit - dngPenalty;
+        double total = distanceFit + foodFit + massFit - penalty;
 
-        return totalA;
+        if (PRINT_FIT) {
+            if (PRINT_BAD_FIT) {
+                printFitness(distanceFit, foodFit, penalty, massFit, total);
+            } else if (total > 900) {
+                printFitness(distanceFit, foodFit, penalty, massFit, total);
+            }
+        }
+        return total;
+    }
+    
+    private ArrayList<String> fitsPr = new ArrayList<>();
+
+    public void printFitness(double dist, double food, double penalty, double mass, double total) {
+        String fit = "Dist: " + Base.maximumFractionDigits(2, dist) + ", "
+                + "food: " + Base.maximumFractionDigits(2, food) + ", "
+                + "penlty: " + Base.maximumFractionDigits(2, penalty) + ", "
+                + "mass: " + Base.maximumFractionDigits(2, mass) + "; "
+                + "Total: " + Base.maximumFractionDigits(2, total);
+        boolean alrPrinted = false;
+        for (int i = 0; i < fitsPr.size(); i++) {
+            String get = fitsPr.get(i);
+            if(get.equals(fit)) {
+                alrPrinted = true;
+                break;
+            }
+        }
+        if(!alrPrinted) {
+            System.out.println(fit);
+            fitsPr.add(fit);
+        }
     }
 
     public boolean isAlive() {
@@ -224,7 +266,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     protected void kill() {
         alive = false;
         super.setMass(0);
-        dangerZonePenalty += 10; //Some negative fitness for dying
+        penalty += 10; //Some negative fitness for dying
     }
 
     /**
@@ -236,7 +278,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
 
     public void feed(double mass) {
         setMass(getMass() + mass);
-        foodGathered += mass;
+        foodGathered++;
     }
 
     /**
@@ -433,7 +475,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         hash = 97 * hash + Objects.hashCode(this.network);
         hash = 97 * hash + Float.floatToIntBits(this.distance);
         hash = 97 * hash + Float.floatToIntBits(this.foodGathered);
-        hash = 97 * hash + Float.floatToIntBits(this.dangerZonePenalty);
+        hash = 97 * hash + Float.floatToIntBits(this.penalty);
         hash = 97 * hash + (this.alive ? 1 : 0);
         return hash;
     }
@@ -465,7 +507,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         if (Float.floatToIntBits(this.foodGathered) != Float.floatToIntBits(other.foodGathered)) {
             return false;
         }
-        if (Float.floatToIntBits(this.dangerZonePenalty) != Float.floatToIntBits(other.dangerZonePenalty)) {
+        if (Float.floatToIntBits(this.penalty) != Float.floatToIntBits(other.penalty)) {
             return false;
         }
         if (this.alive != other.alive) {
@@ -483,7 +525,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     }
     
     //When you need to eat your mass?
-    private static final float distq = 20;
+    private static final float distq = 10 + 4;
     
     //How much mass you spend for moving by distq?
     private static final float amountqForDist = 1;
@@ -502,6 +544,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     
     public void spendMassForMove(float amount) {
         setMass(getMass() - amount);
+        if(!alive) UpdThread.incStarveKilled();
     }
     
     /**
@@ -516,6 +559,14 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         } else {
             kill();
         }
+    }
+    
+    public float getPenalty() {
+        return penalty;
+    }
+
+    public void addPenalty(float penalty) {
+        this.penalty += penalty;
     }
 
 }

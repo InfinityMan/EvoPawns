@@ -19,7 +19,6 @@ package ru.dmig.pawns.gui;
 import java.util.Timer;
 import java.util.TimerTask;
 import ru.dmig.pawns.Game;
-import ru.dmig.pawns.UpdThread;
 import ru.epiclib.base.Base;
 
 /**

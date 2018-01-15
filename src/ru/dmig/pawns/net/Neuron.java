@@ -17,8 +17,6 @@
 package ru.dmig.pawns.net;
 
 import java.io.Serializable;
-import java.util.List;
-import ru.dmig.pawns.Evolution;
 import ru.dmig.pawns.Game;
 import ru.epiclib.base.Base;
 

@@ -17,10 +17,7 @@
 package ru.dmig.pawns;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import ru.dmig.pawns.agents.*;
 import ru.dmig.pawns.gui.Frame;
 import ru.dmig.pawns.gui.Panel;
@@ -364,11 +361,11 @@ public final class UpdThread extends Thread {
     public static int getBorderKilled() {
         return borderKilled;
     }
-    
+
     public static void incStarveKilled() {
         starveKilled++;
     }
-    
+
     public static int getStarveKilled() {
         return starveKilled;
     }

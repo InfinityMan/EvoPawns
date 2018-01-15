@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import ru.dmig.pawns.agents.Pawn;
 import ru.dmig.pawns.net.Network;
-import ru.dmig.pawns.net.Neuron;
 import ru.epiclib.base.Arrayer;
 import ru.epiclib.base.Base;
 import ru.epiclib.evo.EvoAlg;
@@ -55,16 +54,7 @@ public final class Evolution {
     }
 
     public static double[] getGenomFromNet(Network net) {
-        double[] genom = new double[net.getGenomSize()];
-        double[] wGenom = weightsIntoGenom(net.getWeights());
-        for (int i = 0; i < wGenom.length; i++) {
-            genom[i] = wGenom[i];
-        }
-        Neuron[] neurons = net.getNeurons();
-        for (int i = 0; i < net.getGenomSize() - net.getSize(); i++) {
-            genom[i + wGenom.length] = neurons[i].getRadius();
-        }
-        return genom;
+        return weightsIntoGenom(net.getWeights());
     }
 
     public static Pawn[][] arrayToMatrix(Pawn[] array, int period) {

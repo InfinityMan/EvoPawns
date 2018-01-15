@@ -18,9 +18,6 @@ package ru.dmig.pawns.gui;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import javax.swing.JFrame;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
@@ -89,7 +86,7 @@ public class ChartPanel extends JFrame {
             aFittests.add(0d);
             aAverages.add(0d);
         }
-        
+
         ArrayList<Integer> nil = new ArrayList<>();
         for (int i = 0; i < fittests.size(); i++) {
             nil.add(0);

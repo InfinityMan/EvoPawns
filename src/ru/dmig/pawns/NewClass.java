@@ -16,13 +16,7 @@
  */
 package ru.dmig.pawns;
 
-import java.util.Arrays;
-import ru.dmig.pawns.agents.Agent;
-import ru.dmig.pawns.net.Network;
-import ru.dmig.pawns.net.Neuron;
 import ru.dmig.util.Angler;
-import ru.epiclib.base.Arrayer;
-import ru.epiclib.base.Base;
 
 /**
  *

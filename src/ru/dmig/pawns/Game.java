@@ -18,11 +18,6 @@ package ru.dmig.pawns;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import ru.dmig.pawns.agents.Agent;
 import ru.dmig.pawns.agents.Killer;
@@ -32,11 +27,8 @@ import ru.dmig.pawns.gui.ChartPanel;
 import ru.dmig.pawns.gui.Frame;
 import ru.dmig.pawns.gui.Panel;
 import ru.dmig.pawns.net.Network;
-import ru.dmig.pawns.net.Neuron;
 import ru.epiclib.base.Arrayer;
-import ru.epiclib.base.Base;
 import ru.epiclib.base.FileWorker;
-import ru.epiclib.evo.EvoAlg;
 
 /**
  * Class for lauching game; main variables; static functions
@@ -48,9 +40,9 @@ public class Game {
     /**
      * Amount of pawns for game.
      */
-    public static int AMOUNT_OF_PAWNS = 120;
+    public static int AMOUNT_OF_PAWNS = 80;
 
-    public static int TURN_PAWN_AMOUNT = 12;
+    public static int TURN_PAWN_AMOUNT = 10;
 
     /**
      * Interplanetary pawns array.
@@ -79,9 +71,9 @@ public class Game {
     public static UpdThread upThread;
 
     /**
-     * Setting of minds anatomy of pawns.
+     * Setting of nn anatomy of pawns.
      */
-    public static final int[] LAYERS_OF_NET = {8, 12, 8, 4};
+    public static final int[] LAYERS_OF_NET = {8, 6, 2, 1};
 
     /**
      * Length of field to simulate.
@@ -96,39 +88,39 @@ public class Game {
     /**
      * Duration of one tick of game.
      */
-    public static int TICK_DURATION = 24; // 20 is normal
+    public static int TICK_DURATION = 24; // 24 is normal
 
-    public static int CYCLE_AMOUNT = 9000;
+    public static int CYCLE_AMOUNT = 21000;
 
     /**
      * Amount of rounds (generations) to play.
      */
     public static final int AMOUNT_OF_ROUNDS = 10000;
 
-    public static int FOOD_AMOUNT = 620;
+    public static int FOOD_AMOUNT = 717;
 
     //!!! Only 1 after point sign is work right !!!
-    public static final float MIN_MASS_OF_FOOD = 4.8f;
-    public static final float MAX_MASS_OF_FOOD = 5.2f;
+    public static final float MIN_MASS_OF_FOOD = 4.9f;
+    public static final float MAX_MASS_OF_FOOD = 5.1f;
 
     public static final int DANGER_ZONE = 22;
 
-    public static final double KILLER_DAMAGE = 45;
+    public static final double KILLER_DAMAGE = 52;
 
-    public static final int KILLER_AMOUNT = 38;
+    public static final int KILLER_AMOUNT = 150;
 
     public static final int PAWN_SCAN_RANGE = 200;
 
-    public static final boolean KILLER_ENABLED = false;
+    public static final boolean KILLER_ENABLED = true;
     public static final boolean SAVING_ENABLED = true;
-    public static final boolean LOADING_ENABLED = false;
+    public static final boolean LOADING_ENABLED = true;
     public static final boolean DEBUG = false;
     public static final boolean MINI = false;
 
     /**
      * Generation index, when <code>new.gen</code> loads.
      */
-    public static final int GENERATION_FOR_UPDATE = 2;
+    public static final int GENERATION_FOR_UPDATE = 1;
 
     public static double[] fits;
 
@@ -141,7 +133,6 @@ public class Game {
     public static void main(String[] args) throws InterruptedException {
         tutorial();
         newRun();
-
     }
 
     public static void newRun() {
@@ -233,8 +224,9 @@ public class Game {
 
         Activity.fittest = fit;
         Activity.avg = avg;
-        Activity.killerKilled = (double) (UpdThread.getKillerKilled()) / AMOUNT_OF_PAWNS;
-        Activity.borderKilled = (double) (UpdThread.getBorderKilled()) / AMOUNT_OF_PAWNS;
+        Activity.killerKilled = (double) (UpdThread.getKillerKilled()) / (double) AMOUNT_OF_PAWNS;
+        Activity.borderKilled = (double) (UpdThread.getBorderKilled()) / (double) AMOUNT_OF_PAWNS;
+        Activity.starveKilled = (double) (UpdThread.getStarveKilled()) / (double) AMOUNT_OF_PAWNS;
     }
 
     public static void exception() {
@@ -288,7 +280,7 @@ public class Game {
             }
 
         }
-        if (Network.getGenomSize(LAYERS_OF_NET) != len) {
+        if (Network.getSize(LAYERS_OF_NET) != len) {
             throw new ParsingException("Invalid model of neural network");
         }
         Pawn[] pawns = new Pawn[genoms.length];

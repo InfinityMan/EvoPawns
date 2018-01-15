@@ -22,27 +22,29 @@ import ru.dmig.util.Angler;
 import ru.epiclib.base.Base;
 
 /**
- * Class for object on game field.
- * Agent has: speed, absolute angle, coordinates
+ * Class for object on game field. Agent has: speed, absolute angle, coordinates
+ *
  * @author Dmig
  */
 public class Agent {
-    
+
     public static final float MAX_BULLET_SPEED = 60;
-    
-    public enum Type {PAWN, BULLET, FOOD};
-    
+
+    public enum Type {
+        PAWN, BULLET, FOOD
+    };
+
     public Type t = Type.PAWN;
-    
+
     private double speed; // [0;1]
     private double absAngle; // [0;2pi)
-    
+
     private float x;
     private float y;
-    
+
     private double mass; // (0;1000]
     public Pawn authorOfBullet;
-    
+
     public Agent(double speed, double absAngle, float x, float y, double mass) {
         this.speed = 0;
         this.absAngle = 0;
@@ -64,27 +66,27 @@ public class Agent {
         addY(y);
         setMass(mass);
     }
-    
+
     public Agent(float x, float y) {
         this.speed = 0;
         this.absAngle = 0;
         this.x = 0;
         this.y = 0;
-        
+
         addX(x);
         addY(y);
     }
-    
+
     public Agent() {
-        this(0,0);
+        this(0, 0);
         placeInRandomPosition();
     }
-    
+
     public Agent(double speed, double absAngle, double mass) {
         this(speed, absAngle, 0, 0, mass);
         placeInRandomPosition();
     }
-    
+
     public Agent(double mass) {
         this();
         this.mass = 0;
@@ -94,6 +96,7 @@ public class Agent {
 
     /**
      * Updating coordinates of agent by current speed and angle
+     *
      * @param maxSpeed Max speed of agent
      */
     public void updateCoords(double maxSpeed) {
@@ -105,22 +108,22 @@ public class Agent {
         addX(xMov);
         addY(-yMov);
     }
-    
+
     public boolean isInDangerZone() {
         return getX() <= Game.DANGER_ZONE || getX() >= Game.LENGTH_OF_FIELD - Game.DANGER_ZONE
                 || getY() <= Game.DANGER_ZONE || getY() >= Game.HEIGHT_OF_FIELD - Game.DANGER_ZONE;
     }
-    
+
     public final void placeInRandomPosition() {
         x = Base.randomNumber(Game.DANGER_ZONE + 1, Game.LENGTH_OF_FIELD - Game.DANGER_ZONE - 1);
         y = Base.randomNumber(Game.DANGER_ZONE + 1, Game.HEIGHT_OF_FIELD - Game.DANGER_ZONE - 1);
     }
-    
+
     public final void placeInStartPlace() {
-        x = Game.DANGER_ZONE +1;
-        y = Game.DANGER_ZONE +1;
+        x = Game.DANGER_ZONE + 1;
+        y = Game.DANGER_ZONE + 1;
     }
-    
+
     public final void placeInCenter() {
         x = Game.LENGTH_OF_FIELD / 2;
         y = Game.HEIGHT_OF_FIELD / 2;
@@ -141,9 +144,11 @@ public class Agent {
      * @param speed new value of speed
      */
     public final void setSpeed(double speed) throws IllegalArgumentException {
-        if(speed >= 0 && speed <= 1) {
+        if (speed >= 0 && speed <= 1) {
             this.speed = speed;
-        } else throw new IllegalArgumentException();
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -163,7 +168,7 @@ public class Agent {
     public final void setAbsAngle(double absAngle) throws IllegalArgumentException {
         this.absAngle = Angler.doAngle(absAngle);
     }
-    
+
     /**
      * Get the value of x
      *
@@ -231,7 +236,7 @@ public class Agent {
             }
         }
     }
-    
+
     /**
      * Get the value of mass
      *
@@ -293,5 +298,4 @@ public class Agent {
         return true;
     }
 
-    
 }

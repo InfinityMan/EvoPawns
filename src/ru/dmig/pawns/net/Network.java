@@ -18,7 +18,6 @@ package ru.dmig.pawns.net;
 
 import java.io.Serializable;
 import ru.dmig.pawns.Evolution;
-import ru.dmig.pawns.Game;
 import ru.epiclib.base.Base;
 
 /**
@@ -56,7 +55,7 @@ public final class Network implements Serializable {
     public Network(int[] layersDimensions) {
         this(layersDimensions, true);
     }
-    
+
     public Network(int[] layersDimensions, boolean pause) {
         if (layersDimensions.length < 3 || layersDimensions.length > 12) {
             throw new IllegalArgumentException();
@@ -66,10 +65,12 @@ public final class Network implements Serializable {
             layers[i] = new Layer(layersDimensions[i + 1], layersDimensions[i], pause);
         }
     }
-    
+
     public Network(double[] genom, int[] layers) {
         this(layers, false);
-        if(genom.length != getSize(layers)) throw new IllegalArgumentException();
+        if (genom.length != getSize(layers)) {
+            throw new IllegalArgumentException();
+        }
         double[] gens = new double[getSize(layers)];
         for (int i = 0; i < gens.length; i++) {
             gens[i] = genom[i];
@@ -78,7 +79,7 @@ public final class Network implements Serializable {
     }
 
     public double[] calculate(final double[] input) {
-        if(input.length != getInputDimension()) {
+        if (input.length != getInputDimension()) {
             throw new IllegalArgumentException("Wrong input dimension"); //Control for in
         }
         int i, j;
@@ -86,17 +87,17 @@ public final class Network implements Serializable {
         for (i = 0; i < layers.length; i++) { //i - layerID
             Layer l = layers[i];
             for (j = 0; j < l.neurons.length; j++) { //j - neuronID
-                if(i == 0) {
+                if (i == 0) {
                     l.neurons[j].calc(input);
                 } else {
                     l.neurons[j].calc(layers[i - 1]);
                 }
             }
         }
-        
+
         double[] out = new double[getOutputDimension()];
         Layer lastLayer = layers[layers.length - 1];
-        if(out.length != lastLayer.neurons.length) {
+        if (out.length != lastLayer.neurons.length) {
             throw new IllegalStateException(); //Control for out
         }
         for (i = 0; i < lastLayer.neurons.length; i++) {
@@ -157,7 +158,7 @@ public final class Network implements Serializable {
         }
         return size;
     }
-    
+
     public int getNeuronAmount() {
         int ret = 0;
         for (Layer layer : layers) {
@@ -165,7 +166,7 @@ public final class Network implements Serializable {
         }
         return ret;
     }
-    
+
     public Neuron[] getNeurons() {
         Neuron[] neurons = new Neuron[getNeuronAmount()];
         int index = 0;
@@ -177,15 +178,17 @@ public final class Network implements Serializable {
         }
         return neurons;
     }
-    
+
     public void mutate() {
         int i = 0, id = Base.randomNumber(0, getNeuronAmount() - 1);
         for (Layer layer : layers) {
             for (Neuron neuron : layer.neurons) {
-                if(i == id) {
+                if (i == id) {
                     neuron.tryToMutate();
                     return;
-                } else i++;
+                } else {
+                    i++;
+                }
             }
         }
     }

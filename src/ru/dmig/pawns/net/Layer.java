@@ -17,7 +17,6 @@
 package ru.dmig.pawns.net;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Implements the neural network layer of neurons
