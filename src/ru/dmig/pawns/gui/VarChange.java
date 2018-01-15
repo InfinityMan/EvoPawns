@@ -16,17 +16,28 @@
  */
 package ru.dmig.pawns.gui;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import ru.dmig.pawns.Game;
+
 /**
  *
  * @author Dmig
  */
 public class VarChange extends javax.swing.JFrame {
 
+    public static void init() {
+        java.awt.EventQueue.invokeLater(() -> {
+            new VarChange().setVisible(true);
+        });
+    }
+
     /**
      * Creates new form VarChange
      */
     public VarChange() {
         initComponents();
+        setupUpdater();
     }
 
     /**
@@ -60,6 +71,11 @@ public class VarChange extends javax.swing.JFrame {
 
         pawnAC.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         pawnAC.setText("Change");
+        pawnAC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pawnACActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pawnPLayout = new javax.swing.GroupLayout(pawnP);
         pawnP.setLayout(pawnPLayout);
@@ -84,6 +100,11 @@ public class VarChange extends javax.swing.JFrame {
 
         turnAC.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         turnAC.setText("Change");
+        turnAC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                turnACActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout turnPLayout = new javax.swing.GroupLayout(turnP);
         turnP.setLayout(turnPLayout);
@@ -108,6 +129,11 @@ public class VarChange extends javax.swing.JFrame {
 
         cycleAC.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cycleAC.setText("Change");
+        cycleAC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cycleACActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout cyclePLayout = new javax.swing.GroupLayout(cycleP);
         cycleP.setLayout(cyclePLayout);
@@ -132,6 +158,11 @@ public class VarChange extends javax.swing.JFrame {
 
         foodAC.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         foodAC.setText("Change");
+        foodAC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                foodACActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout foodPLayout = new javax.swing.GroupLayout(foodP);
         foodP.setLayout(foodPLayout);
@@ -157,6 +188,11 @@ public class VarChange extends javax.swing.JFrame {
 
         killerAC.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         killerAC.setText("Change");
+        killerAC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                killerACActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout killerPLayout = new javax.swing.GroupLayout(killerP);
         killerP.setLayout(killerPLayout);
@@ -204,40 +240,49 @@ public class VarChange extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(VarChange.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(VarChange.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(VarChange.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(VarChange.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    private void pawnACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pawnACActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pawnACActionPerformed
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
+    private void turnACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_turnACActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_turnACActionPerformed
+
+    private void cycleACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cycleACActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cycleACActionPerformed
+
+    private void foodACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foodACActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_foodACActionPerformed
+
+    private void killerACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_killerACActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_killerACActionPerformed
+
+    public void setupUpdater() {
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
             public void run() {
-                new VarChange().setVisible(true);
+                update();
             }
-        });
+        }, 100, 100);
     }
+
+    public void update() {
+        updateLabels(Game.AMOUNT_OF_PAWNS, Game.TURN_PAWN_AMOUNT,
+                Game.CYCLE_AMOUNT, Game.FOOD_AMOUNT, Game.KILLER_AMOUNT);
+    }
+
+    protected void updateLabels(double pawn, double turn, double cycle, double food, double killers) {
+        pawnAL.setText("Pawn amount: " + pawn);
+        turnAL.setText("Turn amount: " + turn);
+        cycleAL.setText("Cycle amount: " + (cycle / 1000) + "k");
+        foodAL.setText("Food amount: "+food);
+        killerAL.setText("Kilr amount: "+killers);
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cycleAC;
