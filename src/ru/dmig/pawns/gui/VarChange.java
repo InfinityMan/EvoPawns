@@ -18,6 +18,7 @@ package ru.dmig.pawns.gui;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.JOptionPane;
 import ru.dmig.pawns.Game;
 
 /**
@@ -249,11 +250,11 @@ public final class VarChange extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void pawnACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pawnACActionPerformed
-        Game.AMOUNT_OF_PAWNS = (int) getUserValue(ValueType.PAWN);
+        setNewPawnsAmounts();
     }//GEN-LAST:event_pawnACActionPerformed
 
     private void turnACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_turnACActionPerformed
-        Game.TURN_PAWN_AMOUNT = (int) getUserValue(ValueType.TURN);
+        setNewPawnsAmounts();
     }//GEN-LAST:event_turnACActionPerformed
 
     private void cycleACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cycleACActionPerformed
@@ -261,13 +262,26 @@ public final class VarChange extends javax.swing.JFrame {
     }//GEN-LAST:event_cycleACActionPerformed
 
     private void foodACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foodACActionPerformed
-        Game.FOOD_AMOUNT = (int) getUserValue(ValueType.FOOD);
+        Game.setFoodAmount((int) getUserValue(ValueType.FOOD));
     }//GEN-LAST:event_foodACActionPerformed
 
     private void killerACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_killerACActionPerformed
-        Game.KILLER_AMOUNT = (int) getUserValue(ValueType.KILLER);
+        Game.setKillerAmount((int) getUserValue(ValueType.KILLER));
     }//GEN-LAST:event_killerACActionPerformed
 
+    private static void setNewPawnsAmounts() {
+        if(ignorePawnWarning()) {
+            Game.AMOUNT_OF_PAWNS = (int) getUserValue(ValueType.PAWN);
+            Game.TURN_PAWN_AMOUNT = (int) getUserValue(ValueType.TURN);
+            Game.restartGame();
+        }
+    }
+    
+    public static boolean ignorePawnWarning() {
+        int code = JOptionPane.showConfirmDialog(null, "Warning! If you continue, you break all previous progress!\nCurrent progress will be saved.", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        return code == JOptionPane.YES_OPTION;
+    }
+    
     public static double getUserValue(ValueType valueType) {
         double newValue;
         String subject;

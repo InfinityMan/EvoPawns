@@ -134,7 +134,7 @@ public class ChartPanel extends JFrame {
         averages = new ArrayList<>();
         aFittests = new ArrayList<>();
         aAverages = new ArrayList<>();
-        INITED = false;
+        INITED = true;
     }
 
 }

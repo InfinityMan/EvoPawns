@@ -132,16 +132,16 @@ public class Game {
 
     public static void main(String[] args) throws InterruptedException {
         tutorial();
-        newRun();
+        newRun(true);
     }
 
-    public static void newRun() {
+    public static void newRun(boolean launchGUI) {
         try {
             if (MINI) {
                 AMOUNT_OF_PAWNS = 2;
                 TURN_PAWN_AMOUNT = 2;
             }
-            ChartPanel.lauch();
+
             allPawns = Evolution.arrayToMatrix(Generator.generatePawns(AMOUNT_OF_PAWNS), TURN_PAWN_AMOUNT);
             pawns = allPawns[0];
             foods = new ArrayList<>();
@@ -151,19 +151,32 @@ public class Game {
                 for (int i = 0; i < KILLER_AMOUNT; i++) {
                     killers.add(Generator.generateKiller());
                 }
-            } else KILLER_AMOUNT = 0;
+            } else {
+                KILLER_AMOUNT = 0;
+            }
             Generator.generateFood(FOOD_AMOUNT);
 
-            Frame.panel = new Panel();
+            if (launchGUI) {
+                ChartPanel.lauch();
+                Frame.panel = new Panel();
 
-            java.awt.EventQueue.invokeLater(() -> {
-                Frame.frame = new Frame();
-                Frame.frame.setVisible(true);
-            });
+                java.awt.EventQueue.invokeLater(() -> {
+                    Frame.frame = new Frame();
+                    Frame.frame.setVisible(true);
+                });
 
-            Activity.init();
+                Activity.init();
+                Thread.sleep(1200);
+            } else {
+                ChartPanel.clear();
+            }
+            
+            generation = 0;
+            UpdThread.killerKilled = 0;
+            UpdThread.borderKilled = 0;
+            UpdThread.starveKilled = 0;
 
-            Thread.sleep(2000);
+            Thread.sleep(800);
 
             upThread = new UpdThread();
             upThread.start();
@@ -202,7 +215,6 @@ public class Game {
             }
 
             AMOUNT_OF_PAWNS = amountOfPawns;
-            FOOD_AMOUNT = 360;
         }
 
     }
@@ -294,9 +306,32 @@ public class Game {
     public static double askUserValue(String message) throws NumberFormatException {
         return Double.valueOf(JOptionPane.showInputDialog(null, message, "Enter a value", JOptionPane.QUESTION_MESSAGE));
     }
-    
+
     public static double askUserValue() throws NumberFormatException {
         return askUserValue("");
     }
-    
+
+    public static void restartGame() {
+        saveGenoms(Evolution.matrixToArray(Game.allPawns), "restGen" + generation + ".gen");
+        newRun(false);
+    }
+
+    public static void setFoodAmount(int fa) {
+        if (fa >= 0) {
+            FOOD_AMOUNT = fa;
+            foods = new ArrayList<>();
+            Generator.generateFood(FOOD_AMOUNT);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static void setKillerAmount(int ka) {
+        KILLER_AMOUNT = ka;
+        killers = new ArrayList<>();
+        for (int i = 0; i < KILLER_AMOUNT; i++) {
+            killers.add(Generator.generateKiller());
+        }
+    }
+
 }

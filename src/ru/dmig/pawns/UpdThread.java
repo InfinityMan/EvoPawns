@@ -38,9 +38,9 @@ public final class UpdThread extends Thread {
     private static final int MAX_REMAIN = 1000;
     private int remainingCycles = MAX_REMAIN;
 
-    private static int killerKilled = 0;
-    private static int borderKilled = 0;
-    private static int starveKilled = 0;
+    protected static int killerKilled = 0;
+    protected static int borderKilled = 0;
+    protected static int starveKilled = 0;
 
     public UpdThread() {
     }
