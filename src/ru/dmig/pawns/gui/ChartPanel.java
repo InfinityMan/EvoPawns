@@ -128,5 +128,13 @@ public class ChartPanel extends JFrame {
             new ChartPanel().setVisible(true);
         });
     }
+    
+    public static void clear() {
+        fittests = new ArrayList<>();
+        averages = new ArrayList<>();
+        aFittests = new ArrayList<>();
+        aAverages = new ArrayList<>();
+        INITED = false;
+    }
 
 }
