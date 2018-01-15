@@ -114,8 +114,11 @@ public class Generator {
     }
 
     public static Killer generateKiller() {
-        //return new Killer(1,randomAngle(),5);
-        return new Killer(0, randomAngle(), 5);
+        if(Game.KILLER_MOVING) {
+            return new Killer(1,randomAngle(),5);
+        } else {
+            return new Killer(0, randomAngle(), 5);
+        }
     }
 
     public static void regenerateKillers(int chance) {

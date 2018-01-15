@@ -53,7 +53,7 @@ public class Panel extends JPanel {
         
         if (DRAW_HUNDRED) {
             gr.setColor(Color.GRAY);
-            gr.drawLine(100, 100, 200, 100);
+            gr.drawLine(10, 10, 200, 100);
         }
         
         gr.setColor(Color.PINK);

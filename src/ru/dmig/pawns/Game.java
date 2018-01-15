@@ -97,21 +97,22 @@ public class Game {
      */
     public static final int AMOUNT_OF_ROUNDS = 10000;
 
-    public static int FOOD_AMOUNT = 717;
+    public static int FOOD_AMOUNT = 747;
 
     //!!! Only 1 after point sign is work right !!!
     public static final float MIN_MASS_OF_FOOD = 4.9f;
     public static final float MAX_MASS_OF_FOOD = 5.1f;
 
-    public static final int DANGER_ZONE = 22;
+    public static final int DANGER_ZONE = 10;
 
     public static final double KILLER_DAMAGE = 52;
 
-    public static final int KILLER_AMOUNT = 150;
+    public static final int KILLER_AMOUNT = 144;
 
     public static final int PAWN_SCAN_RANGE = 200;
 
     public static final boolean KILLER_ENABLED = true;
+    public static final boolean KILLER_MOVING = true;
     public static final boolean SAVING_ENABLED = true;
     public static final boolean LOADING_ENABLED = true;
     public static final boolean DEBUG = false;
