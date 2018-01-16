@@ -111,6 +111,9 @@ public class Game {
 
     public static final int PAWN_SCAN_RANGE = 200;
 
+    //When you need to eat your mass?
+    public static double MASS_MOVE_TAX = 10 + 4;
+
     public static final boolean KILLER_ENABLED = true;
     public static final boolean SAVING_ENABLED = true;
     public static final boolean LOADING_ENABLED = true;
@@ -170,7 +173,7 @@ public class Game {
             } else {
                 ChartPanel.clear();
             }
-            
+
             generation = 0;
             UpdThread.killerKilled = 0;
             UpdThread.borderKilled = 0;

@@ -23,12 +23,13 @@ import ru.dmig.pawns.Game;
 
 /**
  * Class of GUI for changing main variables (Game and Pawn classes)
+ *
  * @author Dmig
  */
 public final class VarChange extends javax.swing.JFrame {
 
-    protected static enum ValueType {
-        PAWN, TURN, CYCLE, FOOD, KILLER
+    public static enum ValueType {
+        PAWN, TURN, CYCLE, FOOD, KILLER, MASS
     };
 
     public static void init() {
@@ -67,6 +68,9 @@ public final class VarChange extends javax.swing.JFrame {
         killerP = new javax.swing.JPanel();
         killerAL = new javax.swing.JLabel();
         killerAC = new javax.swing.JButton();
+        killerP1 = new javax.swing.JPanel();
+        massAL = new javax.swing.JLabel();
+        massAC = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Globals");
@@ -220,6 +224,36 @@ public final class VarChange extends javax.swing.JFrame {
             .addComponent(killerAC, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
         );
 
+        massAL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        massAL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        massAL.setText("Mass tax dist: 00");
+        massAL.setToolTipText("");
+
+        massAC.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        massAC.setText("Change");
+        massAC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                massACActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout killerP1Layout = new javax.swing.GroupLayout(killerP1);
+        killerP1.setLayout(killerP1Layout);
+        killerP1Layout.setHorizontalGroup(
+            killerP1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(killerP1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(massAL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(massAC)
+                .addContainerGap())
+        );
+        killerP1Layout.setVerticalGroup(
+            killerP1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(massAL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(massAC, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -229,6 +263,7 @@ public final class VarChange extends javax.swing.JFrame {
             .addComponent(cycleP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(foodP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(killerP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(killerP1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -243,6 +278,8 @@ public final class VarChange extends javax.swing.JFrame {
                 .addComponent(foodP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(killerP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(killerP1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -269,19 +306,23 @@ public final class VarChange extends javax.swing.JFrame {
         Game.setKillerAmount((int) getUserValue(ValueType.KILLER));
     }//GEN-LAST:event_killerACActionPerformed
 
+    private void massACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_massACActionPerformed
+        Game.MASS_MOVE_TAX = getUserValue(ValueType.MASS);
+    }//GEN-LAST:event_massACActionPerformed
+
     private static void setNewPawnsAmounts() {
-        if(ignorePawnWarning()) {
+        if (ignorePawnWarning()) {
             Game.AMOUNT_OF_PAWNS = (int) getUserValue(ValueType.PAWN);
             Game.TURN_PAWN_AMOUNT = (int) getUserValue(ValueType.TURN);
             Game.restartGame();
         }
     }
-    
+
     public static boolean ignorePawnWarning() {
         int code = JOptionPane.showConfirmDialog(null, "Warning! If you continue, you break all previous progress!\nCurrent progress will be saved.", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         return code == JOptionPane.YES_OPTION;
     }
-    
+
     public static double getUserValue(ValueType valueType) {
         double newValue;
         String subject;
@@ -301,6 +342,9 @@ public final class VarChange extends javax.swing.JFrame {
             case KILLER:
                 subject = "killer ";
                 break;
+            case MASS:
+                subject = " mass tax distance";
+                break;
             default:
                 subject = "";
                 throw new AssertionError();
@@ -309,35 +353,43 @@ public final class VarChange extends javax.swing.JFrame {
         while (true) {
             try {
                 newValue = Game.askUserValue("Enter a new " + subject + ".");
-                if(newValue % 1 != 0) throw new NumberFormatException();
+                if (newValue % 1 != 0) {
+                    throw new NumberFormatException();
+                }
                 switch (valueType) {
                     case PAWN:
-                        if(newValue > 0 && newValue % 4 == 0) {
+                        if (newValue > 0 && newValue % 4 == 0) {
                             return newValue;
                         } else {
                             throw new NumberFormatException();
                         }
                     case TURN:
-                        if(newValue > 0 && newValue <= Game.AMOUNT_OF_PAWNS &&
-                                Game.AMOUNT_OF_PAWNS % newValue == 0) {
+                        if (newValue > 0 && newValue <= Game.AMOUNT_OF_PAWNS
+                                && Game.AMOUNT_OF_PAWNS % newValue == 0) {
                             return newValue;
                         } else {
                             throw new NumberFormatException();
                         }
                     case CYCLE:
-                        if(newValue >= 1000 && newValue % 1000 == 0) {
+                        if (newValue >= 1000 && newValue % 1000 == 0) {
                             return newValue;
                         } else {
                             throw new NumberFormatException();
                         }
                     case FOOD:
-                        if(newValue > 0) {
+                        if (newValue > 0) {
                             return newValue;
                         } else {
                             throw new NumberFormatException();
                         }
                     case KILLER:
-                        if(newValue > 0) {
+                        if (newValue > 0) {
+                            return newValue;
+                        } else {
+                            throw new NumberFormatException();
+                        }
+                    case MASS:
+                        if (newValue > 0) {
                             return newValue;
                         } else {
                             throw new NumberFormatException();
@@ -363,15 +415,17 @@ public final class VarChange extends javax.swing.JFrame {
 
     public void update() {
         updateLabels(Game.AMOUNT_OF_PAWNS, Game.TURN_PAWN_AMOUNT,
-                Game.CYCLE_AMOUNT, Game.FOOD_AMOUNT, Game.KILLER_AMOUNT);
+                Game.CYCLE_AMOUNT, Game.FOOD_AMOUNT,
+                Game.KILLER_AMOUNT, Game.MASS_MOVE_TAX);
     }
 
-    protected void updateLabels(double pawn, double turn, double cycle, double food, double killers) {
+    protected void updateLabels(double pawn, double turn, double cycle, double food, double killers, double mass) {
         pawnAL.setText("Pawn amount: " + pawn);
         turnAL.setText("Turn amount: " + turn);
         cycleAL.setText("Cycle amount: " + (cycle / 1000) + "k");
         foodAL.setText("Food amount: " + food);
         killerAL.setText("Kilr amount: " + killers);
+        massAL.setText("Mass tax dist: " + mass);
     }
 
 
@@ -385,6 +439,9 @@ public final class VarChange extends javax.swing.JFrame {
     private javax.swing.JButton killerAC;
     private javax.swing.JLabel killerAL;
     private javax.swing.JPanel killerP;
+    private javax.swing.JPanel killerP1;
+    private javax.swing.JButton massAC;
+    private javax.swing.JLabel massAL;
     private javax.swing.JButton pawnAC;
     private javax.swing.JLabel pawnAL;
     private javax.swing.JPanel pawnP;
