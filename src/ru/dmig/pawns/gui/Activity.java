@@ -26,14 +26,14 @@ import ru.epiclib.base.Base;
  * @author Dmig
  */
 public final class Activity extends javax.swing.JFrame {
-    
+
     public static double fittest = 0;
     public static double avg = 0;
-    
+
     public static double killerKilled = 0;
     public static double borderKilled = 0;
     public static double starveKilled = 0;
-    
+
     public static void init() {
         java.awt.EventQueue.invokeLater(() -> {
             new Activity().setVisible(true);
@@ -47,7 +47,7 @@ public final class Activity extends javax.swing.JFrame {
         initComponents();
         setupUpdater();
     }
-    
+
     public void update() {
         String speed = (Game.TICK_DURATION == 0 ? "max" : (Game.TICK_DURATION + " tks"));
         curSpeedL.setText("Current speed: " + speed);
@@ -57,8 +57,9 @@ public final class Activity extends javax.swing.JFrame {
         killKL.setText("Killer: " + Base.maximumFractionDigits(0, killerKilled * 100) + " %");
         bordKL.setText("Border: " + Base.maximumFractionDigits(0, borderKilled * 100) + " %");
         strvKL.setText("Starve: " + Base.maximumFractionDigits(0, starveKilled * 100) + " %");
+        versionL.setText("Version: " + Game.VERSION); //There is no need every upd do it
     }
-    
+
     public void setupUpdater() {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -89,6 +90,7 @@ public final class Activity extends javax.swing.JFrame {
         bordKL = new javax.swing.JLabel();
         strvKL = new javax.swing.JLabel();
         changeG = new javax.swing.JButton();
+        versionL = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Activity");
@@ -136,9 +138,9 @@ public final class Activity extends javax.swing.JFrame {
             .addGroup(speedPanelLayout.createSequentialGroup()
                 .addComponent(curSpeedL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(speedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(speedPlus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(speedMinus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(speedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(speedMinus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(speedPlus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -201,6 +203,11 @@ public final class Activity extends javax.swing.JFrame {
             }
         });
 
+        versionL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        versionL.setForeground(new java.awt.Color(0, 0, 50));
+        versionL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        versionL.setText("Version: dev-");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -211,21 +218,24 @@ public final class Activity extends javax.swing.JFrame {
                     .addComponent(speedPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jSeparator1)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(changeG, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(changeG, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(versionL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(versionL, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(speedPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(changeG, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(changeG)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -259,5 +269,6 @@ public final class Activity extends javax.swing.JFrame {
     private javax.swing.JPanel speedPanel;
     private javax.swing.JButton speedPlus;
     private javax.swing.JLabel strvKL;
+    private javax.swing.JLabel versionL;
     // End of variables declaration//GEN-END:variables
 }

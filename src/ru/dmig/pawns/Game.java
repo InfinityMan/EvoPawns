@@ -134,6 +134,8 @@ public class Game {
             + "Свою скорость, свой угл движения, угол к ближайшей еде, угол к ближайшей угрозе, дистанцию до угрозы, свои координаты.\n"
             + "На выходе, пешка изменяет свою скорость и угол движения.\n"
             + "Кружочки тёмно-синего цвета - еда.";
+    
+    public static final String VERSION = "Dev (plus)";
 
     public static void main(String[] args) throws InterruptedException {
         tutorial();
