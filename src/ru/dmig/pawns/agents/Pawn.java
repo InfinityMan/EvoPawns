@@ -75,9 +75,12 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     private float tempDistance = 0;
 
     private boolean alive = true;
-    
+
     public static final float ZONE_PENALTY = 10;
     public static final double START_MASS = 20;
+
+    //How much mass you spend for moving by distq?
+    private static final float amountqForDist = 1;
 
     public Pawn(float x, float y, Network network) {
         super(1, 0, x, y, START_MASS);
@@ -93,6 +96,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
 
     /**
      * Calculate out parameters from input parameters by network.
+     *
      * @param pr Print?
      */
     public void calculate(boolean pr) {
@@ -128,12 +132,12 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
             System.out.println("dist enemy " + distE);
             System.out.println("mem" + getMemory());
         }
-        
-        if(!Game.KILLER_ENABLED) {
+
+        if (!Game.KILLER_ENABLED) {
             ranglE = 0;
             distE = 0;
         }
-        
+
         final double[] in = {ranglF, distF, ranglAF, distAF, ranglE, distE, x, y};
         setNews(in, pr);
     }
@@ -147,12 +151,12 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         if (!Double.isInfinite(newAngle)) {
             try {
                 setAbsAngle(Angler.roulToRad(newAngle));
-                
+
                 //setSpeed(newSpeed);
                 setSpeed(1);
-                
-                if(pr) {
-                    System.out.println("Rad new angle: raw("+newAngle+"), new(" + Angler.roulToRad(newAngle)+")");
+
+                if (pr) {
+                    System.out.println("Rad new angle: raw(" + newAngle + "), new(" + Angler.roulToRad(newAngle) + ")");
                     //System.out.println("New speed: "+newSpeed);
                 }
                 //setMemory(out[2]);
@@ -171,7 +175,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         distance += amount;
         addTempDist(amount);
     }
-    
+
     @Override
     public void updateCoords(double maxSpeed) {
         double mov = getSpeed() * maxSpeed;
@@ -181,7 +185,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
 
         addX(xMov);
         addY(-yMov);
-        
+
         float tMov = Math.abs(xMov) + Math.abs(yMov);
         addDistance(tMov);
     }
@@ -210,7 +214,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     }
 
     public static final float MIN_DISTANCE = 60;
-    
+
     public static final boolean PRINT_FIT = false;
     public static final boolean PRINT_BAD_FIT = false;
 
@@ -236,7 +240,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         }
         return total;
     }
-    
+
     private ArrayList<String> fitsPr = new ArrayList<>();
 
     public void printFitness(double dist, double food, double penalty, double mass, double total) {
@@ -248,12 +252,12 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         boolean alrPrinted = false;
         for (int i = 0; i < fitsPr.size(); i++) {
             String get = fitsPr.get(i);
-            if(get.equals(fit)) {
+            if (get.equals(fit)) {
                 alrPrinted = true;
                 break;
             }
         }
-        if(!alrPrinted) {
+        if (!alrPrinted) {
             System.out.println(fit);
             fitsPr.add(fit);
         }
@@ -523,30 +527,26 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     public int compareTo(Pawn o) {
         return Double.compare(calcFitness(), o.calcFitness());
     }
-    
-    //When you need to eat your mass?
-    private static final float distq = 10 + 4;
-    
-    //How much mass you spend for moving by distq?
-    private static final float amountqForDist = 1;
-    
+
     public void addTempDist(float amount) {
         float massConsumption = 0;
-        while(tempDistance + amount >= distq) {
-            amount -= distq;
+        while (tempDistance + amount >= Game.MASS_MOVE_TAX) {
+            amount -= Game.MASS_MOVE_TAX;
             massConsumption += amountqForDist;
         }
         tempDistance += amount;
-        if(massConsumption > 0) {
+        if (massConsumption > 0) {
             spendMassForMove(massConsumption);
         }
     }
-    
+
     public void spendMassForMove(float amount) {
         setMass(getMass() - amount);
-        if(!alive) UpdThread.incStarveKilled();
+        if (!alive) {
+            UpdThread.incStarveKilled();
+        }
     }
-    
+
     /**
      * Set the value of mass
      *
@@ -554,13 +554,13 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
      */
     @Override
     public final void setMass(double mass) {
-        if(mass > 0) {
+        if (mass > 0) {
             super.setMass(mass);
         } else {
             kill();
         }
     }
-    
+
     public float getPenalty() {
         return penalty;
     }

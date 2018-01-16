@@ -88,9 +88,11 @@ public final class Activity extends javax.swing.JFrame {
         killKL = new javax.swing.JLabel();
         bordKL = new javax.swing.JLabel();
         strvKL = new javax.swing.JLabel();
+        changeG = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Activity");
+        setResizable(false);
 
         curSpeedL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         curSpeedL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -191,6 +193,14 @@ public final class Activity extends javax.swing.JFrame {
                 .addComponent(strvKL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        changeG.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        changeG.setText("Change globals");
+        changeG.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                changeGActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -200,7 +210,8 @@ public final class Activity extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(speedPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jSeparator1)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(changeG, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -212,7 +223,9 @@ public final class Activity extends javax.swing.JFrame {
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(changeG, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -228,9 +241,14 @@ public final class Activity extends javax.swing.JFrame {
         update();
     }//GEN-LAST:event_speedMinusActionPerformed
 
+    private void changeGActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeGActionPerformed
+        VarChange.init();
+    }//GEN-LAST:event_changeGActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel avgL;
     private javax.swing.JLabel bordKL;
+    private javax.swing.JButton changeG;
     private javax.swing.JLabel curSpeedL;
     private javax.swing.JLabel fitL;
     private javax.swing.JLabel genL;
