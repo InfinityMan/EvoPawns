@@ -37,6 +37,13 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     public static final double MAX_SPEED = 1;
 
     public static final double MAX_DEGREE_PER_TICK = 30;
+    public static final float ZONE_PENALTY = 10;
+    public static final double START_MASS = 20;
+    //How much mass you spend for moving by distq?
+    private static final float amountqForDist = 1;
+    public static final float MIN_DISTANCE = 60;
+    public static final boolean PRINT_FIT = false;
+    public static final boolean PRINT_BAD_FIT = false;
 
     /*
         Inputs of neuron net:
@@ -75,12 +82,7 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
     private float tempDistance = 0;
 
     private boolean alive = true;
-
-    public static final float ZONE_PENALTY = 10;
-    public static final double START_MASS = 20;
-
-    //How much mass you spend for moving by distq?
-    private static final float amountqForDist = 1;
+    private ArrayList<String> fitsPr = new ArrayList<>();
 
     public Pawn(float x, float y, Network network) {
         super(1, 0, x, y, START_MASS);
@@ -213,10 +215,6 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         }
     }
 
-    public static final float MIN_DISTANCE = 60;
-
-    public static final boolean PRINT_FIT = false;
-    public static final boolean PRINT_BAD_FIT = false;
 
     /**
      * Calculate fitness of this pawn
@@ -241,7 +239,6 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         return total;
     }
 
-    private ArrayList<String> fitsPr = new ArrayList<>();
 
     public void printFitness(double dist, double food, double penalty, double mass, double total) {
         String fit = "Dist: " + Base.maximumFractionDigits(2, dist) + ", "

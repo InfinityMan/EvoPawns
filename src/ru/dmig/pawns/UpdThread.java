@@ -30,28 +30,132 @@ import ru.epiclib.base.Base;
  */
 public final class UpdThread extends Thread {
 
-    private int newTickDuration = Game.TICK_DURATION;
 
     public static final boolean TIME_PRINT = false;
     public static final int CYCLE_AMOUNT_BEFORE_TICK_TEST = 20;
 
     private static final int MAX_REMAIN = 1000;
-    private int remainingCycles = MAX_REMAIN;
 
     protected static int killerKilled = 0;
     protected static int borderKilled = 0;
     protected static int starveKilled = 0;
 
-    public UpdThread() {
+
+    private static final double KILLER_SMITE_CHANCE = 0.07;
+
+
+    protected static double getAngle(float x1, float y1, float x2, float y2) {
+        y1 = Game.HEIGHT_OF_FIELD - y1;
+        y2 = Game.HEIGHT_OF_FIELD - y2;
+
+        double x = x2 - x1;
+        double y = y2 - y1;
+        double xDiff = Math.abs(x);
+        double yDiff = Math.abs(y);
+        int sqr;
+        double degreeToAdd;
+        if (x < 0 && y > 0) {
+            sqr = 2;
+            degreeToAdd = Math.PI / 2;
+        } else if (x < 0 && y < 0) {
+            sqr = 3;
+            degreeToAdd = Math.PI;
+        } else if (x > 0 && y < 0) {
+            sqr = 4;
+            degreeToAdd = Math.PI * 3 / 2;
+        } else {
+            sqr = 1;
+            degreeToAdd = 0;
+        }
+        if (sqr == 4 || sqr == 2) {
+            if (yDiff == 0) {
+                return 0;
+            }
+            return (degreeToAdd + Math.atan(xDiff / yDiff));
+        } else {
+            if (xDiff == 0) {
+                return 0;
+            }
+            return (degreeToAdd + Math.atan(yDiff / xDiff));
+        }
     }
 
+    protected static double getDistance(float x1, float y1, float x2, float y2) {
+        y1 = Game.HEIGHT_OF_FIELD - y1;
+        y2 = Game.HEIGHT_OF_FIELD - y2;
+
+        double xDiff = x2 - x1;
+        double yDiff = y2 - y1;
+        double x = Math.abs(xDiff);
+        double y = Math.abs(yDiff);
+        return Math.sqrt(x * x + y * y);
+    }
+
+
+    public static <T extends Agent> int getNearestAgent(float x, float y, ArrayList<T> agents) {
+        double lastDiff = Game.LENGTH_OF_FIELD;
+        int lastID = 0;
+        for (int i = 0; i < agents.size(); i++) {
+            Agent get = agents.get(i);
+            double xDiff = Math.abs(get.getX() - x);
+            double yDiff = Math.abs(get.getY() - y);
+            double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+            if (distance < lastDiff) {
+                lastID = i;
+                lastDiff = distance;
+            }
+        }
+        return lastID;
+    }
+
+    public static <T extends Agent> int getNearestAgent(float x, float y, ArrayList<T> agents, T except) {
+        double lastDiff = Game.LENGTH_OF_FIELD;
+        int lastID = 0;
+        for (int i = 0; i < agents.size(); i++) {
+            Agent get = agents.get(i);
+            if (!get.equals(except)) {
+                double xDiff = Math.abs(get.getX() - x);
+                double yDiff = Math.abs(get.getY() - y);
+                double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+                if (distance < lastDiff) {
+                    lastID = i;
+                    lastDiff = distance;
+                }
+            }
+        }
+        return lastID;
+    }
+
+
+    public static boolean testCollision(float x1, float y1, float x2, float y2, int rad) {
+        return (x1 + rad >= x2) && (x1 - rad <= x2) && (y1 + rad >= y2) && (y1 - rad <= y2);
+    }
+
+    public static int getKillerKilled() {
+        return killerKilled;
+    }
+
+    public static int getBorderKilled() {
+        return borderKilled;
+    }
+
+    public static void incStarveKilled() {
+        starveKilled++;
+    }
+
+    public static int getStarveKilled() {
+        return starveKilled;
+    }
+    private int newTickDuration = Game.TICK_DURATION;
+    private int remainingCycles = MAX_REMAIN;
+    public UpdThread() {
+    }
     @Override
     public void run() {
         for (int i = 0; i < Game.AMOUNT_OF_ROUNDS; i++) {
             simulateRound();
         }
     }
-
     @SuppressWarnings("SleepWhileInLoop")
     private void simulateRound() {
         Game.generation++;
@@ -141,7 +245,6 @@ public final class UpdThread extends Thread {
         }
 
     }
-
     private boolean processPawns() {
         float distSum = 0;
         for (Pawn pawn : Game.pawns) {
@@ -157,7 +260,6 @@ public final class UpdThread extends Thread {
         }
         return distSum >= 1;
     }
-
     private void processKillers() {
         for (int i = 0; i < Game.killers.size(); i++) {
             if (Game.killers.get(i).isInDangerZone()) {
@@ -167,7 +269,6 @@ public final class UpdThread extends Thread {
             }
         }
     }
-
     private void dangerZoneProcess(Pawn p) {
         if (p.isInDangerZone()) {
             p.addPenalty(Pawn.ZONE_PENALTY);
@@ -180,7 +281,6 @@ public final class UpdThread extends Thread {
             }
         }
     }
-
     private void collisionSensor() {
 
         for (Pawn pawn : Game.pawns) {
@@ -226,9 +326,6 @@ public final class UpdThread extends Thread {
             }
         }
     }
-
-    private static final double KILLER_SMITE_CHANCE = 0.07;
-
     private void setRelativeToFood(Pawn p) {
         Agent food = Game.foods.get(getNearestAgent(p.getX(), p.getY(), Game.foods));
         Agent altFood = Game.foods.get(getNearestAgent(p.getX(), p.getY(), Game.foods, food));
@@ -239,54 +336,6 @@ public final class UpdThread extends Thread {
         p.setRltAngleToAltFood(getAngle(p.getX(), p.getY(), altFood.getX(), altFood.getY()));
         p.setDistToAltFood((float) getDistance(p.getX(), p.getY(), altFood.getX(), altFood.getY()));
     }
-
-    protected static double getAngle(float x1, float y1, float x2, float y2) {
-        y1 = Game.HEIGHT_OF_FIELD - y1;
-        y2 = Game.HEIGHT_OF_FIELD - y2;
-
-        double x = x2 - x1;
-        double y = y2 - y1;
-        double xDiff = Math.abs(x);
-        double yDiff = Math.abs(y);
-        int sqr;
-        double degreeToAdd;
-        if (x < 0 && y > 0) {
-            sqr = 2;
-            degreeToAdd = Math.PI / 2;
-        } else if (x < 0 && y < 0) {
-            sqr = 3;
-            degreeToAdd = Math.PI;
-        } else if (x > 0 && y < 0) {
-            sqr = 4;
-            degreeToAdd = Math.PI * 3 / 2;
-        } else {
-            sqr = 1;
-            degreeToAdd = 0;
-        }
-        if (sqr == 4 || sqr == 2) {
-            if (yDiff == 0) {
-                return 0;
-            }
-            return (degreeToAdd + Math.atan(xDiff / yDiff));
-        } else {
-            if (xDiff == 0) {
-                return 0;
-            }
-            return (degreeToAdd + Math.atan(yDiff / xDiff));
-        }
-    }
-
-    protected static double getDistance(float x1, float y1, float x2, float y2) {
-        y1 = Game.HEIGHT_OF_FIELD - y1;
-        y2 = Game.HEIGHT_OF_FIELD - y2;
-
-        double xDiff = x2 - x1;
-        double yDiff = y2 - y1;
-        double x = Math.abs(xDiff);
-        double y = Math.abs(yDiff);
-        return Math.sqrt(x * x + y * y);
-    }
-
     private void setRelativeToEnemy(Pawn p) {
         final Agent killer = Game.killers.get(getNearestAgent(p.getX(), p.getY(), Game.killers));
 
@@ -294,41 +343,6 @@ public final class UpdThread extends Thread {
         //p.setAbsAngleOfEnemy(killer.getAbsAngle());
         p.setDistToEnemy((float) getDistance(p.getX(), p.getY(), killer.getX(), killer.getY()));
     }
-
-    public static <T extends Agent> int getNearestAgent(float x, float y, ArrayList<T> agents) {
-        double lastDiff = Game.LENGTH_OF_FIELD;
-        int lastID = 0;
-        for (int i = 0; i < agents.size(); i++) {
-            Agent get = agents.get(i);
-            double xDiff = Math.abs(get.getX() - x);
-            double yDiff = Math.abs(get.getY() - y);
-            double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-            if (distance < lastDiff) {
-                lastID = i;
-                lastDiff = distance;
-            }
-        }
-        return lastID;
-    }
-
-    public static <T extends Agent> int getNearestAgent(float x, float y, ArrayList<T> agents, T except) {
-        double lastDiff = Game.LENGTH_OF_FIELD;
-        int lastID = 0;
-        for (int i = 0; i < agents.size(); i++) {
-            Agent get = agents.get(i);
-            if (!get.equals(except)) {
-                double xDiff = Math.abs(get.getX() - x);
-                double yDiff = Math.abs(get.getY() - y);
-                double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-                if (distance < lastDiff) {
-                    lastID = i;
-                    lastDiff = distance;
-                }
-            }
-        }
-        return lastID;
-    }
-
     /**
      *
      * @param half If half new speed will be half of current; if false speed doubles
@@ -351,26 +365,6 @@ public final class UpdThread extends Thread {
             }
         }
         return false;
-    }
-
-    public static boolean testCollision(float x1, float y1, float x2, float y2, int rad) {
-        return (x1 + rad >= x2) && (x1 - rad <= x2) && (y1 + rad >= y2) && (y1 - rad <= y2);
-    }
-
-    public static int getKillerKilled() {
-        return killerKilled;
-    }
-
-    public static int getBorderKilled() {
-        return borderKilled;
-    }
-
-    public static void incStarveKilled() {
-        starveKilled++;
-    }
-
-    public static int getStarveKilled() {
-        return starveKilled;
     }
 
 }

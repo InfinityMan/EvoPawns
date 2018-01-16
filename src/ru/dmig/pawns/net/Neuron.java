@@ -29,10 +29,6 @@ public final class Neuron implements Serializable {
 
     //http://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
     private static final long serialVersionUID = 1734654068548880380L;
-    // weights[0] is bias
-    public double[] weights;
-    public double output;
-
     public static double calc(final double[] inputs, final double[] weights) {
         if (inputs.length != weights.length - 1) {
             throw new IllegalArgumentException();
@@ -45,19 +41,6 @@ public final class Neuron implements Serializable {
         //return lineFunc(radius, potential, false);
         return potential;
     }
-
-    public void calc(final Layer prevLayer) {
-        final double[] inps = new double[prevLayer.neurons.length];
-        for (int i = 0; i < inps.length; i++) {
-            inps[i] = prevLayer.neurons[i].output;
-        }
-        calc(inps);
-    }
-
-    public void calc(final double[] inputs) {
-        output = calc(inputs, weights);
-    }
-
     public static double lineFunc(int radius, double value, boolean simmetric) {
         if (radius < 0) {
             throw new IllegalArgumentException();
@@ -92,7 +75,17 @@ public final class Neuron implements Serializable {
             }
         }
     }
-
+    public static double genWeight() {
+        final byte MAX = 10;
+        final byte MIN = -10;
+        
+        final short amountOfPeriods = MAX - MIN;
+        final int periodId = Base.randomNumber(0, amountOfPeriods - 1);
+        return (MIN + periodId + Math.random());
+    }
+    // weights[0] is bias
+    public double[] weights;
+    public double output;
     /**
      *
      * @param inputCount number of inputs not counting treshold
@@ -103,6 +96,19 @@ public final class Neuron implements Serializable {
         weights = new double[inputCount];
         restart(pause);
     }
+
+    public void calc(final Layer prevLayer) {
+        final double[] inps = new double[prevLayer.neurons.length];
+        for (int i = 0; i < inps.length; i++) {
+            inps[i] = prevLayer.neurons[i].output;
+        }
+        calc(inps);
+    }
+
+    public void calc(final double[] inputs) {
+        output = calc(inputs, weights);
+    }
+
 
     /**
      * Restarts the neuron
@@ -132,14 +138,6 @@ public final class Neuron implements Serializable {
         }
     }
 
-    public static double genWeight() {
-        final byte MAX = 10;
-        final byte MIN = -10;
-
-        final short amountOfPeriods = MAX - MIN;
-        final int periodId = Base.randomNumber(0, amountOfPeriods - 1);
-        return (MIN + periodId + Math.random());
-    }
 
     public void tryToMutate() {
         weights[Base.randomNumber(0, weights.length - 1)] = genWeight();

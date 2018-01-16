@@ -36,7 +36,6 @@ public final class ChartPanel extends JFrame {
     public static ArrayList<Double> aFittests = new ArrayList<>();
     public static ArrayList<Double> aAverages = new ArrayList<>();
 
-    public XYChart chart;
     public static ChartPanel cp;
 
     private static final int MIN_LENGTH = 1920;
@@ -44,6 +43,29 @@ public final class ChartPanel extends JFrame {
 
     private static boolean INITED = false;
 
+
+    public static double[] arrayListToArray(ArrayList<Double> doubles) {
+        double[] ret = new double[doubles.size()];
+        for (int i = 0; i < doubles.size(); i++) {
+            ret[i] = doubles.get(i);
+        }
+        return ret;
+    }
+
+    public static void lauch() {
+        java.awt.EventQueue.invokeLater(() -> {
+            new ChartPanel().setVisible(true);
+        });
+    }
+    
+    public static void clear() {
+        fittests = new ArrayList<>();
+        averages = new ArrayList<>();
+        aFittests = new ArrayList<>();
+        aAverages = new ArrayList<>();
+        INITED = true;
+    }
+    public XYChart chart;
     public ChartPanel() {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -65,7 +87,6 @@ public final class ChartPanel extends JFrame {
         cp = this;
 
     }
-
     public void update() {
         ArrayList<Integer> gen = new ArrayList<>();
         for (int i = 1; i < fittests.size() + 1; i++) {
@@ -108,33 +129,10 @@ public final class ChartPanel extends JFrame {
         pack();
         repaint();
     }
-
     public void update(double fit, double avg) {
         fittests.add(fit);
         averages.add(avg);
         update();
-    }
-
-    public static double[] arrayListToArray(ArrayList<Double> doubles) {
-        double[] ret = new double[doubles.size()];
-        for (int i = 0; i < doubles.size(); i++) {
-            ret[i] = doubles.get(i);
-        }
-        return ret;
-    }
-
-    public static void lauch() {
-        java.awt.EventQueue.invokeLater(() -> {
-            new ChartPanel().setVisible(true);
-        });
-    }
-    
-    public static void clear() {
-        fittests = new ArrayList<>();
-        averages = new ArrayList<>();
-        aFittests = new ArrayList<>();
-        aAverages = new ArrayList<>();
-        INITED = true;
     }
 
 }

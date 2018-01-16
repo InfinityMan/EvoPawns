@@ -28,29 +28,25 @@ import ru.epiclib.base.Base;
 public final class Network implements Serializable {
 
     private static final long serialVersionUID = -6200117127679042364L;
+    static double sigma(double x) {
+        //1.0/(1.0+e^(-1.4e*x))
+        return 1.0 / (1.0 + Math.exp(-(1.4 * Math.E * x)));
+    }
+    public static int getSize(int[] layersD) {
+        int size = 0;
+        for (int i = 0; i < layersD.length - 1; i++) {
+            size += (layersD[i] * layersD[i + 1]);
+        }
+        for (int i = 1; i < layersD.length; i++) {
+            size += layersD[i];
+        }
+        return size;
+    }
 
     protected double[] output;
 
     public Layer[] layers;
 
-    static double sigma(double x) {
-        //1.0/(1.0+e^(-1.4e*x))
-        return 1.0 / (1.0 + Math.exp(-(1.4 * Math.E * x)));
-    }
-
-    public int getInputDimension() {
-        if (layers == null || layers.length == 0 || layers[0] == null || layers[0].neurons == null || layers[0].neurons[0] == null || layers[0].neurons[0].weights == null) {
-            return 0;
-        }
-        return layers[0].neurons[0].weights.length - 1;
-    }
-
-    public int getOutputDimension() {
-        if (layers == null || layers.length == 0 || layers[layers.length - 1] == null || layers[layers.length - 1].neurons == null) {
-            return 0;
-        }
-        return layers[layers.length - 1].neurons.length;
-    }
 
     public Network(int[] layersDimensions) {
         this(layersDimensions, true);
@@ -76,6 +72,18 @@ public final class Network implements Serializable {
             gens[i] = genom[i];
         }
         setWeights(Evolution.genomIntoWeights(gens, layers));
+    }
+    public int getInputDimension() {
+        if (layers == null || layers.length == 0 || layers[0] == null || layers[0].neurons == null || layers[0].neurons[0] == null || layers[0].neurons[0].weights == null) {
+            return 0;
+        }
+        return layers[0].neurons[0].weights.length - 1;
+    }
+    public int getOutputDimension() {
+        if (layers == null || layers.length == 0 || layers[layers.length - 1] == null || layers[layers.length - 1].neurons == null) {
+            return 0;
+        }
+        return layers[layers.length - 1].neurons.length;
     }
 
     public double[] calculate(final double[] input) {
@@ -148,16 +156,6 @@ public final class Network implements Serializable {
         return getSize(layersD);
     }
 
-    public static int getSize(int[] layersD) {
-        int size = 0;
-        for (int i = 0; i < layersD.length - 1; i++) {
-            size += (layersD[i] * layersD[i + 1]);
-        }
-        for (int i = 1; i < layersD.length; i++) {
-            size += layersD[i];
-        }
-        return size;
-    }
 
     public int getNeuronAmount() {
         int ret = 0;

@@ -30,9 +30,6 @@ public class Agent {
 
     public static final float MAX_BULLET_SPEED = 60;
 
-    public enum Type {
-        PAWN, BULLET, FOOD
-    };
 
     public Type t = Type.PAWN;
 
@@ -296,6 +293,9 @@ public class Agent {
             return false;
         }
         return true;
+    }
+    public enum Type {
+        PAWN, BULLET, FOOD
     }
 
 }
