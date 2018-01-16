@@ -16,6 +16,7 @@
  */
 package ru.dmig.pawns;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import ru.dmig.pawns.agents.*;
@@ -132,13 +133,14 @@ public final class UpdThread extends Thread {
                 Generator.regenerateKillers(91);
             }
             if (Game.SAVING_ENABLED && Game.generation % 50 == 0) {
-                Game.saveGenoms(Evolution.matrixToArray(Game.allPawns), "gens//gen" + Game.generation + ".gen");
-            }
-        } else {
-            if (Game.KILLER_ENABLED) {
-                Generator.regenerateKillers(23);
+                Game.saveBaseGen();
+            } else {
+                if (Game.KILLER_ENABLED) {
+                    Generator.regenerateKillers(23);
+                }
             }
         }
+
     }
 
     private boolean processPawns() {
@@ -161,7 +163,7 @@ public final class UpdThread extends Thread {
         for (int i = 0; i < Game.killers.size(); i++) {
             if (Game.killers.get(i).isInDangerZone()) {
                 Game.killers.get(i).placeInRandomPosition();
-            } else if(Game.KILLER_MOVING) {
+            } else if (Game.KILLER_MOVING) {
                 Game.killers.get(i).updateCoords(Killer.MAX_SPEED);
             }
         }
@@ -213,7 +215,7 @@ public final class UpdThread extends Thread {
                         Killer killer = it.next();
                         if (testCollision(pawn.getX(), pawn.getY(), killer.getX(), killer.getY(), Panel.PAWN_DIAMETER / 2)) {
                             pawn.attack(Game.KILLER_DAMAGE);
-                            if (Base.chance((int) KILLER_SMITE_CHANCE*100, 0)) {
+                            if (Base.chance((int) KILLER_SMITE_CHANCE * 100, 0)) {
                                 pawn.smite();
                             }
                             if (!pawn.isAlive()) {
@@ -225,7 +227,7 @@ public final class UpdThread extends Thread {
             }
         }
     }
-    
+
     private static double KILLER_SMITE_CHANCE = 0.07;
 
     private void setRelativeToFood(Pawn p) {

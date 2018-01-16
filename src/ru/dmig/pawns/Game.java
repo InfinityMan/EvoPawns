@@ -16,6 +16,7 @@
  */
 package ru.dmig.pawns;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
@@ -316,7 +317,7 @@ public class Game {
     }
 
     public static void restartGame() {
-        saveGenoms(Evolution.matrixToArray(Game.allPawns), "gens\\restGen" + generation + ".gen");
+        saveGen("restGen" + generation + ".gen");
         newRun(false);
     }
 
@@ -336,6 +337,24 @@ public class Game {
         for (int i = 0; i < KILLER_AMOUNT; i++) {
             killers.add(Generator.generateKiller());
         }
+    }
+
+    public static void saveGen(String fileName) {
+        try {
+            Game.saveGenoms(Evolution.matrixToArray(Game.allPawns), "gens" + File.separator + fileName);
+        } catch (RuntimeException ex) {
+            File file = new File("gens");
+            if (!file.exists()) {
+                file.mkdir();
+                Game.saveGen(fileName);
+            } else {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    public static void saveBaseGen() {
+        saveGen("gen" + Game.generation + ".gen");
     }
 
 }
