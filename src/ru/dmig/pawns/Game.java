@@ -131,9 +131,12 @@ public class Game {
 
     public static final String HELP = "Программа представляет собой симулятор развития нейронных сетей с помощью эволюционного алгоритма.\n"
             + "Оранжевый кружок на поле - это пешка, она принимает решения с помощью нейронной сети, получая на вход:\n"
-            + "Свою скорость, свой угл движения, угол к ближайшей еде, угол к ближайшей угрозе, дистанцию до угрозы, свои координаты.\n"
-            + "На выходе, пешка изменяет свою скорость и угол движения.\n"
-            + "Кружочки тёмно-синего цвета - еда.";
+            + "Угол к ближайшей еде, дистанцию до еды, угол к ближайшей угрозе, дистанцию до угрозы, свои \"процентные\" координаты.\n"
+            + "На выходе, пешка изменяет свой угол движения.\n"
+            + "Кружочки тёмно-синего цвета - еда. Красного - убийцы.\n"
+            + "Убийцы имеют лишь линейный алгоритм движения.";
+    
+    public static final String VERSION = "Dev (plus)";
 
     public static void main(String[] args) throws InterruptedException {
         tutorial();
@@ -191,37 +194,10 @@ public class Game {
     }
 
     protected static void tutorial() {
-        int set = JOptionPane.showConfirmDialog(null, "Нужна справка/настройки?", "Настройка", JOptionPane.YES_NO_OPTION);
-        if (set == JOptionPane.YES_OPTION) {
+        if (JOptionPane.showConfirmDialog(null, "Нужна справка?", "Приветствие",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
             JOptionPane.showMessageDialog(null, HELP);
-            int maxSpeed = JOptionPane.showConfirmDialog(null, "Установить максимальную скорость?", "Скорость", JOptionPane.YES_NO_OPTION);
-            if (maxSpeed == JOptionPane.YES_OPTION) {
-                TICK_DURATION = 0;
-            }
-
-            String amountOfPawnsStr = JOptionPane.showInputDialog(null,
-                    "Введите количество пешек для игры [По умолчанию: 16]: ");
-
-            int amountOfPawns;
-
-            if (!amountOfPawnsStr.isEmpty()) {
-                try {
-                    amountOfPawns = Integer.valueOf(amountOfPawnsStr);
-
-                    if (amountOfPawns < 4 || amountOfPawns > 40 || amountOfPawns % 4 != 0) {
-                        throw new NumberFormatException();
-                    }
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "Тут ошибка с введённым количеством пешек. Теперь оно установлено по умолчанию. Ограничения: должно быть больше 3, но меньше 41, при этом обязательно делиться на 4.");
-                    amountOfPawns = AMOUNT_OF_PAWNS;
-                }
-            } else {
-                amountOfPawns = AMOUNT_OF_PAWNS;
-            }
-
-            AMOUNT_OF_PAWNS = amountOfPawns;
         }
-
     }
 
     /**
