@@ -17,6 +17,7 @@
 package ru.dmig.pawns;
 
 import java.io.FileNotFoundException;
+import static java.lang.System.currentTimeMillis;
 import java.util.ArrayList;
 import java.util.Arrays;
 import ru.dmig.pawns.agents.Pawn;
@@ -162,7 +163,7 @@ public final class Evolution {
      * @return Pawns array after crossover and mutation on start pawns
      */
     public static Pawn[] evolution(Pawn[] pawns) {
-        double timeIn = System.currentTimeMillis();
+        double timeIn = currentTimeMillis();
         if (Game.LOADING_ENABLED && Game.generation == Game.GENERATION_FOR_UPDATE) {
             try {
                 System.out.println("Try to load");
@@ -189,19 +190,19 @@ public final class Evolution {
         Arrayer.reverseArray(fitnesses);
         Arrayer.reverseArray(pawns);
 
-        fitTime = System.currentTimeMillis() - timeIn;
-        timeIn = System.currentTimeMillis();
+        fitTime = currentTimeMillis() - timeIn;
+        timeIn = currentTimeMillis();
 
         //Get Parents
         final int[] parents = getParents(fitnesses); //test for %4
 
-        parentsTime = System.currentTimeMillis() - timeIn;
-        timeIn = System.currentTimeMillis();
+        parentsTime = currentTimeMillis() - timeIn;
+        timeIn = currentTimeMillis();
 
         crossover(parents, pawns, newGens);
 
-        crossoverTime = System.currentTimeMillis() - timeIn;
-        timeIn = System.currentTimeMillis();
+        crossoverTime = currentTimeMillis() - timeIn;
+        timeIn = currentTimeMillis();
 
         //Creating new pawns from gens
         for (i = 0; i < pawns.length; i++) {
@@ -211,12 +212,12 @@ public final class Evolution {
                 newPawns[i] = Generator.generatePawn();
             }
         }
-        pawnsTime = System.currentTimeMillis() - timeIn;
-        timeIn = System.currentTimeMillis();
+        pawnsTime = currentTimeMillis() - timeIn;
+        timeIn = currentTimeMillis();
 
         //Mutation
         mutate(newPawns);
-        mutTime = System.currentTimeMillis() - timeIn;
+        mutTime = currentTimeMillis() - timeIn;
 
         for (int j = 0; j < pawns.length; j++) {
             pawns[j] = null;

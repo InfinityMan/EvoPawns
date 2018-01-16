@@ -16,7 +16,6 @@
  */
 package ru.dmig.pawns;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import ru.dmig.pawns.agents.*;
@@ -228,7 +227,7 @@ public final class UpdThread extends Thread {
         }
     }
 
-    private static double KILLER_SMITE_CHANCE = 0.07;
+    private static final double KILLER_SMITE_CHANCE = 0.07;
 
     private void setRelativeToFood(Pawn p) {
         Agent food = Game.foods.get(getNearestAgent(p.getX(), p.getY(), Game.foods));

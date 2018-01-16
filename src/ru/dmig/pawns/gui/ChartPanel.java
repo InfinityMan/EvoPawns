@@ -28,7 +28,7 @@ import ru.epiclib.base.Arrayer;
  *
  * @author Dmig
  */
-public class ChartPanel extends JFrame {
+public final class ChartPanel extends JFrame {
 
     public static ArrayList<Double> fittests = new ArrayList<>();
     public static ArrayList<Double> averages = new ArrayList<>();

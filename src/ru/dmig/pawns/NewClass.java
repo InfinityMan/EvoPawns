@@ -27,4 +27,5 @@ public class NewClass {
     public static void main(String[] args) throws InterruptedException {
         System.out.println(Angler.roulToRad(0.4));
     }
+    
 }
