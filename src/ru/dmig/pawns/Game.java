@@ -135,7 +135,7 @@ public class Game {
             + "На выходе, пешка изменяет свой угол движения.\n"
             + "Кружочки тёмно-синего цвета - еда. Красного - убийцы.\n"
             + "Убийцы имеют лишь линейный алгоритм движения.";
-    
+
     public static final String VERSION = "Dev (plus)";
 
     public static void main(String[] args) throws InterruptedException {

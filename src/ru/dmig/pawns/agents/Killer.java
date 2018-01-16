@@ -18,6 +18,7 @@ package ru.dmig.pawns.agents;
 
 /**
  * Unit for killing pawns
+ *
  * @author Dmig
  */
 public class Killer extends Agent {
@@ -29,7 +30,7 @@ public class Killer extends Agent {
     public Killer(float x, float y) {
         super(x, y);
     }
-    
+
     public Killer() {
         super();
     }
@@ -37,10 +38,10 @@ public class Killer extends Agent {
     public Killer(double speed, double absAngle, double mass) {
         super(speed, absAngle, mass);
     }
-    
+
     public void calculate() {
         setAbsAngle(getRltAngleToPawn());
-        
+
         double mov = getSpeed() * MAX_SPEED;
         double angle = getAbsAngle();
         float xMov = (float) (Math.cos(angle) * mov);

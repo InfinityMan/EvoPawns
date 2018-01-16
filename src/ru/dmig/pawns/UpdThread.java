@@ -30,7 +30,6 @@ import ru.epiclib.base.Base;
  */
 public final class UpdThread extends Thread {
 
-
     public static final boolean TIME_PRINT = false;
     public static final int CYCLE_AMOUNT_BEFORE_TICK_TEST = 20;
 
@@ -40,9 +39,7 @@ public final class UpdThread extends Thread {
     protected static int borderKilled = 0;
     protected static int starveKilled = 0;
 
-
     private static final double KILLER_SMITE_CHANCE = 0.07;
-
 
     protected static double getAngle(float x1, float y1, float x2, float y2) {
         y1 = Game.HEIGHT_OF_FIELD - y1;
@@ -91,7 +88,6 @@ public final class UpdThread extends Thread {
         return Math.sqrt(x * x + y * y);
     }
 
-
     public static <T extends Agent> int getNearestAgent(float x, float y, ArrayList<T> agents) {
         double lastDiff = Game.LENGTH_OF_FIELD;
         int lastID = 0;
@@ -126,7 +122,6 @@ public final class UpdThread extends Thread {
         return lastID;
     }
 
-
     public static boolean testCollision(float x1, float y1, float x2, float y2, int rad) {
         return (x1 + rad >= x2) && (x1 - rad <= x2) && (y1 + rad >= y2) && (y1 - rad <= y2);
     }
@@ -148,14 +143,17 @@ public final class UpdThread extends Thread {
     }
     private int newTickDuration = Game.TICK_DURATION;
     private int remainingCycles = MAX_REMAIN;
+
     public UpdThread() {
     }
+
     @Override
     public void run() {
         for (int i = 0; i < Game.AMOUNT_OF_ROUNDS; i++) {
             simulateRound();
         }
     }
+
     @SuppressWarnings("SleepWhileInLoop")
     private void simulateRound() {
         Game.generation++;
@@ -245,6 +243,7 @@ public final class UpdThread extends Thread {
         }
 
     }
+
     private boolean processPawns() {
         float distSum = 0;
         for (Pawn pawn : Game.pawns) {
@@ -260,6 +259,7 @@ public final class UpdThread extends Thread {
         }
         return distSum >= 1;
     }
+
     private void processKillers() {
         for (int i = 0; i < Game.killers.size(); i++) {
             if (Game.killers.get(i).isInDangerZone()) {
@@ -269,6 +269,7 @@ public final class UpdThread extends Thread {
             }
         }
     }
+
     private void dangerZoneProcess(Pawn p) {
         if (p.isInDangerZone()) {
             p.addPenalty(Pawn.ZONE_PENALTY);
@@ -281,6 +282,7 @@ public final class UpdThread extends Thread {
             }
         }
     }
+
     private void collisionSensor() {
 
         for (Pawn pawn : Game.pawns) {
@@ -326,6 +328,7 @@ public final class UpdThread extends Thread {
             }
         }
     }
+
     private void setRelativeToFood(Pawn p) {
         Agent food = Game.foods.get(getNearestAgent(p.getX(), p.getY(), Game.foods));
         Agent altFood = Game.foods.get(getNearestAgent(p.getX(), p.getY(), Game.foods, food));
@@ -336,6 +339,7 @@ public final class UpdThread extends Thread {
         p.setRltAngleToAltFood(getAngle(p.getX(), p.getY(), altFood.getX(), altFood.getY()));
         p.setDistToAltFood((float) getDistance(p.getX(), p.getY(), altFood.getX(), altFood.getY()));
     }
+
     private void setRelativeToEnemy(Pawn p) {
         final Agent killer = Game.killers.get(getNearestAgent(p.getX(), p.getY(), Game.killers));
 
@@ -343,6 +347,7 @@ public final class UpdThread extends Thread {
         //p.setAbsAngleOfEnemy(killer.getAbsAngle());
         p.setDistToEnemy((float) getDistance(p.getX(), p.getY(), killer.getX(), killer.getY()));
     }
+
     /**
      *
      * @param half If half new speed will be half of current; if false speed doubles

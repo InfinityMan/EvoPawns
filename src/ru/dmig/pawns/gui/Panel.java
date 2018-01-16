@@ -50,15 +50,15 @@ public class Panel extends JPanel {
     public void paint(Graphics g) {
         Graphics2D gr = (Graphics2D) g;
         gr.setBackground(MY_WHITE);
-        
+
         if (DRAW_HUNDRED) {
             gr.setColor(Color.GRAY);
             gr.drawLine(10, 10, 200, 100);
         }
-        
+
         gr.setColor(Color.PINK);
         drawDangerZone(gr);
-        
+
         drawAllFood(gr);
         drawAllPawns(gr);
 
@@ -75,7 +75,6 @@ public class Panel extends JPanel {
             gr.drawLine(x, y, (int) Math.round(x + Math.cos(bullet.getAbsAngle()) * BULLET_DIAMETER),
                     (int) Math.round(y + Math.sin(bullet.getAbsAngle()) * BULLET_DIAMETER));
         });
-
 
     }
 

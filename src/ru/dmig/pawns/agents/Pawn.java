@@ -215,7 +215,6 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         }
     }
 
-
     /**
      * Calculate fitness of this pawn
      *
@@ -238,7 +237,6 @@ public final class Pawn extends Agent implements Comparable<Pawn> {
         }
         return total;
     }
-
 
     public void printFitness(double dist, double food, double penalty, double mass, double total) {
         String fit = "Dist: " + Base.maximumFractionDigits(2, dist) + ", "
