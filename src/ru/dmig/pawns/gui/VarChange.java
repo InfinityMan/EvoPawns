@@ -19,6 +19,7 @@ package ru.dmig.pawns.gui;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JOptionPane;
+import ru.dmig.pawns.Evolution;
 import ru.dmig.pawns.Game;
 
 /**
@@ -29,7 +30,7 @@ import ru.dmig.pawns.Game;
 public final class VarChange extends javax.swing.JFrame {
 
     public static enum ValueType {
-        PAWN, TURN, CYCLE, FOOD, KILLER, MASS
+        PAWN, TURN, CYCLE, FOOD, KILLER, MASS, MUTATE
     };
 
     public static void init() {
@@ -68,9 +69,12 @@ public final class VarChange extends javax.swing.JFrame {
         killerP = new javax.swing.JPanel();
         killerAL = new javax.swing.JLabel();
         killerAC = new javax.swing.JButton();
-        killerP1 = new javax.swing.JPanel();
+        massP = new javax.swing.JPanel();
         massAL = new javax.swing.JLabel();
         massAC = new javax.swing.JButton();
+        mutateP = new javax.swing.JPanel();
+        mutateAL = new javax.swing.JLabel();
+        mutateAC = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Globals");
@@ -237,21 +241,51 @@ public final class VarChange extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout killerP1Layout = new javax.swing.GroupLayout(killerP1);
-        killerP1.setLayout(killerP1Layout);
-        killerP1Layout.setHorizontalGroup(
-            killerP1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(killerP1Layout.createSequentialGroup()
+        javax.swing.GroupLayout massPLayout = new javax.swing.GroupLayout(massP);
+        massP.setLayout(massPLayout);
+        massPLayout.setHorizontalGroup(
+            massPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(massPLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(massAL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(massAC)
                 .addContainerGap())
         );
-        killerP1Layout.setVerticalGroup(
-            killerP1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        massPLayout.setVerticalGroup(
+            massPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(massAL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(massAC, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+        );
+
+        mutateAL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        mutateAL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        mutateAL.setText("Mutate rate: 00");
+        mutateAL.setToolTipText("");
+
+        mutateAC.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        mutateAC.setText("Change");
+        mutateAC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mutateACActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout mutatePLayout = new javax.swing.GroupLayout(mutateP);
+        mutateP.setLayout(mutatePLayout);
+        mutatePLayout.setHorizontalGroup(
+            mutatePLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(mutatePLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(mutateAL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(mutateAC)
+                .addContainerGap())
+        );
+        mutatePLayout.setVerticalGroup(
+            mutatePLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(mutateAL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(mutateAC, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -263,7 +297,8 @@ public final class VarChange extends javax.swing.JFrame {
             .addComponent(cycleP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(foodP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(killerP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(killerP1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(massP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(mutateP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -279,7 +314,9 @@ public final class VarChange extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(killerP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(killerP1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(massP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(mutateP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -309,6 +346,10 @@ public final class VarChange extends javax.swing.JFrame {
     private void massACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_massACActionPerformed
         Game.MASS_MOVE_TAX = getUserValue(ValueType.MASS);
     }//GEN-LAST:event_massACActionPerformed
+
+    private void mutateACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mutateACActionPerformed
+        Evolution.MUTATION_RATE = (int) getUserValue(ValueType.MUTATE);
+    }//GEN-LAST:event_mutateACActionPerformed
 
     private static void setNewPawnsAmounts() {
         if (ignorePawnWarning()) {
@@ -345,11 +386,16 @@ public final class VarChange extends javax.swing.JFrame {
             case MASS:
                 subject = " mass tax distance";
                 break;
+            case MUTATE:
+                subject = " mutation rate";
+                break;
             default:
                 subject = "";
                 throw new AssertionError();
         }
-        subject += "amount";
+        if (valueType != ValueType.MASS && valueType != ValueType.MUTATE) {
+            subject += "amount";
+        }
         while (true) {
             try {
                 newValue = Game.askUserValue("Enter a new " + subject + ".");
@@ -383,13 +429,19 @@ public final class VarChange extends javax.swing.JFrame {
                             throw new NumberFormatException();
                         }
                     case KILLER:
-                        if (newValue > 0) {
+                        if (newValue >= 0) {
                             return newValue;
                         } else {
                             throw new NumberFormatException();
                         }
                     case MASS:
                         if (newValue > 0) {
+                            return newValue;
+                        } else {
+                            throw new NumberFormatException();
+                        }
+                    case MUTATE:
+                        if (newValue >= 0 && newValue <= 100) {
                             return newValue;
                         } else {
                             throw new NumberFormatException();
@@ -416,16 +468,19 @@ public final class VarChange extends javax.swing.JFrame {
     public void update() {
         updateLabels(Game.AMOUNT_OF_PAWNS, Game.TURN_PAWN_AMOUNT,
                 Game.CYCLE_AMOUNT, Game.FOOD_AMOUNT,
-                Game.KILLER_AMOUNT, Game.MASS_MOVE_TAX);
+                Game.KILLER_AMOUNT, Game.MASS_MOVE_TAX,
+                Evolution.MUTATION_RATE);
     }
 
-    protected void updateLabels(double pawn, double turn, double cycle, double food, double killers, double mass) {
+    protected void updateLabels(double pawn, double turn, double cycle,
+            double food, double killers, double mass, double mutate) {
         pawnAL.setText("Pawn amount: " + pawn);
         turnAL.setText("Turn amount: " + turn);
         cycleAL.setText("Cycle amount: " + (cycle / 1000) + "k");
         foodAL.setText("Food amount: " + food);
         killerAL.setText("Kilr amount: " + killers);
         massAL.setText("Mass tax dist: " + mass);
+        mutateAL.setText("Mutate rate: " + mutate);
     }
 
 
@@ -439,9 +494,12 @@ public final class VarChange extends javax.swing.JFrame {
     private javax.swing.JButton killerAC;
     private javax.swing.JLabel killerAL;
     private javax.swing.JPanel killerP;
-    private javax.swing.JPanel killerP1;
     private javax.swing.JButton massAC;
     private javax.swing.JLabel massAL;
+    private javax.swing.JPanel massP;
+    private javax.swing.JButton mutateAC;
+    private javax.swing.JLabel mutateAL;
+    private javax.swing.JPanel mutateP;
     private javax.swing.JButton pawnAC;
     private javax.swing.JLabel pawnAL;
     private javax.swing.JPanel pawnP;
