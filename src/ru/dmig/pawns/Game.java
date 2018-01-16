@@ -316,7 +316,7 @@ public class Game {
     }
 
     public static void restartGame() {
-        saveGenoms(Evolution.matrixToArray(Game.allPawns), "restGen" + generation + ".gen");
+        saveGenoms(Evolution.matrixToArray(Game.allPawns), "gens\\restGen" + generation + ".gen");
         newRun(false);
     }
 
