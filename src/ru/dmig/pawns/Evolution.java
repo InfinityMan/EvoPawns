@@ -166,7 +166,6 @@ public final class Evolution {
         double timeIn = currentTimeMillis();
         if (Game.LOADING_ENABLED && Game.generation == Game.GENERATION_FOR_UPDATE) {
             try {
-                System.out.println("Try to load");
                 Pawn[] p = Game.loadGenoms("gens//new.gen");
                 if(p.length == Game.AMOUNT_OF_PAWNS) {
                     return p;
