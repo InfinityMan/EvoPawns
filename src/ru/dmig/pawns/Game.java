@@ -137,6 +137,15 @@ public class Game {
             + "Кружочки тёмно-синего цвета - еда. Красного - убийцы.\n"
             + "Убийцы имеют лишь линейный алгоритм движения.\n";
     
+    public static final String GRAPH_HELP = "Для просмотра результатов эволюции предусмотрен граф;\n"
+            + "Рекорд за поколение показан на синем графике\n"
+            + "Среднее по поколению - на зелёном\n"
+            + "Среднее рекордов последних 20 поколений - на красном\n"
+            + "Среднее средних последних 20 поколений - на бирюзовом.";
+    
+    public static final String DETAIL_HELP = "Дополнительная инфрмация: \n"
+            + "При сохранении файлы всегда перезаписываются.";
+    
     public static final String VERSION = "Dev 0.4 (shared)";
 
     public static void main(String[] args) throws InterruptedException {
@@ -199,6 +208,8 @@ public class Game {
         if (JOptionPane.showConfirmDialog(null, "Нужна справка?", "Приветствие",
                 JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
             JOptionPane.showMessageDialog(null, HELP);
+            JOptionPane.showMessageDialog(null, GRAPH_HELP);
+            JOptionPane.showMessageDialog(null, DETAIL_HELP);
         }
     }
 
