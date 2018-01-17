@@ -136,9 +136,10 @@ public class Game {
             + "Кружочки тёмно-синего цвета - еда. Красного - убийцы.\n"
             + "Убийцы имеют лишь линейный алгоритм движения.";
 
-    public static final String VERSION = "Dev (plus)";
+    public static final String VERSION = "Dev 0.4 (shared)";
 
     public static void main(String[] args) throws InterruptedException {
+        testDevice();
         tutorial();
         newRun(true);
     }
@@ -200,6 +201,11 @@ public class Game {
         }
     }
 
+    private static void testDevice() {
+        //Test for dir gens
+        testDirectory("gens");
+    }
+
     /**
      * Prints on screen info about pawns successes
      *
@@ -228,6 +234,7 @@ public class Game {
     }
 
     public static void saveGenoms(Pawn[] pawns, String fileName) {
+        testDirectory(fileName);
         double[][] genoms = new double[pawns.length][];
         for (int i = 0; i < genoms.length; i++) {
             genoms[i] = Evolution.getGenomFromNet(pawns[i].network);
@@ -251,6 +258,7 @@ public class Game {
     }
 
     public static Pawn[] loadGenoms(String fileName) throws FileNotFoundException, ParsingException {
+        testDirectory(fileName);
         String[] genoms = FileWorker.read(fileName).split("\n");
         double[][] gens = new double[genoms.length][];
         int len = 0;
@@ -281,6 +289,7 @@ public class Game {
             pawns[i] = Generator.generatePawn();
             pawns[i].network = new Network(gens[i], LAYERS_OF_NET);
         }
+        System.out.println("Successfull load");
         return pawns;
     }
 
@@ -316,21 +325,22 @@ public class Game {
     }
 
     public static void saveGen(String fileName) {
-        try {
-            Game.saveGenoms(Evolution.matrixToArray(Game.allPawns), "gens" + File.separator + fileName);
-        } catch (RuntimeException ex) {
-            File file = new File("gens");
-            if (!file.exists()) {
-                file.mkdir();
-                Game.saveGen(fileName);
-            } else {
-                throw new RuntimeException(ex);
-            }
-        }
+        Game.saveGenoms(Evolution.matrixToArray(Game.allPawns), "gens" + File.separator + fileName);
     }
 
     public static void saveBaseGen() {
         saveGen("gen" + Game.generation + ".gen");
+    }
+
+    /**
+     * Method tests dirName folder exist and create folder with this name if folder doesn't exist
+     * @param dirName dirName to find or/and create
+     */
+    public static void testDirectory(String dirName) {
+        File file = new File(dirName);
+        if (!file.exists()) {
+            file.mkdir();
+        }
     }
 
 }
