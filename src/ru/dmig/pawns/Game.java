@@ -116,6 +116,9 @@ public class Game {
 
     //When you need to eat your mass?
     public static double MASS_MOVE_TAX = 10 + 4;
+    
+    public static double FITNESS_RECORD = 0;
+    public static int GENERATION_RECORD = 0;
 
     public static final boolean KILLER_ENABLED = true;
     public static final boolean KILLER_MOVING = true;
@@ -233,6 +236,11 @@ public class Game {
         }
         double avg = Arrayer.mediumValueOfArray(fitnesses);
         double fit = Arrayer.maxDoubleInArray(fitnesses);
+        
+        if(fit > FITNESS_RECORD) {
+            FITNESS_RECORD = fit;
+            GENERATION_RECORD = generation;
+        }
 
         ChartPanel.cp.update(fit, avg);
 

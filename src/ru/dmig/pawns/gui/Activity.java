@@ -58,6 +58,7 @@ public final class Activity extends javax.swing.JFrame {
         bordKL.setText("Border: " + Base.maximumFractionDigits(0, borderKilled * 100) + " %");
         strvKL.setText("Starve: " + Base.maximumFractionDigits(0, starveKilled * 100) + " %");
         versionL.setText("Version: " + Game.VERSION); //There is no need every upd do it
+        recordL.setText("Record: "+Base.maximumFractionDigits(1,Game.FITNESS_RECORD)+" ("+Game.GENERATION_RECORD+")");
     }
 
     public void setupUpdater() {
@@ -89,6 +90,7 @@ public final class Activity extends javax.swing.JFrame {
         killKL = new javax.swing.JLabel();
         bordKL = new javax.swing.JLabel();
         strvKL = new javax.swing.JLabel();
+        recordL = new javax.swing.JLabel();
         changeG = new javax.swing.JButton();
         versionL = new javax.swing.JLabel();
         saveB = new javax.swing.JButton();
@@ -170,6 +172,10 @@ public final class Activity extends javax.swing.JFrame {
         strvKL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         strvKL.setText("Starve: ");
 
+        recordL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        recordL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        recordL.setText("Record:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -180,6 +186,7 @@ public final class Activity extends javax.swing.JFrame {
             .addComponent(killKL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(bordKL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(strvKL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(recordL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -194,7 +201,9 @@ public final class Activity extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(bordKL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(strvKL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(strvKL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(recordL, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         changeG.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
@@ -206,7 +215,7 @@ public final class Activity extends javax.swing.JFrame {
         });
 
         versionL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        versionL.setForeground(new java.awt.Color(0, 0, 50));
+        versionL.setForeground(new java.awt.Color(0, 0, 60));
         versionL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         versionL.setText("Version: dev-");
 
@@ -250,7 +259,7 @@ public final class Activity extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(speedPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -259,7 +268,7 @@ public final class Activity extends javax.swing.JFrame {
                 .addComponent(saveB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(loadB)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         pack();
@@ -298,6 +307,7 @@ public final class Activity extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel killKL;
     private javax.swing.JButton loadB;
+    private javax.swing.JLabel recordL;
     private javax.swing.JButton saveB;
     private javax.swing.JButton speedMinus;
     private javax.swing.JPanel speedPanel;
