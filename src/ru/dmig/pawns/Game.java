@@ -31,6 +31,7 @@ import ru.dmig.pawns.gui.Panel;
 import ru.dmig.pawns.net.Network;
 import ru.epiclib.base.Arrayer;
 import ru.epiclib.base.FileWorker;
+import ru.epiclib.gui.Util;
 
 /**
  * Class for lauching game; main variables; static functions
@@ -146,9 +147,9 @@ public class Game {
     public static final String DETAIL_HELP = "Дополнительная инфрмация: \n"
             + "При сохранении файлы всегда перезаписываются.";
     
-    public static final String VERSION = "Dev 0.4 (shared)";
+    public static final String VERSION = "Dev 0.4";
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         testDevice();
         tutorial();
         newRun(true);
@@ -213,9 +214,11 @@ public class Game {
         }
     }
 
-    private static void testDevice() {
+    private static void testDevice() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         //Test for dir gens
         testDirectory("gens");
+        //Do nice look
+        Util.setStyle();
     }
 
     /**
