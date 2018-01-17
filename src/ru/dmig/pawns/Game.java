@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import static ru.dmig.pawns.UpdThread.arrayToMatrix;
 import ru.dmig.pawns.agents.Agent;
 import ru.dmig.pawns.agents.Killer;
 import ru.dmig.pawns.agents.Pawn;
@@ -134,8 +135,8 @@ public class Game {
             + "Угол к ближайшей еде, дистанцию до еды, угол к ближайшей угрозе, дистанцию до угрозы, свои \"процентные\" координаты.\n"
             + "На выходе, пешка изменяет свой угол движения.\n"
             + "Кружочки тёмно-синего цвета - еда. Красного - убийцы.\n"
-            + "Убийцы имеют лишь линейный алгоритм движения.";
-
+            + "Убийцы имеют лишь линейный алгоритм движения.\n";
+    
     public static final String VERSION = "Dev 0.4 (shared)";
 
     public static void main(String[] args) throws InterruptedException {
@@ -151,7 +152,7 @@ public class Game {
                 TURN_PAWN_AMOUNT = 2;
             }
 
-            allPawns = Evolution.arrayToMatrix(Generator.generatePawns(AMOUNT_OF_PAWNS), TURN_PAWN_AMOUNT);
+            allPawns = UpdThread.arrayToMatrix(Generator.generatePawns(AMOUNT_OF_PAWNS), TURN_PAWN_AMOUNT);
             pawns = allPawns[0];
             foods = new ArrayList<>();
             bullets = new ArrayList<>();
@@ -234,7 +235,7 @@ public class Game {
     }
 
     public static void saveGenoms(Pawn[] pawns, String fileName) {
-        testDirectory(fileName);
+        testDirectory("gens");
         double[][] genoms = new double[pawns.length][];
         for (int i = 0; i < genoms.length; i++) {
             genoms[i] = Evolution.getGenomFromNet(pawns[i].network);
@@ -258,7 +259,7 @@ public class Game {
     }
 
     public static Pawn[] loadGenoms(String fileName) throws FileNotFoundException, ParsingException {
-        testDirectory(fileName);
+        testDirectory("gens");
         String[] genoms = FileWorker.read(fileName).split("\n");
         double[][] gens = new double[genoms.length][];
         int len = 0;
@@ -289,8 +290,26 @@ public class Game {
             pawns[i] = Generator.generatePawn();
             pawns[i].network = new Network(gens[i], LAYERS_OF_NET);
         }
-        System.out.println("Successfull load");
         return pawns;
+    }
+
+    public static Pawn[] mainGenomLoad() throws FileNotFoundException, ParsingException {
+        return loadGenoms("gens" + File.separator + "new.gen");
+    }
+
+    public static void loadAndPaste() {
+        try {
+            Pawn[] p = mainGenomLoad();
+            if (p.length == Game.AMOUNT_OF_PAWNS) {
+                Game.allPawns = arrayToMatrix(p, Game.TURN_PAWN_AMOUNT);
+                newRun(false);
+            }
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        } catch (ParsingException ex) {
+            showMessage("Fail to load save file; Parsing exception", true);
+            System.out.println(ex.getMessage());
+        }
     }
 
     public static double askUserValue(String message) throws NumberFormatException {
@@ -325,7 +344,7 @@ public class Game {
     }
 
     public static void saveGen(String fileName) {
-        Game.saveGenoms(Evolution.matrixToArray(Game.allPawns), "gens" + File.separator + fileName);
+        Game.saveGenoms(UpdThread.matrixToArray(Game.allPawns), "gens" + File.separator + fileName);
     }
 
     public static void saveBaseGen() {
@@ -334,6 +353,7 @@ public class Game {
 
     /**
      * Method tests dirName folder exist and create folder with this name if folder doesn't exist
+     *
      * @param dirName dirName to find or/and create
      */
     public static void testDirectory(String dirName) {
@@ -341,6 +361,10 @@ public class Game {
         if (!file.exists()) {
             file.mkdir();
         }
+    }
+    
+    public static void showMessage(String message, boolean error) {
+        JOptionPane.showMessageDialog(null, message, "Message", error ? JOptionPane.ERROR_MESSAGE : JOptionPane.INFORMATION_MESSAGE);
     }
 
 }

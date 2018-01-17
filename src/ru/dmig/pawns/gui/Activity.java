@@ -91,6 +91,8 @@ public final class Activity extends javax.swing.JFrame {
         strvKL = new javax.swing.JLabel();
         changeG = new javax.swing.JButton();
         versionL = new javax.swing.JLabel();
+        saveB = new javax.swing.JButton();
+        loadB = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Activity");
@@ -208,6 +210,22 @@ public final class Activity extends javax.swing.JFrame {
         versionL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         versionL.setText("Version: dev-");
 
+        saveB.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        saveB.setText("Save");
+        saveB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveBActionPerformed(evt);
+            }
+        });
+
+        loadB.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        loadB.setText("Load");
+        loadB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadBActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -219,7 +237,9 @@ public final class Activity extends javax.swing.JFrame {
                     .addComponent(jSeparator1)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(changeG, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(versionL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(versionL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(saveB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(loadB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -235,6 +255,10 @@ public final class Activity extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(changeG)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(saveB)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(loadB)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -255,6 +279,14 @@ public final class Activity extends javax.swing.JFrame {
         VarChange.init();
     }//GEN-LAST:event_changeGActionPerformed
 
+    private void loadBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadBActionPerformed
+        Game.loadAndPaste();
+    }//GEN-LAST:event_loadBActionPerformed
+
+    private void saveBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveBActionPerformed
+        Game.saveBaseGen();
+    }//GEN-LAST:event_saveBActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel avgL;
     private javax.swing.JLabel bordKL;
@@ -265,6 +297,8 @@ public final class Activity extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel killKL;
+    private javax.swing.JButton loadB;
+    private javax.swing.JButton saveB;
     private javax.swing.JButton speedMinus;
     private javax.swing.JPanel speedPanel;
     private javax.swing.JButton speedPlus;

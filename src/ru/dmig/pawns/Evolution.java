@@ -58,16 +58,6 @@ public final class Evolution {
         return weightsIntoGenom(net.getWeights());
     }
 
-    public static Pawn[][] arrayToMatrix(Pawn[] array, int period) {
-        Pawn[][] ret = new Pawn[array.length / period][period];
-        for (int i = 0; i < array.length; i++) {
-            //if (i % period == 0 && i != 0) {
-            ret[i / period][i % period] = array[i];
-            //}
-        }
-        return ret;
-    }
-
     /**
      * Calculate indexes of fittest pawns in given array
      *
@@ -164,17 +154,6 @@ public final class Evolution {
      */
     public static Pawn[] evolution(Pawn[] pawns) {
         double timeIn = currentTimeMillis();
-        if (Game.LOADING_ENABLED && Game.generation == Game.GENERATION_FOR_UPDATE) {
-            try {
-                Pawn[] p = Game.loadGenoms("gens//new.gen");
-                if(p.length == Game.AMOUNT_OF_PAWNS) {
-                    return p;
-                }
-            } catch (FileNotFoundException ex) {
-            } catch (ParsingException ex) {
-                ex.printStackTrace();
-            }
-        }
         int i;
         double[][] newGens = new double[pawns.length][];
         Pawn[] newPawns = new Pawn[pawns.length];
@@ -239,30 +218,6 @@ public final class Evolution {
             newGens[idx] = EvoAlg.crossover(genomA, genomB);
             idx++;
         }
-    }
-
-    public static Pawn[] getPawnArray(Pawn[][] matrix) {
-        return matrixToArray(matrix);
-    }
-
-    public static Pawn[] matrixToArray(Pawn[][] matrix) {
-        if (matrix == null) {
-            throw new IllegalArgumentException("Matrix is null");
-        }
-        if (matrix.length == 0) {
-            throw new IllegalArgumentException("Matrix have size 0");
-        }
-        if (matrix[0].length == 0) {
-            throw new IllegalArgumentException("Matrix element 0 have size 0");
-        }
-        Pawn[] ret = new Pawn[matrix.length * matrix[0].length];
-        int len = matrix[0].length;
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < len; j++) {
-                ret[i * len + j] = matrix[i][j];
-            }
-        }
-        return ret;
     }
 
 }

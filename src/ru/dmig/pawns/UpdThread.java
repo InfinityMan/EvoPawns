@@ -16,6 +16,7 @@
  */
 package ru.dmig.pawns;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import ru.dmig.pawns.agents.*;
@@ -141,6 +142,40 @@ public final class UpdThread extends Thread {
     public static int getStarveKilled() {
         return starveKilled;
     }
+
+    public static Pawn[] getPawnArray(Pawn[][] matrix) {
+        return matrixToArray(matrix);
+    }
+
+    public static Pawn[] matrixToArray(Pawn[][] matrix) {
+        if (matrix == null) {
+            throw new IllegalArgumentException("Matrix is null");
+        }
+        if (matrix.length == 0) {
+            throw new IllegalArgumentException("Matrix have size 0");
+        }
+        if (matrix[0].length == 0) {
+            throw new IllegalArgumentException("Matrix element 0 have size 0");
+        }
+        Pawn[] ret = new Pawn[matrix.length * matrix[0].length];
+        int len = matrix[0].length;
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < len; j++) {
+                ret[i * len + j] = matrix[i][j];
+            }
+        }
+        return ret;
+    }
+
+    public static Pawn[][] arrayToMatrix(Pawn[] array, int period) {
+        Pawn[][] ret = new Pawn[array.length / period][period];
+        for (int i = 0; i < array.length; i++) {
+            //if (i % period == 0 && i != 0) {
+            ret[i / period][i % period] = array[i];
+            //}
+        }
+        return ret;
+    }
     private int newTickDuration = Game.TICK_DURATION;
     private int remainingCycles = MAX_REMAIN;
 
@@ -221,7 +256,7 @@ public final class UpdThread extends Thread {
         starveKilled = 0;
 
         timeIn = System.currentTimeMillis();
-        Game.allPawns = Evolution.arrayToMatrix(Evolution.evolution(Evolution.getPawnArray(Game.allPawns)), Game.TURN_PAWN_AMOUNT);
+        Game.allPawns = arrayToMatrix(Evolution.evolution(getPawnArray(Game.allPawns)), Game.TURN_PAWN_AMOUNT);
         if (TIME_PRINT) {
             System.out.println(System.currentTimeMillis() - timeIn);
         }
