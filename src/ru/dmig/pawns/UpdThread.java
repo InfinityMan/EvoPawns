@@ -40,6 +40,8 @@ public final class UpdThread extends Thread {
     protected static int borderKilled = 0;
     protected static int starveKilled = 0;
 
+    private boolean stopped = false;
+
     private static final double KILLER_SMITE_CHANCE = 0.07;
 
     protected static double getAngle(float x1, float y1, float x2, float y2) {
@@ -184,99 +186,125 @@ public final class UpdThread extends Thread {
 
     @Override
     public void run() {
-        for (int i = 0; i < Game.AMOUNT_OF_ROUNDS; i++) {
-            simulateRound();
+        if (!stopped) {
+            for (int i = 0; i < Game.AMOUNT_OF_ROUNDS; i++) {
+                simulateGeneration();
+                if (stopped) {
+                    break;
+                }
+            }
         }
+    }
+    
+    public void normalStop() {
+        stopped = true;
     }
 
     @SuppressWarnings("SleepWhileInLoop")
-    private void simulateRound() {
+    private void simulateGeneration() {
         Game.generation++;
-        int tick = Game.TICK_DURATION;
-        int cyc = 0;
 
         double timeIn = System.currentTimeMillis();
 
         if (TIME_PRINT) {
             System.out.print("Cycles: ");
         }
+
         for (int i = 0; i < (Game.AMOUNT_OF_PAWNS / Game.TURN_PAWN_AMOUNT); i++) {
             Game.pawns = Game.allPawns[i];
 
-            //Do tick
-            boolean isTickZero = (tick == 0);
-            for (cyc = 0; cyc < Game.CYCLE_AMOUNT; cyc++) {
-                //Changing global speed in Cycling
-                if (cyc % CYCLE_AMOUNT_BEFORE_TICK_TEST == 0) {
-                    if (newTickDuration != tick) {
-                        tick = newTickDuration;
-                        Game.TICK_DURATION = newTickDuration;
-                    }
-
-                    isTickZero = (tick == 0);
-                }
-
-                if (cyc == Game.CYCLE_AMOUNT / 2) {
-                    Generator.regenerateFood(24);
-                }
-
-                if (!processPawns()) {
-                    break;
-                }
-                if (Game.KILLER_ENABLED) {
-                    processKillers();
-                }
-
-                collisionSensor();
-                if (remainingCycles == 0) {
-                    break;
-                }
-
-                if (!isTickZero) {
-                    try {
-                        Thread.sleep(tick);
-                    } catch (InterruptedException ex) {
-                        Game.exception();
-                    }
-                }
-                Frame.frame.update();
+            simulateRound();
+            if (stopped) {
+                break;
             }
+        }
+        if (!stopped) {
             if (TIME_PRINT) {
-                System.out.print(cyc + " ");
+                System.out.print("\nSIM: " + (System.currentTimeMillis() - timeIn) + "\nEVO: ");
             }
-            Generator.regenerateFood(75);
-        }
-        if (TIME_PRINT) {
-            System.out.print("\nSIM: " + (System.currentTimeMillis() - timeIn) + "\nEVO: ");
-        }
 
-        Game.viewStats(Game.pawns);
-        killerKilled = 0;
-        borderKilled = 0;
-        starveKilled = 0;
+            Game.viewStats(Game.pawns);
+            killerKilled = 0;
+            borderKilled = 0;
+            starveKilled = 0;
 
-        timeIn = System.currentTimeMillis();
-        Game.allPawns = arrayToMatrix(Evolution.evolution(getPawnArray(Game.allPawns)), Game.TURN_PAWN_AMOUNT);
-        if (TIME_PRINT) {
-            System.out.println(System.currentTimeMillis() - timeIn);
-        }
+            timeIn = System.currentTimeMillis();
 
-        System.gc();
+            Game.allPawns = arrayToMatrix(Evolution.evolution(getPawnArray(Game.allPawns)), Game.TURN_PAWN_AMOUNT);
 
-        Generator.regenerateFood(100);
-        if (Game.generation % 5 == 0) {
-            if (Game.KILLER_ENABLED) {
-                Generator.regenerateKillers(91);
+            if (TIME_PRINT) {
+                System.out.println(System.currentTimeMillis() - timeIn);
             }
-            if (Game.SAVING_ENABLED && Game.generation % 50 == 0) {
-                Game.saveBaseGen();
-            } else {
+
+            System.gc();
+
+            Generator.regenerateFood(100);
+            if (Game.generation % 5 == 0) {
                 if (Game.KILLER_ENABLED) {
-                    Generator.regenerateKillers(23);
+                    Generator.regenerateKillers(91);
+                }
+                if (Game.SAVING_ENABLED && Game.generation % 50 == 0) {
+                    Game.saveBaseGen();
+                } else {
+                    if (Game.KILLER_ENABLED) {
+                        Generator.regenerateKillers(23);
+                    }
                 }
             }
         }
 
+    }
+
+    private void simulateRound() {
+        int cyc = 0;
+        for (cyc = 0; cyc < Game.CYCLE_AMOUNT; cyc++) {
+            if (simulateTick(cyc)) {
+                break;
+            }
+        }
+        if (TIME_PRINT) {
+            System.out.print(cyc + " ");
+        }
+        Generator.regenerateFood(75);
+    }
+
+    private boolean simulateTick(int cyc) {
+        if (stopped) {
+            return true;
+        }
+        int tick = Game.TICK_DURATION;
+        boolean isTickZero = (tick == 0);
+        //Changing global speed in Cycling
+        if (cyc % CYCLE_AMOUNT_BEFORE_TICK_TEST == 0) {
+            if (newTickDuration != tick) {
+                tick = newTickDuration;
+                Game.TICK_DURATION = newTickDuration;
+            }
+
+            isTickZero = (tick == 0);
+        }
+        if (cyc == Game.CYCLE_AMOUNT / 2) {
+            Generator.regenerateFood(24);
+        }
+        if (!processPawns()) {
+            return true;
+        }
+        if (Game.KILLER_ENABLED) {
+            processKillers();
+        }
+        collisionSensor();
+        if (remainingCycles == 0) {
+            return true;
+        }
+        if (!isTickZero) {
+            try {
+                Thread.sleep(tick);
+            } catch (InterruptedException ex) {
+                Game.exception();
+            }
+        }
+        Frame.frame.update();
+        return false;
     }
 
     private boolean processPawns() {

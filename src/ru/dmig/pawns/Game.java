@@ -116,7 +116,7 @@ public class Game {
 
     //When you need to eat your mass?
     public static double MASS_MOVE_TAX = 10 + 4;
-    
+
     public static double FITNESS_RECORD = 0;
     public static int GENERATION_RECORD = 0;
 
@@ -140,32 +140,34 @@ public class Game {
             + "На выходе, пешка изменяет свой угол движения.\n"
             + "Кружочки тёмно-синего цвета - еда. Красного - убийцы.\n"
             + "Убийцы имеют лишь линейный алгоритм движения.\n";
-    
+
     public static final String GRAPH_HELP = "Для просмотра результатов эволюции предусмотрен граф;\n"
             + "Рекорд за поколение показан на синем графике\n"
             + "Среднее по поколению - на зелёном\n"
             + "Среднее рекордов последних 20 поколений - на красном\n"
             + "Среднее средних последних 20 поколений - на бирюзовом.";
-    
+
     public static final String DETAIL_HELP = "Дополнительная инфрмация: \n"
             + "При сохранении файлы всегда перезаписываются.";
-    
-    public static final String VERSION = "Dev 0.4";
+
+    public static final String VERSION = "Dev 0.4.1";
 
     public static void main(String[] args) throws InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         testDevice();
         tutorial();
-        newRun(true);
+        newRun(true, true);
     }
 
-    public static void newRun(boolean launchGUI) {
+    public static void newRun(boolean launchGUI, boolean genNewPawns) {
         try {
             if (MINI) {
                 AMOUNT_OF_PAWNS = 2;
                 TURN_PAWN_AMOUNT = 2;
             }
 
-            allPawns = UpdThread.arrayToMatrix(Generator.generatePawns(AMOUNT_OF_PAWNS), TURN_PAWN_AMOUNT);
+            if (genNewPawns) {
+                allPawns = UpdThread.arrayToMatrix(Generator.generatePawns(AMOUNT_OF_PAWNS), TURN_PAWN_AMOUNT);
+            }
             pawns = allPawns[0];
             foods = new ArrayList<>();
             bullets = new ArrayList<>();
@@ -201,6 +203,7 @@ public class Game {
 
             Thread.sleep(800);
 
+            if(upThread != null) upThread.normalStop();
             upThread = new UpdThread();
             upThread.start();
         } catch (InterruptedException ex) {
@@ -236,8 +239,8 @@ public class Game {
         }
         double avg = Arrayer.mediumValueOfArray(fitnesses);
         double fit = Arrayer.maxDoubleInArray(fitnesses);
-        
-        if(fit > FITNESS_RECORD) {
+
+        if (fit > FITNESS_RECORD) {
             FITNESS_RECORD = fit;
             GENERATION_RECORD = generation;
         }
@@ -324,7 +327,7 @@ public class Game {
             Pawn[] p = mainGenomLoad();
             if (p.length == Game.AMOUNT_OF_PAWNS) {
                 Game.allPawns = arrayToMatrix(p, Game.TURN_PAWN_AMOUNT);
-                newRun(false);
+                newRun(false, false);
             }
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
@@ -344,7 +347,7 @@ public class Game {
 
     public static void restartGame() {
         saveGen("restGen" + generation + ".gen");
-        newRun(false);
+        newRun(false, true);
     }
 
     public static void setFoodAmount(int fa) {
@@ -384,7 +387,7 @@ public class Game {
             file.mkdir();
         }
     }
-    
+
     public static void showMessage(String message, boolean error) {
         JOptionPane.showMessageDialog(null, message, "Message", error ? JOptionPane.ERROR_MESSAGE : JOptionPane.INFORMATION_MESSAGE);
     }
