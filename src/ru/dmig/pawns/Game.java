@@ -95,6 +95,8 @@ public class Game {
 
     public static int CYCLE_AMOUNT = 21000;
 
+    public static int CEIL_CYCLE_AMOUNT = 100000;
+
     /**
      * Amount of rounds (generations) to play.
      */
@@ -126,6 +128,7 @@ public class Game {
     public static final boolean LOADING_ENABLED = true;
     public static final boolean DEBUG = false;
     public static final boolean MINI = false;
+    public static final boolean RAISE_CYCLE_AMOUNT = true;
 
     /**
      * Generation index, when <code>new.gen</code> loads.
@@ -201,9 +204,11 @@ public class Game {
             UpdThread.borderKilled = 0;
             UpdThread.starveKilled = 0;
 
-            Thread.sleep(800);
+            Thread.sleep(600);
 
-            if(upThread != null) upThread.normalStop();
+            if (upThread != null) {
+                upThread.normalStop();
+            }
             upThread = new UpdThread();
             upThread.start();
         } catch (InterruptedException ex) {
@@ -390,6 +395,14 @@ public class Game {
 
     public static void showMessage(String message, boolean error) {
         JOptionPane.showMessageDialog(null, message, "Message", error ? JOptionPane.ERROR_MESSAGE : JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static void raiseCycleAmount() {
+        if (RAISE_CYCLE_AMOUNT) {
+            if (CYCLE_AMOUNT < CEIL_CYCLE_AMOUNT) {
+                CYCLE_AMOUNT += 1000;
+            }
+        }
     }
 
 }

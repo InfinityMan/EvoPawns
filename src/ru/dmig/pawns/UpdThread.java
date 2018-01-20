@@ -31,7 +31,7 @@ import ru.epiclib.base.Base;
  */
 public final class UpdThread extends Thread {
 
-    public static final boolean TIME_PRINT = false;
+    public static final boolean TIME_PRINT = true;
     public static final int CYCLE_AMOUNT_BEFORE_TICK_TEST = 20;
 
     private static final int MAX_REMAIN = 1000;
@@ -265,6 +265,7 @@ public final class UpdThread extends Thread {
         if (TIME_PRINT) {
             System.out.print(cyc + " ");
         }
+        if(cyc == Game.CYCLE_AMOUNT) Game.raiseCycleAmount();
         Generator.regenerateFood(75);
     }
 
