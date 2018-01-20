@@ -32,11 +32,12 @@ public final class PawnChange extends javax.swing.JFrame {
      */
     public PawnChange() {
         initComponents();
+        setupValues();
     }
 
     public static void init() {
         java.awt.EventQueue.invokeLater(() -> {
-            new VarChange().setVisible(true);
+            new PawnChange().setVisible(true);
         });
     }
 
