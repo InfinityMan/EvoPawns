@@ -30,7 +30,7 @@ import ru.dmig.pawns.Game;
 public final class VarChange extends javax.swing.JFrame {
 
     public static enum ValueType {
-        PAWN, TURN, CYCLE, FOOD, KILLER, MASS, MUTATE
+        CYCLE, FOOD, KILLER, MASS, MUTATE
     };
 
     public static void init() {
@@ -54,12 +54,6 @@ public final class VarChange extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pawnP = new javax.swing.JPanel();
-        pawnAL = new javax.swing.JLabel();
-        pawnAC = new javax.swing.JButton();
-        turnP = new javax.swing.JPanel();
-        turnAL = new javax.swing.JLabel();
-        turnAC = new javax.swing.JButton();
         cycleP = new javax.swing.JPanel();
         cycleAL = new javax.swing.JLabel();
         cycleAC = new javax.swing.JButton();
@@ -75,70 +69,13 @@ public final class VarChange extends javax.swing.JFrame {
         mutateP = new javax.swing.JPanel();
         mutateAL = new javax.swing.JLabel();
         mutateAC = new javax.swing.JButton();
+        pawnConfigB = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Globals");
         setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         setName("globals"); // NOI18N
         setResizable(false);
-
-        pawnAL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        pawnAL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        pawnAL.setText("Pawn amount: 000");
-
-        pawnAC.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        pawnAC.setText("Change");
-        pawnAC.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                pawnACActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pawnPLayout = new javax.swing.GroupLayout(pawnP);
-        pawnP.setLayout(pawnPLayout);
-        pawnPLayout.setHorizontalGroup(
-            pawnPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pawnPLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pawnAL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pawnAC)
-                .addContainerGap())
-        );
-        pawnPLayout.setVerticalGroup(
-            pawnPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pawnAL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(pawnAC, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-        );
-
-        turnAL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        turnAL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        turnAL.setText("Turn amount: 000");
-
-        turnAC.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        turnAC.setText("Change");
-        turnAC.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                turnACActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout turnPLayout = new javax.swing.GroupLayout(turnP);
-        turnP.setLayout(turnPLayout);
-        turnPLayout.setHorizontalGroup(
-            turnPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(turnPLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(turnAL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(turnAC)
-                .addContainerGap())
-        );
-        turnPLayout.setVerticalGroup(
-            turnPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(turnAL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(turnAC, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-        );
 
         cycleAL.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cycleAL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -158,7 +95,7 @@ public final class VarChange extends javax.swing.JFrame {
             cyclePLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(cyclePLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(cycleAL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(cycleAL, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(cycleAC)
                 .addContainerGap())
@@ -288,26 +225,34 @@ public final class VarChange extends javax.swing.JFrame {
             .addComponent(mutateAC, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
         );
 
+        pawnConfigB.setFont(new java.awt.Font("Verdana", 0, 14)); // NOI18N
+        pawnConfigB.setText("Change pawn config");
+        pawnConfigB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pawnConfigBActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pawnP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(turnP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(cycleP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(foodP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(killerP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(massP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(mutateP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pawnConfigB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pawnP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(turnP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pawnConfigB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(cycleP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(foodP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -322,14 +267,6 @@ public final class VarChange extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void pawnACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pawnACActionPerformed
-        setNewPawnsAmounts();
-    }//GEN-LAST:event_pawnACActionPerformed
-
-    private void turnACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_turnACActionPerformed
-        setNewPawnsAmounts();
-    }//GEN-LAST:event_turnACActionPerformed
 
     private void cycleACActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cycleACActionPerformed
         Game.CYCLE_AMOUNT = (int) getUserValue(ValueType.CYCLE);
@@ -351,13 +288,9 @@ public final class VarChange extends javax.swing.JFrame {
         Evolution.MUTATION_RATE = (int) getUserValue(ValueType.MUTATE);
     }//GEN-LAST:event_mutateACActionPerformed
 
-    private static void setNewPawnsAmounts() {
-        if (ignorePawnWarning()) {
-            Game.AMOUNT_OF_PAWNS = (int) getUserValue(ValueType.PAWN);
-            Game.TURN_PAWN_AMOUNT = (int) getUserValue(ValueType.TURN);
-            Game.restartGame();
-        }
-    }
+    private void pawnConfigBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pawnConfigBActionPerformed
+        PawnChange.init();
+    }//GEN-LAST:event_pawnConfigBActionPerformed
 
     public static boolean ignorePawnWarning() {
         int code = JOptionPane.showConfirmDialog(null, "Warning! If you continue, you break all previous progress!\nCurrent progress will be saved.", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -368,12 +301,6 @@ public final class VarChange extends javax.swing.JFrame {
         double newValue;
         String subject;
         switch (valueType) {
-            case PAWN:
-                subject = "pawn ";
-                break;
-            case TURN:
-                subject = "turn ";
-                break;
             case CYCLE:
                 subject = "cycle ";
                 break;
@@ -403,19 +330,6 @@ public final class VarChange extends javax.swing.JFrame {
                     throw new NumberFormatException();
                 }
                 switch (valueType) {
-                    case PAWN:
-                        if (newValue > 0 && newValue % 4 == 0) {
-                            return newValue;
-                        } else {
-                            throw new NumberFormatException();
-                        }
-                    case TURN:
-                        if (newValue > 0 && newValue <= Game.AMOUNT_OF_PAWNS
-                                && Game.AMOUNT_OF_PAWNS % newValue == 0) {
-                            return newValue;
-                        } else {
-                            throw new NumberFormatException();
-                        }
                     case CYCLE:
                         if (newValue >= 1000 && newValue % 1000 == 0) {
                             return newValue;
@@ -466,16 +380,13 @@ public final class VarChange extends javax.swing.JFrame {
     }
 
     public void update() {
-        updateLabels(Game.AMOUNT_OF_PAWNS, Game.TURN_PAWN_AMOUNT,
-                Game.CYCLE_AMOUNT, Game.FOOD_AMOUNT,
+        updateLabels(Game.CYCLE_AMOUNT, Game.FOOD_AMOUNT,
                 Game.KILLER_AMOUNT, Game.MASS_MOVE_TAX,
                 Evolution.MUTATION_RATE);
     }
 
-    protected void updateLabels(double pawn, double turn, double cycle,
+    protected void updateLabels(double cycle,
             double food, double killers, double mass, double mutate) {
-        pawnAL.setText("Pawn amount: " + pawn);
-        turnAL.setText("Turn amount: " + turn);
         cycleAL.setText("Cycle amount: " + (cycle / 1000) + "k");
         foodAL.setText("Food amount: " + food);
         killerAL.setText("Kilr amount: " + killers);
@@ -500,11 +411,6 @@ public final class VarChange extends javax.swing.JFrame {
     private javax.swing.JButton mutateAC;
     private javax.swing.JLabel mutateAL;
     private javax.swing.JPanel mutateP;
-    private javax.swing.JButton pawnAC;
-    private javax.swing.JLabel pawnAL;
-    private javax.swing.JPanel pawnP;
-    private javax.swing.JButton turnAC;
-    private javax.swing.JLabel turnAL;
-    private javax.swing.JPanel turnP;
+    private javax.swing.JButton pawnConfigB;
     // End of variables declaration//GEN-END:variables
 }

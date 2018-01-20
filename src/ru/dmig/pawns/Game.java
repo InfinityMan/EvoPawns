@@ -76,6 +76,7 @@ public class Game {
 
     /**
      * Setting of nn anatomy of pawns.
+     * Use only for 4 layers
      */
     public static int[] LAYERS_OF_NET = {8, 6, 2, 1};
 
