@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Dmig
+ * Copyright (C) 2017-2018 Dmig
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ public class Game {
      */
     public static final int AMOUNT_OF_ROUNDS = 10000;
 
-    public static int FOOD_AMOUNT = 747;
+    public static int FOOD_AMOUNT = 777;
 
     //!!! Only 1 after point sign is work right !!!
     public static final float MIN_MASS_OF_FOOD = 4.9f;
@@ -119,7 +119,7 @@ public class Game {
     public static final int PAWN_SCAN_RANGE = 200;
 
     //When you need to eat your mass?
-    public static double MASS_MOVE_TAX = 10 + 4;
+    public static double MASS_MOVE_TAX = 9.7 + 4;
 
     public static double FITNESS_RECORD = 0;
     public static int GENERATION_RECORD = 0;
