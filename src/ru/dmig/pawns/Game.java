@@ -76,7 +76,7 @@ public class Game {
     /**
      * Setting of nn anatomy of pawns.
      */
-    public static final int[] LAYERS_OF_NET = {8, 6, 2, 1};
+    public static int[] LAYERS_OF_NET = {8, 6, 2, 1};
 
     /**
      * Length of field to simulate.
