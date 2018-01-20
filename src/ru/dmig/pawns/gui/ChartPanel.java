@@ -36,13 +36,14 @@ public final class ChartPanel extends JFrame {
     public static ArrayList<Double> aFittests = new ArrayList<>();
     public static ArrayList<Double> aAverages = new ArrayList<>();
 
+    public static ArrayList<Double> bFittests = new ArrayList<>();
+
     public static ChartPanel cp;
 
     private static final int MIN_LENGTH = 1920;
     private static final int MIN_HEIGHT = 1000;
 
     private static boolean INITED = false;
-
 
     public static double[] arrayListToArray(ArrayList<Double> doubles) {
         double[] ret = new double[doubles.size()];
@@ -57,15 +58,17 @@ public final class ChartPanel extends JFrame {
             new ChartPanel().setVisible(true);
         });
     }
-    
+
     public static void clear() {
         fittests = new ArrayList<>();
         averages = new ArrayList<>();
         aFittests = new ArrayList<>();
         aAverages = new ArrayList<>();
+        bFittests = new ArrayList<>();
         INITED = true;
     }
     public XYChart chart;
+
     public ChartPanel() {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -87,6 +90,7 @@ public final class ChartPanel extends JFrame {
         cp = this;
 
     }
+
     public void update() {
         ArrayList<Integer> gen = new ArrayList<>();
         for (int i = 1; i < fittests.size() + 1; i++) {
@@ -96,16 +100,27 @@ public final class ChartPanel extends JFrame {
 
             double[] lastFits = new double[20];
             double[] lastAvgs = new double[20];
+
             for (int i = 0; i < 20; i++) {
                 lastFits[i] = fittests.get(fittests.size() - 1 - i);
                 lastAvgs[i] = averages.get(averages.size() - 1 - i);
             }
+
             aFittests.add(Arrayer.mediumValueOfArray(lastFits));
             aAverages.add(Arrayer.mediumValueOfArray(lastAvgs));
 
         } else {
-            aFittests.add(0d);
-            aAverages.add(0d);
+            aFittests.add(mediumValueOfArray(fittests));
+            aAverages.add(mediumValueOfArray(averages));
+        }
+        if (fittests.size() > 100) {
+            double[] alastFits = new double[100];
+            for (int i = 0; i < 100; i++) {
+                alastFits[i] = fittests.get(fittests.size() - 1 - i);
+            }
+            bFittests.add(Arrayer.mediumValueOfArray(alastFits));
+        } else {
+            bFittests.add(mediumValueOfArray(fittests));
         }
 
         ArrayList<Integer> nil = new ArrayList<>();
@@ -118,21 +133,33 @@ public final class ChartPanel extends JFrame {
             chart.updateXYSeries("Averages", gen, averages, nil);
             chart.updateXYSeries("FittestA", gen, aFittests, nil);
             chart.updateXYSeries("AveragesA", gen, aAverages, nil);
+            chart.updateXYSeries("FittestAl", gen, bFittests, nil);
         } else {
             chart.addSeries("Fittest", gen, fittests);
             chart.addSeries("Averages", gen, averages);
             chart.addSeries("FittestA", gen, aFittests);
             chart.addSeries("AveragesA", gen, aAverages);
+            chart.addSeries("FittestAl", gen, bFittests);
             INITED = true;
         }
 
         pack();
         repaint();
     }
+
     public void update(double fit, double avg) {
         fittests.add(fit);
         averages.add(avg);
         update();
     }
 
+    public static double mediumValueOfArray(ArrayList<Double> list) {
+        double result = 0;
+
+        for (int i = 0; i < list.size(); i++) {
+            result = result + list.get(i);
+        }
+
+        return result / list.size();
+    }
 }
