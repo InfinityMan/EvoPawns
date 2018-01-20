@@ -76,7 +76,7 @@ public class Game {
     /**
      * Setting of nn anatomy of pawns.
      */
-    public static final int[] LAYERS_OF_NET = {8, 6, 2, 1};
+    public static int[] LAYERS_OF_NET = {8, 6, 2, 1};
 
     /**
      * Length of field to simulate.
@@ -271,29 +271,49 @@ public class Game {
             genoms[i] = Evolution.getGenomFromNet(pawns[i].network);
         }
 
-        String genomsStr = "";
+        String save = "";
+
+        for (int i = 0; i < LAYERS_OF_NET.length; i++) {
+            if (i != 0) {
+                save += "^";
+            }
+            save += LAYERS_OF_NET[i];
+        }
+
+        save += ";;\n";
+
         for (int i = 0; i < genoms.length; i++) {
             if (i != 0) {
-                genomsStr += "\n";
+                save += "\n";
             }
             for (int j = 0; j < genoms[i].length; j++) {
                 if (j != 0) {
-                    genomsStr += ";" + genoms[i][j];
+                    save += ";" + genoms[i][j];
                 } else {
-                    genomsStr += genoms[i][j];
+                    save += genoms[i][j];
                 }
             }
         }
 
-        FileWorker.write(fileName, genomsStr);
+        FileWorker.write(fileName, save);
     }
 
     public static Pawn[] loadGenoms(String fileName) throws FileNotFoundException, ParsingException {
         testDirectory("gens");
         String[] genoms = FileWorker.read(fileName).split("\n");
         double[][] gens = new double[genoms.length][];
+
+        String[] l = genoms[0].split("^");
+
+        int[] layers = castStringToInt(l);
+        if (testLayers(layers)) {
+            LAYERS_OF_NET = layers;
+        } else {
+            throw new ParsingException("Invalid save file layers");
+        }
+
         int len = 0;
-        for (int i = 0; i < genoms.length; i++) {
+        for (int i = 1; i < genoms.length; i++) {
             String[] gensStr = genoms[i].split(";");
             if (i == 0) {
                 len = gensStr.length;
@@ -403,6 +423,23 @@ public class Game {
                 CYCLE_AMOUNT += 1000;
             }
         }
+    }
+
+    public static boolean testLayers(int[] layers) {
+        for (int i = 0; i < layers.length; i++) {
+            if (!(layers[i] > 0 && layers[i] <= 100)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static int[] castStringToInt(String[] in) {
+        int[] ret = new int[in.length];
+        for (int i = 0; i < in.length; i++) {
+            ret[i] = Integer.valueOf(in[i]);
+        }
+        return ret;
     }
 
 }
