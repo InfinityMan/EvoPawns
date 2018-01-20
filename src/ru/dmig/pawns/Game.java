@@ -30,6 +30,7 @@ import ru.dmig.pawns.gui.Frame;
 import ru.dmig.pawns.gui.Panel;
 import ru.dmig.pawns.net.Network;
 import ru.epiclib.base.Arrayer;
+import ru.epiclib.base.Base;
 import ru.epiclib.base.FileWorker;
 import ru.epiclib.gui.Util;
 
@@ -275,7 +276,7 @@ public class Game {
 
         for (int i = 0; i < LAYERS_OF_NET.length; i++) {
             if (i != 0) {
-                save += "^";
+                save += "~";
             }
             save += LAYERS_OF_NET[i];
         }
@@ -288,22 +289,24 @@ public class Game {
             }
             for (int j = 0; j < genoms[i].length; j++) {
                 if (j != 0) {
-                    save += ";" + genoms[i][j];
-                } else {
-                    save += genoms[i][j];
+                    save += ";";
                 }
+                save += Base.maximumFractionDigits(6, genoms[i][j]);
             }
         }
 
+        save = save.replaceAll(",", ".");
         FileWorker.write(fileName, save);
     }
 
     public static Pawn[] loadGenoms(String fileName) throws FileNotFoundException, ParsingException {
         testDirectory("gens");
         String[] genoms = FileWorker.read(fileName).split("\n");
-        double[][] gens = new double[genoms.length][];
+        double[][] gens = new double[genoms.length-1][];
 
-        String[] l = genoms[0].split("^");
+        genoms[0] = genoms[0].replaceAll(";", "");
+        System.err.println(genoms[0]);
+        String[] l = genoms[0].split("~");
 
         int[] layers = castStringToInt(l);
         if (testLayers(layers)) {
@@ -313,8 +316,8 @@ public class Game {
         }
 
         int len = 0;
-        for (int i = 1; i < genoms.length; i++) {
-            String[] gensStr = genoms[i].split(";");
+        for (int i = 0; i < genoms.length-1; i++) {
+            String[] gensStr = genoms[i+1].split(";");
             if (i == 0) {
                 len = gensStr.length;
             }
@@ -335,7 +338,7 @@ public class Game {
         if (Network.getSize(LAYERS_OF_NET) != len) {
             throw new ParsingException("Invalid model of neural network");
         }
-        Pawn[] pawns = new Pawn[genoms.length];
+        Pawn[] pawns = new Pawn[genoms.length-1];
         for (int i = 0; i < pawns.length; i++) {
             pawns[i] = Generator.generatePawn();
             pawns[i].network = new Network(gens[i], LAYERS_OF_NET);
